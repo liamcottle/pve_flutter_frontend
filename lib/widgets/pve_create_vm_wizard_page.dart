@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pve_flutter_frontend/bloc/pve_guest_id_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_node_selector_bloc.dart';
+import 'package:pve_flutter_frontend/events/pve_guest_id_selector_events.dart';
 import 'package:pve_flutter_frontend/events/pve_node_selector_events.dart';
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
+import 'package:pve_flutter_frontend/widgets/pve_guest_id_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_node_selector_widget.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
     as proxclient;
@@ -60,6 +63,11 @@ class _General extends StatelessWidget {
                 dispose: (context, value) => value.dispose(),
                 child: PveNodeSelector(),
               ),
+              Provider<PveGuestIdSelectorBloc>(
+                builder: (context) => PveGuestIdSelectorBloc(apiClient: apiClient)
+                ..events.add(LoadNextFreeId()),
+                dispose: (context, value) => value.dispose(),
+                child: PveGuestIdSelector(),
               ),
               TextFormField(
                 decoration: InputDecoration(
