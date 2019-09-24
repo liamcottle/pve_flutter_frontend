@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
 import 'package:pve_flutter_frontend/widgets/pve_main_navigation_drawer.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
+    as proxclient;
 
 class MainLayoutWide extends StatelessWidget {
   @override
@@ -21,14 +25,10 @@ class MainLayoutWide extends StatelessWidget {
             ),
             LogButton()
           ],
-
         ),
-        body: Container()
-        );
+        body: Container());
   }
 }
-
-
 
 class LogButton extends StatelessWidget {
   const LogButton({
@@ -46,7 +46,9 @@ class LogButton extends StatelessWidget {
             builder: (context) => Container(
                 height: MediaQuery.of(context).size.height * 0.25,
                 width: MediaQuery.of(context).size.width,
-                child: PVETaskLog()));
+                child: PVETaskLog(
+                    bloc: PveTaskLogBloc(
+                        apiClient: Provider.of<proxclient.Client>(context)))));
       },
     );
   }

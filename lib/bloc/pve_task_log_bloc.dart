@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/events/pve_task_log_events.dart';
 import 'package:pve_flutter_frontend/models/pve_cluster_tasks_model.dart';
 import 'package:pve_flutter_frontend/models/serializers.dart';
@@ -22,7 +23,7 @@ class PveTaskLogBloc {
   StreamSink<PVETaskLogEvent> get events => _eventSubject.sink;
   Stream<PVETaskLogState> get state => _stateSubject.stream;
 
-  PveTaskLogBloc({this.apiClient}) {
+  PveTaskLogBloc({@required this.apiClient}) {
     _stateSubject = BehaviorSubject<PVETaskLogState>.seeded(initialState);
 
     _eventSubject
@@ -36,7 +37,7 @@ class PveTaskLogBloc {
     if (event is LoadRecentTasks) {
 
       var response = await apiClient
-          .get(Uri.parse("http://localhost/api2/json/cluster/tasks"));
+          .get(Uri.parse(proxclient.getPlatformAwareOrigin() + '/api2/json/cluster/tasks'));
       var data = (json.decode(response.body)['data'] as List).map((f) {
         f["starttime"] = f["starttime"] * 1000 * 1000;
         if (f["endtime"] != null) {

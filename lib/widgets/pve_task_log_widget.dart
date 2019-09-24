@@ -1,29 +1,30 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
 import 'package:pve_flutter_frontend/events/pve_task_log_events.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_states.dart';
 
 class PVETaskLog extends StatefulWidget {
+  final PveTaskLogBloc bloc;
+
+  const PVETaskLog({Key key, this.bloc}) : super(key: key);
+
   @override
   _PVETaskLogState createState() => _PVETaskLogState();
 }
 
 class _PVETaskLogState extends State<PVETaskLog> {
-  PveTaskLogBloc bloc;
+  PveTaskLogBloc get _taskBloc => widget.bloc;
 
   @override
   void initState() {
     super.initState();
 
-    bloc = PveTaskLogBloc();
-    bloc.events.add(LoadRecentTasks());
+    _taskBloc.events.add(LoadRecentTasks());
   }
 
   @override
   void dispose() {
-    bloc.dispose();
+    _taskBloc.dispose();
     super.dispose();
   }
 
@@ -44,18 +45,18 @@ class _PVETaskLogState extends State<PVETaskLog> {
                   // the same behavior is triggerd by the browser back button
                   Navigator.pop(context);
                 },
-
               ),
             ),
             Row(
               children: <Widget>[],
             ),
             Expanded(
-                        child: StreamBuilder<PVETaskLogState>(
-                stream: bloc?.state,
+              child: StreamBuilder<PVETaskLogState>(
+                stream: _taskBloc?.state,
                 builder: (BuildContext context,
                     AsyncSnapshot<PVETaskLogState> snapshot) {
-                  if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+                  if (snapshot.hasError)
+                    return Text('Error: ${snapshot.error}');
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                       return Center(child: CircularProgressIndicator());
@@ -63,7 +64,8 @@ class _PVETaskLogState extends State<PVETaskLog> {
                       return Center(child: CircularProgressIndicator());
                     case ConnectionState.active:
                       if (snapshot.data is LoadedRecentTasks) {
-                        final tasks = (snapshot.data as LoadedRecentTasks).tasks;
+                        final tasks =
+                            (snapshot.data as LoadedRecentTasks).tasks;
                         return Column(
                           children: <Widget>[
                             Row(
@@ -97,18 +99,20 @@ class _PVETaskLogState extends State<PVETaskLog> {
                                         children: <Widget>[
                                           Container(
                                             width: 150,
-                                            child: tasks[index].startTime != null
-                                                ? Text(
-                                                    tasks[index]
-                                                        .startTime
-                                                        .toIso8601String(),
-                                                  )
-                                                : Text(""),
+                                            child:
+                                                tasks[index].startTime != null
+                                                    ? Text(
+                                                        tasks[index]
+                                                            .startTime
+                                                            .toIso8601String(),
+                                                      )
+                                                    : Text(""),
                                           ),
                                           Container(
                                             width: 150,
                                             child: Center(
-                                              child: tasks[index].endTime != null
+                                              child: tasks[index].endTime !=
+                                                      null
                                                   ? Text(tasks[index]
                                                       .endTime
                                                       ?.toIso8601String())
