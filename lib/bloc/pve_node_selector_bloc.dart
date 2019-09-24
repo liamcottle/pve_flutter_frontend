@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/events/pve_node_selector_events.dart';
 import 'package:pve_flutter_frontend/models/pve_nodes_model.dart';
 import 'package:pve_flutter_frontend/models/serializers.dart';
@@ -22,7 +23,7 @@ class PveNodeSelectorBloc {
   StreamSink<PveNodeSelectorEvent> get events => _eventSubject.sink;
   Stream<PveNodeSelectorState> get state => _stateSubject.stream;
 
-  PveNodeSelectorBloc({this.apiClient}) {
+  PveNodeSelectorBloc({@required this.apiClient}) {
     _stateSubject = BehaviorSubject<PveNodeSelectorState>.seeded(initialState);
 
     _eventSubject
@@ -37,7 +38,7 @@ class PveNodeSelectorBloc {
     if (event is LoadNodesEvent) {
 
       var response = await apiClient
-          .get(Uri.parse("https://192.168.24.1:8006/api2/json/nodes"));
+          .get(Uri.parse(proxclient.getPlatformAwareOrigin() + '/api2/json/nodes'));
       var data = (json.decode(response.body)['data'] as List).map((f) {
         return serializers.deserializeWith(PveNodesModel.serializer, f);
       }).toList();
@@ -47,7 +48,7 @@ class PveNodeSelectorBloc {
     if (event is NodeSelectedEvent) {
 
       var response = await apiClient
-          .get(Uri.parse("https://192.168.24.1:8006/api2/json/nodes"));
+          .get(Uri.parse(proxclient.getPlatformAwareOrigin() + '/api2/json/nodes'));
       var data = (json.decode(response.body)['data'] as List).map((f) {
         return serializers.deserializeWith(PveNodesModel.serializer, f);
       }).toList();

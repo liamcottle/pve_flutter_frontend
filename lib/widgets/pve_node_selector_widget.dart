@@ -1,35 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_node_selector_bloc.dart';
 import 'package:pve_flutter_frontend/events/pve_node_selector_events.dart';
 import 'package:pve_flutter_frontend/models/pve_nodes_model.dart';
 import 'package:pve_flutter_frontend/states/pve_node_selector_states.dart';
 
-class PveNodeSelector extends StatefulWidget {
-  @override
-  _PveNodeSelectorState createState() => _PveNodeSelectorState();
-}
 
-class _PveNodeSelectorState extends State<PveNodeSelector> {
-  PveNodeSelectorBloc bloc;
-
-  @override
-  void initState() {
-    super.initState();
-
-    bloc = PveNodeSelectorBloc();
-    bloc.events.add(LoadNodesEvent());
-  }
-
-  @override
-  void dispose() {
-    bloc.dispose();
-    super.dispose();
-  }
+class PveNodeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _pveNodeSelectorBloc = Provider.of<PveNodeSelectorBloc>(context);
     return StreamBuilder<PveNodeSelectorState>(
-      stream: bloc.state,
+      stream: _pveNodeSelectorBloc.state,
       initialData: InitalState(),
       builder:
           (BuildContext context, AsyncSnapshot<PveNodeSelectorState> snapshot) {
@@ -55,7 +38,7 @@ class _PveNodeSelectorState extends State<PveNodeSelector> {
                     value: node,
                   )
               ],
-              onChanged: (PveNodesModel selectedNode) => bloc.events.add(NodeSelectedEvent(selectedNode)),
+              onChanged: (PveNodesModel selectedNode) => _pveNodeSelectorBloc.events.add(NodeSelectedEvent(selectedNode)),
               value: null,
               );
         }
@@ -81,7 +64,7 @@ class _PveNodeSelectorState extends State<PveNodeSelector> {
                     value: node,
                   )
               ],
-              onChanged: (PveNodesModel selectedNode) => bloc.events.add(NodeSelectedEvent(selectedNode)),
+              onChanged: (PveNodesModel selectedNode) => _pveNodeSelectorBloc.events.add(NodeSelectedEvent(selectedNode)),
               value: state.selectedNode,
               );
         }
