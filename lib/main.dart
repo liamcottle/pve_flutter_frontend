@@ -8,8 +8,8 @@ import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
 import 'package:pve_flutter_frontend/states/pve_authentication_states.dart';
 import 'package:pve_flutter_frontend/widgets/pve_create_vm_wizard_page.dart';
 
-import 'events/pve_authentication_events.dart';
-import 'utils/proxmox_layout_builder.dart';
+import 'package:pve_flutter_frontend/events/pve_authentication_events.dart';
+import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 
 void main() {
   final authBloc = PveAuthenticationBloc();
