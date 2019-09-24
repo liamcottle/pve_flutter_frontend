@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:pve_flutter_frontend/events/pve_authentication_events.dart';
 import 'package:pve_flutter_frontend/states/pve_authentication_states.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
+    as proxclient;
 
 class PveAuthenticationBloc {
   final PublishSubject<PveAuthenticationEvent> _eventSubject =
@@ -28,12 +30,17 @@ class PveAuthenticationBloc {
   Stream<PveAuthenticationState> _eventToState(
       PveAuthenticationEvent event) async* {
     if (event is AppStarted) {
-      yield Unauthenticated();
-      //yield Authenticated();
-
+      try {
+        var credentials = proxclient.Credentials.fromPlatformStorage();
+        var apiClient = proxclient.Client(credentials);
+        apiClient.refreshCredentials();
+        yield Authenticated(apiClient);
+      } catch (_) {
+        yield Unauthenticated();
+      }
     }
     if (event is LoggedIn) {
-      yield Authenticated();
+      yield Authenticated(event.apiClient);
     }
     if (event is LoggedOut) {
       yield Unauthenticated();

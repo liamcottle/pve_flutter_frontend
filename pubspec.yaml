@@ -27,6 +27,8 @@ dependencies:
   built_collection: ^4.2.2
   built_value: ^6.7.1
   path: ^1.6.4
+  provider: ^3.1.0
+  meta: ^1.1.7
   proxmox_dart_api_client:
     git: gitolite3@proxdev.maurer-it.com:staff/t.marx/proxmox_dart_api_client
 

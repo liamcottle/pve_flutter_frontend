@@ -28,7 +28,7 @@ class _PveLoginPageState extends State<PveLoginPage> {
     super.initState();
     _loginBloc.state.where((state) => state.isSuccess).forEach(
         (loginSucceded) => _authenticationBloc.events.add(
-            LoggedIn()));
+            LoggedIn(loginSucceded.apiClient)));
   }
 
   @override

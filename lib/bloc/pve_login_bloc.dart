@@ -73,7 +73,7 @@ class PveLoginBloc {
     yield PveLoginState.loading();
     try {
       final client = await proxclient.authenticate(username, password);
-      yield PveLoginState.success();
+      yield PveLoginState.success(apiClient: client);
     } catch (e, trace) {
       print("ERROR Login:$e");
       print(trace);

@@ -1,3 +1,6 @@
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
+    as proxclient;
+
 abstract class PveAuthenticationState{
 }
 
@@ -7,6 +10,9 @@ class Uninitialized extends PveAuthenticationState {
 }
 
 class Authenticated extends PveAuthenticationState {
+  final proxclient.Client apiClient;
+
+  Authenticated(this.apiClient);
 
   @override
   String toString() => 'Authenticated';
