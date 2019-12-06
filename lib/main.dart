@@ -14,9 +14,17 @@ import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
 import 'package:pve_flutter_frontend/events/pve_authentication_events.dart';
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 
-void main() {
+void main() async {
   final authBloc = PveAuthenticationBloc();
-  authBloc.events.add(AppStarted());
+  try {
+    var credentials = proxclient.Credentials.fromPlatformStorage();
+    var apiClient = proxclient.Client(credentials);
+    apiClient.refreshCredentials();
+    authBloc.events.add(LoggedIn(apiClient));
+  } catch (_) {
+    authBloc.events.add(LoggedOut());
+  }
+
   runApp(MyApp(
     authbloc: authBloc,
   ));
