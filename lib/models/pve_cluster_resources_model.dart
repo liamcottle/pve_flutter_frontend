@@ -9,7 +9,6 @@ abstract class PveClusterResourcesModel
   static Serializer<PveClusterResourcesModel> get serializer =>
       _$pveClusterResourcesModelSerializer;
 
-  @BuiltValueField(wireName: 'cpu')
   @nullable
   double get cpu;
   @nullable
@@ -49,4 +48,21 @@ abstract class PveClusterResourcesModel
           [void Function(PveClusterResourcesModelBuilder) updates]) =
       _$PveClusterResourcesModel;
   PveClusterResourcesModel._();
+
+  String get displayName {
+    switch (type) {
+      case "node":
+        return node;
+      case "qemu":
+        return "$vmid $name";
+      case "lxc":
+        return "$vmid $name";
+      case "storage":
+        return storage;
+      case "pool":
+        return pool;
+      default:
+        return id;
+    }
+  }
 }
