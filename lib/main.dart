@@ -13,6 +13,7 @@ import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
 
 import 'package:pve_flutter_frontend/events/pve_authentication_events.dart';
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
+import 'package:pve_flutter_frontend/widgets/pve_console_widget.dart';
 
 import 'bloc/proxmox_global_error_bloc.dart';
 
@@ -67,14 +68,27 @@ class MyApp extends StatelessWidget {
           switch (context.name) {
             case PveCreateVmWizard.routeName:
               return MaterialPageRoute(
+                fullscreenDialog: true,
+                settings: context,
                 builder: (_) {
                   return Provider<proxclient.Client>.value(
-                      value: state.apiClient,
-                      child: PveCreateVmWizard());
+                      value: state.apiClient, child: PveCreateVmWizard());
+                },
+              );
+            case PveConsoleWidget.routeName:
+              return MaterialPageRoute(
+                fullscreenDialog: true,
+                settings: context,
+                builder: (_) {
+                  return Provider<proxclient.Client>.value(
+                      value: state.apiClient, child: PveConsoleWidget(
+                        nodeid: 'localhost',
+                      ));
                 },
               );
             default:
               return MaterialPageRoute(
+                settings: context,
                 builder: (context) {
                   return NotFoundPage();
                 },
