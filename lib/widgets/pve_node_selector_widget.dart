@@ -1,72 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_node_selector_bloc.dart';
-import 'package:pve_flutter_frontend/events/pve_node_selector_events.dart';
 import 'package:pve_flutter_frontend/models/pve_nodes_model.dart';
-import 'package:pve_flutter_frontend/states/pve_node_selector_states.dart';
-
 
 class PveNodeSelector extends StatelessWidget {
+  final String labelText;
+
+  const PveNodeSelector({Key key, this.labelText}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final _pveNodeSelectorBloc = Provider.of<PveNodeSelectorBloc>(context);
     return StreamBuilder<PveNodeSelectorState>(
       stream: _pveNodeSelectorBloc.state,
-      initialData: InitalState(),
+      initialData: _pveNodeSelectorBloc.state.value,
       builder:
           (BuildContext context, AsyncSnapshot<PveNodeSelectorState> snapshot) {
-        final state = snapshot.data;
-        if (state is LoadedNodesState) {
-          final nodes = state.nodes;
-          return DropdownButtonFormField(
-              decoration: InputDecoration(
-                errorText: 'todo',
-              ),
-              items: <DropdownMenuItem<PveNodesModel>>[
-                for (var node in nodes)
-                  DropdownMenuItem(
-                    child: Row(
-                      children: <Widget>[
-                        Text(node.nodeName),
-                        VerticalDivider(),
-                        Text(node.renderMemoryUsagePercent()),
-                        VerticalDivider(),
-                        Text(node.renderCpuUsage())
-                      ],
-                    ),
-                    value: node,
-                  )
-              ],
-              onChanged: (PveNodesModel selectedNode) => _pveNodeSelectorBloc.events.add(NodeSelectedEvent(selectedNode)),
-              value: null,
-              );
-        }
+        if (snapshot.hasData && snapshot.data.nodes != null) {
+          final state = snapshot.data;
 
-        if (state is LoadedNodesWithSelectionState) {
-          final nodes = state.nodes;
           return DropdownButtonFormField(
-              decoration: InputDecoration(
-                errorText: 'todo',
-              ),
-              items: <DropdownMenuItem<PveNodesModel>>[
-                for (var node in nodes)
-                  DropdownMenuItem(
-                    child: Row(
-                      children: <Widget>[
-                        Text(node.nodeName),
-                        VerticalDivider(),
-                        Text(node.renderMemoryUsagePercent()),
-                        VerticalDivider(),
-                        Text(node.renderCpuUsage())
-                      ],
-                    ),
-                    value: node,
-                  )
-              ],
-              onChanged: (PveNodesModel selectedNode) => _pveNodeSelectorBloc.events.add(NodeSelectedEvent(selectedNode)),
-              value: state.selectedNode,
-              );
+            decoration: InputDecoration(
+              labelText: labelText,
+              helperText: ' ',
+            ),
+            items: state.nodes
+                .map((item) => DropdownMenuItem(
+                      child: Row(
+                        children: <Widget>[
+                          Text(item.nodeName),
+                          VerticalDivider(),
+                          Text(item.renderMemoryUsagePercent()),
+                          VerticalDivider(),
+                          Text(item.renderCpuUsage())
+                        ],
+                      ),
+                      value: item,
+                    ))
+                .toList(),
+            selectedItemBuilder: (context) =>
+                state.nodes.map((item) => Text(item.nodeName)).toList(),
+            onChanged: (PveNodesModel selectedNode) => _pveNodeSelectorBloc
+                .events
+                .add(NodeSelectedEvent(selectedNode)),
+            value: state.value,
+            autovalidate: true,
+            validator: (_) {
+              return state?.errorText;
+            },
+          );
         }
 
         return Container();
