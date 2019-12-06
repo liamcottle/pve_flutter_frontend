@@ -29,6 +29,7 @@ dependencies:
   path: ^1.6.4
   provider: ^3.1.0
   meta: ^1.1.7
+  font_awesome_flutter: ^8.5.0
   proxmox_dart_api_client:
     git: gitolite3@proxdev.maurer-it.com:staff/t.marx/proxmox_dart_api_client
 
