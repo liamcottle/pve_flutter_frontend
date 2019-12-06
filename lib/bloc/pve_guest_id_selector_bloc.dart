@@ -1,61 +1,59 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
+import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
 
 import 'package:meta/meta.dart';
-import 'package:pve_flutter_frontend/events/pve_guest_id_selector_events.dart';
-import 'package:pve_flutter_frontend/states/pve_guest_id_selector_states.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
     as proxclient;
 
-class PveGuestIdSelectorBloc {
+class PveGuestIdSelectorBloc
+    extends ProxmoxBaseBloc<PveGuestIdSelectorEvent, GuestIdSelectorState> {
   final proxclient.Client apiClient;
-  final PublishSubject<PveGuestIdSelectorEvent> _eventSubject =
-      PublishSubject<PveGuestIdSelectorEvent>();
-  BehaviorSubject<PveGuestIdSelectorState> _stateSubject;
 
-  StreamSink<PveGuestIdSelectorEvent> get events => _eventSubject.sink;
-  Stream<PveGuestIdSelectorState> get state => _stateSubject.stream;
+  @override
+  GuestIdSelectorState get initialState => GuestIdSelectorState();
 
-  PveGuestIdSelectorBloc({@required this.apiClient}) {
-    _stateSubject = BehaviorSubject<PveGuestIdSelectorState>();
-    _eventSubject
-        .debounceTime(Duration(milliseconds: 250))
-        .switchMap((event) => _eventToState(event))
-        .forEach((PveGuestIdSelectorState state) {
-      _stateSubject.add(state);
-    });
+  PveGuestIdSelectorBloc({@required this.apiClient});
+
+  @override
+  Stream<GuestIdSelectorState> eventPipe(
+    PublishSubject<PveGuestIdSelectorEvent> events,
+    Stream<GuestIdSelectorState> pipeInto(PveGuestIdSelectorEvent event),
+  ) {
+    return events.debounceTime(Duration(milliseconds: 150)).switchMap(pipeInto);
   }
 
-  Stream<PveGuestIdSelectorState> _eventToState(
+  @override
+  Stream<GuestIdSelectorState> processEvents(
       PveGuestIdSelectorEvent event) async* {
-    print(event);
-
-    if (event is LoadNextFreeId) {
-      final id = await getNextFreeID();
-      yield PveGuestIdSelectorState(id: id);
+    if (event is PrefetchId) {
+      try {
+        final id = await getNextFreeID();
+        yield GuestIdSelectorState(value: id);
+      } on proxclient.ProxmoxApiException catch (e) {
+        yield GuestIdSelectorState(value: null, errorText: "Could not load ID");
+      }
     }
-
-    if (event is ValidateInput) {
+    if (event is OnChanged) {
       if (event.id == "") {
-        yield PveGuestIdSelectorState(id: event.id, error: "Input required");
+        yield GuestIdSelectorState(
+            value: event.id, errorText: "Input required");
         return;
       }
 
       try {
         final id = await getNextFreeID(id: event.id);
-        yield PveGuestIdSelectorState(id: id);
+        yield GuestIdSelectorState(value: id);
       } on proxclient.ProxmoxApiException catch (e) {
         if (e.details != null && e.details['vmid'] != null) {
-          yield PveGuestIdSelectorState(id: event.id, error: e.details['vmid']);
+          yield GuestIdSelectorState(
+              value: event.id, errorText: e.details['vmid']);
         }
       }
     }
-  }
-
-  void dispose() {
-    _eventSubject.close();
-    _stateSubject.close();
   }
 
   Future<String> getNextFreeID({String id}) async {
@@ -71,4 +69,19 @@ class PveGuestIdSelectorBloc {
     var jsonBody = json.decode(response.body);
     return jsonBody['data'];
   }
+}
+
+abstract class PveGuestIdSelectorEvent {}
+
+class PrefetchId extends PveGuestIdSelectorEvent {}
+
+class OnChanged extends PveGuestIdSelectorEvent {
+  final String id;
+
+  OnChanged(this.id);
+}
+
+class GuestIdSelectorState extends PveFormFieldState<String> {
+  GuestIdSelectorState({String value, String errorText})
+      : super(value: value, errorText: errorText);
 }
