@@ -14,6 +14,8 @@ import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
 import 'package:pve_flutter_frontend/events/pve_authentication_events.dart';
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 
+import 'bloc/proxmox_global_error_bloc.dart';
+
 void main() async {
   final authBloc = PveAuthenticationBloc();
   try {
@@ -24,6 +26,8 @@ void main() async {
   } catch (_) {
     authBloc.events.add(LoggedOut());
   }
+
+  ProxmoxGlobalErrorBloc();
 
   runApp(MyApp(
     authbloc: authBloc,
