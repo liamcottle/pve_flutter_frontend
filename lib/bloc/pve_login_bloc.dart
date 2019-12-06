@@ -37,6 +37,7 @@ class PveLoginBloc {
         })
         .switchMap((event) => _eventToState(event))
         .forEach((PveLoginState state) {
+          if (_stateSubject.isClosed) return;
           _stateSubject.add(state);
         });
   }
