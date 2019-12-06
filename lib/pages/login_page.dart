@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
-import 'package:pve_flutter_frontend/events/pve_authentication_events.dart';
 import 'package:pve_flutter_frontend/widgets/pve_login_form.dart';
 
 class PveLoginPage extends StatefulWidget {
