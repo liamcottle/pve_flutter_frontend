@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
+import 'package:pve_flutter_frontend/utils/renderers.dart';
+import 'package:pve_flutter_frontend/widgets/cluster_status_widget.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_tree_widget.dart';
 
 class PveMainNavigationDrawer extends StatelessWidget {
@@ -10,6 +14,7 @@ class PveMainNavigationDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: DefaultTabController(
+        initialIndex: 1,
         length: 2,
         child: Column(
           children: <Widget>[
@@ -32,7 +37,39 @@ class PveMainNavigationDrawer extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: <Widget>[
-                  ProxmoxTreeWidget(),
+                  StreamBuilder<PveResourceState>(
+                    stream: Provider.of<PveResourceBloc>(context).state,
+                    initialData:
+                        Provider.of<PveResourceBloc>(context).state.value,
+                    builder: (context, snapshot) => ProxmoxTreeWidget(
+                      data: snapshot.data.resources
+                          .where((resource) =>
+                              resource.type == "node" ||
+                              resource.type == "pool")
+                          .map((resource) => ProxmoxTreeItem(
+                              id: resource.id,
+                              headerValue: resource.displayName,
+                              icon: Renderers.getDefaultResourceIcon(
+                                  resource.type,
+                                  resource.shared,
+                                  resource.status),
+                              children: snapshot.data.resources
+                                  .where((child) =>
+                                      child.node != null &&
+                                      resource.id.contains(child.node) &&
+                                      child.type != resource.type)
+                                  .map((child) {
+                                return ProxmoxTreeItem(
+                                    id: child.id,
+                                    headerValue: child.displayName,
+                                    icon: Renderers.getDefaultResourceIcon(
+                                        child.type,
+                                        child.shared,
+                                        child.status));
+                              }).toList()))
+                          .toList(),
+                    ),
+                  ),
                   ListView(
                     children: <Widget>[
                       DrawerHeader(
@@ -59,6 +96,11 @@ class PveMainNavigationDrawer extends StatelessWidget {
                             ],
                           ),
                         ),
+                      ),
+                      ClusterStatus(
+                        isHealthy: true,
+                        healthyColor: Colors.greenAccent,
+                        warningColor: Colors.orangeAccent,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

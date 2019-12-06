@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/pages/404_page.dart';
 import 'package:pve_flutter_frontend/pages/login_page.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
-import 'package:pve_flutter_frontend/states/pve_authentication_states.dart';
 import 'package:pve_flutter_frontend/widgets/pve_create_vm_wizard_page.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
     as proxclient;
 
-import 'package:pve_flutter_frontend/events/pve_authentication_events.dart';
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 import 'package:pve_flutter_frontend/widgets/pve_console_widget.dart';
 
@@ -121,7 +120,6 @@ class _RootPageState extends State<RootPage> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final state = snapshot.data;
-            print(state);
 
             if (state is Unauthenticated) {
               return PveLoginPage(
@@ -130,8 +128,18 @@ class _RootPageState extends State<RootPage> {
               );
             }
             if (state is Authenticated) {
-              return Provider<proxclient.Client>.value(
-                value: state.apiClient,
+              return MultiProvider(
+                providers: [
+                  Provider<proxclient.Client>.value(
+                    value: state.apiClient,
+                  ),
+                  Provider<PveResourceBloc>(
+                    builder: (context) =>
+                        PveResourceBloc(apiClient: state.apiClient)
+                        ..events.add(PollResources()),
+                    dispose: (context, bloc) => bloc.dispose(),
+                  )
+                ],
                 child: ProxmoxLayoutBuilder(
                   builder: (context, layout) => layout != ProxmoxLayout.slim
                       ? MainLayoutWide()
