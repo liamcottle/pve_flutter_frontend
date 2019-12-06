@@ -39,7 +39,7 @@ class _$PveClusterResourcesModelSerializer
       result
         ..add('disk')
         ..add(serializers.serialize(object.disk,
-            specifiedType: const FullType(String)));
+            specifiedType: const FullType(int)));
     }
     if (object.hastate != null) {
       result
@@ -77,6 +77,12 @@ class _$PveClusterResourcesModelSerializer
         ..add(serializers.serialize(object.mem,
             specifiedType: const FullType(int)));
     }
+    if (object.name != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(object.name,
+            specifiedType: const FullType(String)));
+    }
     if (object.node != null) {
       result
         ..add('node')
@@ -95,6 +101,12 @@ class _$PveClusterResourcesModelSerializer
         ..add(serializers.serialize(object.status,
             specifiedType: const FullType(String)));
     }
+    if (object.shared != null) {
+      result
+        ..add('shared')
+        ..add(serializers.serialize(object.shared,
+            specifiedType: const FullType(bool)));
+    }
     if (object.storage != null) {
       result
         ..add('storage')
@@ -105,6 +117,12 @@ class _$PveClusterResourcesModelSerializer
       result
         ..add('uptime')
         ..add(serializers.serialize(object.uptime,
+            specifiedType: const FullType(int)));
+    }
+    if (object.vmid != null) {
+      result
+        ..add('vmid')
+        ..add(serializers.serialize(object.vmid,
             specifiedType: const FullType(int)));
     }
     return result;
@@ -128,7 +146,7 @@ class _$PveClusterResourcesModelSerializer
           break;
         case 'disk':
           result.disk = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(int)) as int;
           break;
         case 'hastate':
           result.hastate = serializers.deserialize(value,
@@ -158,6 +176,10 @@ class _$PveClusterResourcesModelSerializer
           result.mem = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
           break;
+        case 'name':
+          result.name = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
         case 'node':
           result.node = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
@@ -169,6 +191,10 @@ class _$PveClusterResourcesModelSerializer
         case 'status':
           result.status = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
+          break;
+        case 'shared':
+          result.shared = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool;
           break;
         case 'storage':
           result.storage = serializers.deserialize(value,
@@ -182,6 +208,10 @@ class _$PveClusterResourcesModelSerializer
           result.uptime = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
           break;
+        case 'vmid':
+          result.vmid = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int;
+          break;
       }
     }
 
@@ -193,7 +223,7 @@ class _$PveClusterResourcesModel extends PveClusterResourcesModel {
   @override
   final double cpu;
   @override
-  final String disk;
+  final int disk;
   @override
   final String hastate;
   @override
@@ -209,17 +239,23 @@ class _$PveClusterResourcesModel extends PveClusterResourcesModel {
   @override
   final int mem;
   @override
+  final String name;
+  @override
   final String node;
   @override
   final String pool;
   @override
   final String status;
   @override
+  final bool shared;
+  @override
   final String storage;
   @override
   final String type;
   @override
   final int uptime;
+  @override
+  final int vmid;
 
   factory _$PveClusterResourcesModel(
           [void Function(PveClusterResourcesModelBuilder) updates]) =>
@@ -235,12 +271,15 @@ class _$PveClusterResourcesModel extends PveClusterResourcesModel {
       this.maxdisk,
       this.maxmem,
       this.mem,
+      this.name,
       this.node,
       this.pool,
       this.status,
+      this.shared,
       this.storage,
       this.type,
-      this.uptime})
+      this.uptime,
+      this.vmid})
       : super._() {
     if (id == null) {
       throw new BuiltValueNullFieldError('PveClusterResourcesModel', 'id');
@@ -272,12 +311,15 @@ class _$PveClusterResourcesModel extends PveClusterResourcesModel {
         maxdisk == other.maxdisk &&
         maxmem == other.maxmem &&
         mem == other.mem &&
+        name == other.name &&
         node == other.node &&
         pool == other.pool &&
         status == other.status &&
+        shared == other.shared &&
         storage == other.storage &&
         type == other.type &&
-        uptime == other.uptime;
+        uptime == other.uptime &&
+        vmid == other.vmid;
   }
 
   @override
@@ -296,22 +338,32 @@ class _$PveClusterResourcesModel extends PveClusterResourcesModel {
                                                 $jc(
                                                     $jc(
                                                         $jc(
-                                                            $jc(0,
-                                                                cpu.hashCode),
-                                                            disk.hashCode),
-                                                        hastate.hashCode),
-                                                    id.hashCode),
-                                                level.hashCode),
-                                            maxcpu.hashCode),
-                                        maxdisk.hashCode),
-                                    maxmem.hashCode),
-                                mem.hashCode),
-                            node.hashCode),
-                        pool.hashCode),
-                    status.hashCode),
-                storage.hashCode),
-            type.hashCode),
-        uptime.hashCode));
+                                                            $jc(
+                                                                $jc(
+                                                                    $jc(
+                                                                        $jc(
+                                                                            0,
+                                                                            cpu
+                                                                                .hashCode),
+                                                                        disk
+                                                                            .hashCode),
+                                                                    hastate
+                                                                        .hashCode),
+                                                                id.hashCode),
+                                                            level.hashCode),
+                                                        maxcpu.hashCode),
+                                                    maxdisk.hashCode),
+                                                maxmem.hashCode),
+                                            mem.hashCode),
+                                        name.hashCode),
+                                    node.hashCode),
+                                pool.hashCode),
+                            status.hashCode),
+                        shared.hashCode),
+                    storage.hashCode),
+                type.hashCode),
+            uptime.hashCode),
+        vmid.hashCode));
   }
 
   @override
@@ -326,12 +378,15 @@ class _$PveClusterResourcesModel extends PveClusterResourcesModel {
           ..add('maxdisk', maxdisk)
           ..add('maxmem', maxmem)
           ..add('mem', mem)
+          ..add('name', name)
           ..add('node', node)
           ..add('pool', pool)
           ..add('status', status)
+          ..add('shared', shared)
           ..add('storage', storage)
           ..add('type', type)
-          ..add('uptime', uptime))
+          ..add('uptime', uptime)
+          ..add('vmid', vmid))
         .toString();
   }
 }
@@ -345,9 +400,9 @@ class PveClusterResourcesModelBuilder
   double get cpu => _$this._cpu;
   set cpu(double cpu) => _$this._cpu = cpu;
 
-  String _disk;
-  String get disk => _$this._disk;
-  set disk(String disk) => _$this._disk = disk;
+  int _disk;
+  int get disk => _$this._disk;
+  set disk(int disk) => _$this._disk = disk;
 
   String _hastate;
   String get hastate => _$this._hastate;
@@ -377,6 +432,10 @@ class PveClusterResourcesModelBuilder
   int get mem => _$this._mem;
   set mem(int mem) => _$this._mem = mem;
 
+  String _name;
+  String get name => _$this._name;
+  set name(String name) => _$this._name = name;
+
   String _node;
   String get node => _$this._node;
   set node(String node) => _$this._node = node;
@@ -389,6 +448,10 @@ class PveClusterResourcesModelBuilder
   String get status => _$this._status;
   set status(String status) => _$this._status = status;
 
+  bool _shared;
+  bool get shared => _$this._shared;
+  set shared(bool shared) => _$this._shared = shared;
+
   String _storage;
   String get storage => _$this._storage;
   set storage(String storage) => _$this._storage = storage;
@@ -400,6 +463,10 @@ class PveClusterResourcesModelBuilder
   int _uptime;
   int get uptime => _$this._uptime;
   set uptime(int uptime) => _$this._uptime = uptime;
+
+  int _vmid;
+  int get vmid => _$this._vmid;
+  set vmid(int vmid) => _$this._vmid = vmid;
 
   PveClusterResourcesModelBuilder();
 
@@ -414,12 +481,15 @@ class PveClusterResourcesModelBuilder
       _maxdisk = _$v.maxdisk;
       _maxmem = _$v.maxmem;
       _mem = _$v.mem;
+      _name = _$v.name;
       _node = _$v.node;
       _pool = _$v.pool;
       _status = _$v.status;
+      _shared = _$v.shared;
       _storage = _$v.storage;
       _type = _$v.type;
       _uptime = _$v.uptime;
+      _vmid = _$v.vmid;
       _$v = null;
     }
     return this;
@@ -451,12 +521,15 @@ class PveClusterResourcesModelBuilder
             maxdisk: maxdisk,
             maxmem: maxmem,
             mem: mem,
+            name: name,
             node: node,
             pool: pool,
             status: status,
+            shared: shared,
             storage: storage,
             type: type,
-            uptime: uptime);
+            uptime: uptime,
+            vmid: vmid);
     replace(_$result);
     return _$result;
   }
