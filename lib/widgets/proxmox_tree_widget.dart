@@ -51,7 +51,7 @@ class _ProxmoxTreeWidgetState extends State<ProxmoxTreeWidget> {
           semanticsValue: NumberFormat.percentPattern().format(root.progressValue),
         ) : null,
         leading: root.icon,
-        onTap: () => root.callback(root.id),),
+        onTap: root.callback != null ? () => root.callback(root.id) : null),
       );
     return Padding(
       padding: const EdgeInsets.only(left: 8),
@@ -60,7 +60,7 @@ class _ProxmoxTreeWidgetState extends State<ProxmoxTreeWidget> {
         title: Text(root.headerValue),
         leading: root.icon,
         children: root.children.map<Widget>(_buildTiles).toList(),
-        onExpansionChanged: (isExpaned) => root.callback(root.id),
+        onExpansionChanged: root.callback != null ? (isExpaned) => root.callback(root.id) : null,
       ),
     );
   }
