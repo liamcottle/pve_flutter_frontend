@@ -4,24 +4,48 @@ Frontend for Proxmox Virtual Environment
 
 ## Web build infos
 
-In most dev environments you'll want to add the ssl cert of your testing cluster
-to your browsers trusted ones. If you don't do this, you'll need to visit the the
-clusters current web interface first to acknowledge the not trusted cert warning.
-For chrome this can be done via:
-$ certutil -d sql:$HOME/.pki/nssdb -A -t "P,," -n "FILENAME" -i "PATHTOYOURCERTFILE"
+Launch App in Chrome:
+$ flutter run -d chrome --web-port 42000
+You'll need some sort of reverse proxy to workaround CORS in order to serve the
+flutter frontend from your local dev machine, which will enable some convenient
+features, like hot reload, automatic builds on changes...
 
-While this is not served directly from the proxmox host, you'll need to start
-your browser with disabled web security option. This is only needed because of the
-CORS rules enforced by your browser. Another option would be to allow this server
-side.
+nginx snippets:
 
-Cookie workaround, login manually or serve via proxy or directly.
+location / {
 
-For chrome this can be done via:
-$ google-chrome --disable-web-security --user-data-dir='/tmp/debugflutterweb'
+	if ( $query_string ~ "console" ) {
+		proxy_pass https://<clusterip>:8006;
+	}
+	proxy_pass http://127.0.0.1:42000;
+	proxy_read_timeout 24h;
+	proxy_http_version 1.1;
+	proxy_set_header Connection "";
+	proxy_buffering off;
 
+}
 
-Update dependencies:
+location /xterm {
+	proxy_set_header Host $host;
+	proxy_set_header Cookie $http_cookie;
+	proxy_pass https://<clusterip>:8006;
+}
 
-To upgrade the api client for example you'll need to execute:
+location /api2 {
+	proxy_set_header Upgrade $http_upgrade;
+	proxy_set_header Connection "Upgrade";
+	proxy_set_header Host $host;
+	proxy_set_header Cookie $http_cookie;
+	proxy_pass https://<clusterip>:8006;
+}
+
+To upgrade the proxmox_api_client dependency execute:
 $ flutter packages upgrade
+
+To build the model classes use:
+$ flutter packages pub run build_runner build
+
+If you want to login without typing your password for your
+Test-Cluster, add this to the main function:
+
+var apiClient = await proxclient.authenticate("root@pam", "yourpassword");
