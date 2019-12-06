@@ -1,43 +1,21 @@
 import 'dart:async';
 
-import 'package:pve_flutter_frontend/events/pve_authentication_events.dart';
-import 'package:pve_flutter_frontend/states/pve_authentication_states.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
     as proxclient;
 
-class PveAuthenticationBloc {
-  final PublishSubject<PveAuthenticationEvent> _eventSubject =
-      PublishSubject<PveAuthenticationEvent>();
+class PveAuthenticationBloc extends ProxmoxBaseBloc<PveAuthenticationEvent,PveAuthenticationState>{
 
-  BehaviorSubject<PveAuthenticationState> _stateSubject;
-
+  @override
   PveAuthenticationState get initialState => Unauthenticated();
-  StreamSink<PveAuthenticationEvent> get events => _eventSubject.sink;
-  ValueObservable<PveAuthenticationState> get state => _stateSubject.stream;
 
-  PveAuthenticationBloc() {
-    _stateSubject =
-        BehaviorSubject<PveAuthenticationState>.seeded(initialState);
+  PveAuthenticationBloc();
 
-    _eventSubject
-        .switchMap((event) => _eventToState(event))
-        .forEach((PveAuthenticationState state) {
-      _stateSubject.add(state);
-    });
-  }
-
-  Stream<PveAuthenticationState> _eventToState(
+  @override
+  Stream<PveAuthenticationState> processEvents(
       PveAuthenticationEvent event) async* {
     if (event is AppStarted) {
-      try {
-        var credentials = proxclient.Credentials.fromPlatformStorage();
-        var apiClient = proxclient.Client(credentials);
-        apiClient.refreshCredentials();
-        yield Authenticated(apiClient);
-      } catch (_) {
-        yield Unauthenticated();
-      }
+      yield Uninitialized();
     }
     if (event is LoggedIn) {
       yield Authenticated(event.apiClient);
@@ -47,8 +25,49 @@ class PveAuthenticationBloc {
     }
   }
 
-  void dispose() {
-    _eventSubject.close();
-    _stateSubject.close();
-  }
+
+}
+
+abstract class PveAuthenticationEvent {
+}
+
+class AppStarted extends PveAuthenticationEvent {
+  @override
+  String toString() => 'AppStarted';
+}
+
+class LoggedIn extends PveAuthenticationEvent {
+  final proxclient.Client apiClient;
+
+  LoggedIn(this.apiClient);
+
+  @override
+  String toString() => 'LoggedIn';
+}
+
+class LoggedOut extends PveAuthenticationEvent {
+  @override
+  String toString() => 'LoggedOut';
+}
+
+abstract class PveAuthenticationState{
+}
+
+class Uninitialized extends PveAuthenticationState {
+  @override
+  String toString() => 'Uninitialized';
+}
+
+class Authenticated extends PveAuthenticationState {
+  final proxclient.Client apiClient;
+
+  Authenticated(this.apiClient);
+
+  @override
+  String toString() => 'Authenticated';
+}
+
+class Unauthenticated extends PveAuthenticationState {
+  @override
+  String toString() => 'Unauthenticated';
 }
