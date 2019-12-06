@@ -44,6 +44,7 @@ abstract class PveNodesModel
   PveNodesModel._();
 
   String renderMemoryUsagePercent() {
+    if(memoryUsage == null ) return '';
     if (memoryUsage == -1) {
       return '';
     }
