@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
-import 'package:pve_flutter_frontend/events/pve_task_log_events.dart';
-import 'package:pve_flutter_frontend/states/pve_task_log_states.dart';
 
 class PVETaskLog extends StatefulWidget {
   final PveTaskLogBloc bloc;
@@ -14,13 +12,6 @@ class PVETaskLog extends StatefulWidget {
 
 class _PVETaskLogState extends State<PVETaskLog> {
   PveTaskLogBloc get _taskBloc => widget.bloc;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _taskBloc.events.add(LoadRecentTasks());
-  }
 
   @override
   void dispose() {
@@ -47,109 +38,92 @@ class _PVETaskLogState extends State<PVETaskLog> {
                 },
               ),
             ),
-            Row(
-              children: <Widget>[],
-            ),
             Expanded(
               child: StreamBuilder<PVETaskLogState>(
-                stream: _taskBloc?.state,
-                builder: (BuildContext context,
-                    AsyncSnapshot<PVETaskLogState> snapshot) {
-                  if (snapshot.hasError)
-                    return Text('Error: ${snapshot.error}');
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                      return Center(child: CircularProgressIndicator());
-                    case ConnectionState.waiting:
-                      return Center(child: CircularProgressIndicator());
-                    case ConnectionState.active:
-                      if (snapshot.data is LoadedRecentTasks) {
-                        final tasks =
-                            (snapshot.data as LoadedRecentTasks).tasks;
-                        return Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Container(
-                                  width: 150,
-                                  child: Text("Start time"),
-                                ),
-                                Container(
-                                  width: 150,
-                                  child: Text("End time"),
-                                ),
-                                Expanded(
-                                  child: Text("Node"),
-                                ),
-                                Container(
-                                  width: 150,
-                                  child: Text("User"),
-                                ),
-                                Container(
-                                  width: 150,
-                                  child: Text("Status"),
-                                ),
-                              ],
-                            ),
-                            Divider(),
-                            Expanded(
-                              child: ListView.builder(
-                                  itemCount: tasks.length,
-                                  itemBuilder: (context, index) => Row(
-                                        children: <Widget>[
-                                          Container(
-                                            width: 150,
-                                            child:
-                                                tasks[index].startTime != null
-                                                    ? Text(
-                                                        tasks[index]
-                                                            .startTime
-                                                            .toIso8601String(),
-                                                      )
-                                                    : Text(""),
+                  stream: _taskBloc?.state,
+                  initialData: _taskBloc.state.value,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<PVETaskLogState> snapshot) {
+                    if (snapshot.data is LoadedRecentTasks) {
+                      final tasks = (snapshot.data as LoadedRecentTasks).tasks;
+                      return Column(
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                width: 150,
+                                child: Text("Start time"),
+                              ),
+                              Container(
+                                width: 150,
+                                child: Text("End time"),
+                              ),
+                              Expanded(
+                                child: Text("Node"),
+                              ),
+                              Container(
+                                width: 150,
+                                child: Text("User"),
+                              ),
+                              Container(
+                                width: 150,
+                                child: Text("Status"),
+                              ),
+                            ],
+                          ),
+                          Divider(),
+                          Expanded(
+                            child: ListView.builder(
+                                itemCount: tasks.length,
+                                itemBuilder: (context, index) => Row(
+                                      children: <Widget>[
+                                        Container(
+                                          width: 150,
+                                          child: tasks[index].startTime != null
+                                              ? Text(
+                                                  tasks[index]
+                                                      .startTime
+                                                      .toIso8601String(),
+                                                )
+                                              : Text(""),
+                                        ),
+                                        Container(
+                                          width: 150,
+                                          child: Center(
+                                            child: tasks[index].endTime != null
+                                                ? Text(tasks[index]
+                                                    .endTime
+                                                    ?.toIso8601String())
+                                                : CircularProgressIndicator(),
                                           ),
-                                          Container(
-                                            width: 150,
-                                            child: Center(
-                                              child: tasks[index].endTime !=
-                                                      null
-                                                  ? Text(tasks[index]
-                                                      .endTime
-                                                      ?.toIso8601String())
-                                                  : CircularProgressIndicator(),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Text(tasks[index].node),
-                                          ),
-                                          Container(
-                                            width: 150,
-                                            child: Text(tasks[index].user),
-                                          ),
-                                          Container(
-                                            width: 150,
-                                            child: PveTaskLogStatusWidget(
-                                                status: tasks[index].status),
-                                          ),
-                                        ],
-                                      )),
-                            )
-                          ],
-                        );
-                      }
+                                        ),
+                                        Expanded(
+                                          child: Text(tasks[index].node),
+                                        ),
+                                        Container(
+                                          width: 150,
+                                          child: Text(tasks[index].user),
+                                        ),
+                                        Container(
+                                          width: 150,
+                                          child: PveTaskLogStatusWidget(
+                                              status: tasks[index].status),
+                                        ),
+                                      ],
+                                    )),
+                          )
+                        ],
+                      );
+                    }
 
-                      if (snapshot.data is NoTaskLogsAvailable) {
-                        return Center(
-                          child: Text("No task logs available"),
-                        );
-                      }
-                      return Text('\$${snapshot.data}');
-                    case ConnectionState.done:
-                      return Text('Connection (closed)');
-                  }
-                  return null; // unreachable
-                },
-              ),
+                    if (snapshot.data is NoTaskLogsAvailable) {
+                      return Center(
+                        child: Text("No task logs available"),
+                      );
+                    }
+
+                    return Center(child: CircularProgressIndicator());
+                  }),
             ),
           ],
         ),
