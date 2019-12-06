@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
 import 'package:pve_flutter_frontend/events/pve_login_events.dart';
 import 'package:pve_flutter_frontend/states/pve_login_states.dart';
@@ -30,7 +29,6 @@ class _PveLoginFormState extends State<PveLoginForm> {
     super.initState();
     _passwordController.addListener(_onPasswordChanged);
     _usernameController.addListener(_onUsernameChanged);
-
   }
 
   @override
@@ -56,7 +54,6 @@ class _PveLoginFormState extends State<PveLoginForm> {
                       labelText: 'Hostname/IP',
                       labelStyle: TextStyle(color: Color(0xFFFFFFFF))),
                   controller: _hostnameController,
-
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
@@ -116,7 +113,6 @@ class _PveLoginFormState extends State<PveLoginForm> {
   }
 
   void _onPasswordChanged() {
-
     _loginBloc.events.add(
       PasswordChanged(password: _passwordController.text),
     );
