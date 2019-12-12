@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/pages/404_page.dart';
@@ -137,6 +138,12 @@ class _RootPageState extends State<RootPage> {
                     builder: (context) =>
                         PveResourceBloc(apiClient: state.apiClient)
                         ..events.add(PollResources()),
+                    dispose: (context, bloc) => bloc.dispose(),
+                  ),
+                  Provider<PveClusterStatusBloc>(
+                    builder: (context) =>
+                        PveClusterStatusBloc(apiClient: state.apiClient)
+                        ..events.add(UpdateClusterStatus()),
                     dispose: (context, bloc) => bloc.dispose(),
                   )
                 ],
