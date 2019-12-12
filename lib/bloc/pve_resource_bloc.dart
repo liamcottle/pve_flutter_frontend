@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -16,6 +17,20 @@ class PveResourceBloc
 
   @override
   get initialState => PveResourceState(resources: []);
+
+  Timer updateTimer;
+
+  @override
+  void doOnListen() {
+    updateTimer = Timer.periodic(Duration(seconds: 5), (timer) => events.add(PollResources()));
+  }
+
+  @override
+  void doOnCancel() {
+    if (!hasListener) {
+      updateTimer?.cancel();
+    }
+  }
 
   @override
   Stream<PveResourceState> processEvents(event) async* {
@@ -45,7 +60,7 @@ class PveResourceBloc
     });
 
     var resources = data.toList();
-    resources.sort((a, b) => a.type.compareTo(b.type));
+    resources.sort((a, b) => a.id.compareTo(b.id));
 
     return resources;
   }
