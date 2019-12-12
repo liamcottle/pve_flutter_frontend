@@ -13,11 +13,18 @@ abstract class ProxmoxBaseBloc<E, S> {
 
   ValueObservable<S> get state => _stateSubject.stream;
 
+  bool get hasListener => _stateSubject.hasListener;
+
   S get latestState => _stateSubject.stream.value;
 
   S get initialState;
+
+  void doOnListen() {}
+  void doOnCancel() {}
+
   ProxmoxBaseBloc() {
-    _stateSubject = BehaviorSubject<S>.seeded(initialState);
+    _stateSubject = BehaviorSubject<S>.seeded(initialState,
+        onCancel: doOnCancel, onListen: doOnListen);
     _initEventPipe();
   }
 
