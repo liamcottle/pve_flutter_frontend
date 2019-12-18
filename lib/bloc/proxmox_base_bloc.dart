@@ -11,7 +11,7 @@ abstract class ProxmoxBaseBloc<E, S> {
 
   StreamSink<E> get events => _eventSubject.sink;
 
-  ValueObservable<S> get state => _stateSubject.stream;
+  ValueStream<S> get state => _stateSubject.stream;
 
   bool get hasListener => _stateSubject.hasListener;
 
