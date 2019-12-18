@@ -64,8 +64,8 @@ class PveGuestIdSelectorBloc
         "vmid": id,
       }));
     }
-    final response = await apiClient.get(url);
-    apiClient.validateResponse(response, true);
+    final response =  (await apiClient.get(url)).validate(true);
+
     var jsonBody = json.decode(response.body);
     return jsonBody['data'];
   }
