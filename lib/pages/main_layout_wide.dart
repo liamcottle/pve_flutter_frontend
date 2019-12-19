@@ -10,6 +10,8 @@ import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
     as proxclient;
 
+import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
+
 class MainLayoutWide extends StatefulWidget {
   @override
   _MainLayoutWideState createState() => _MainLayoutWideState();
@@ -52,10 +54,15 @@ class _MainLayoutWideState extends State<MainLayoutWide> {
               onPressed: () {},
             ),
             Provider<PveTaskLogBloc>(
-                builder: (context) => PveTaskLogBloc(apiClient: client)
+                create: (context) => PveTaskLogBloc(apiClient: client)
                   ..events.add(LoadRecentTasks()),
                 dispose: (context, value) => value.dispose(),
-                child: LogButton())
+                child: LogButton()),
+            IconButton(
+              icon: Icon(Icons.input),
+              tooltip: "Logout",
+              onPressed: () => Provider.of<PveAuthenticationBloc>(context).events.add(LoggedOut()),
+            )
           ],
         ),
         body: Card(child: PveResourceOverview()));
