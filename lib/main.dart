@@ -15,7 +15,7 @@ import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 import 'package:pve_flutter_frontend/widgets/pve_console_widget.dart';
 
-import 'bloc/proxmox_global_error_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
 
 void main() async {
   final authBloc = PveAuthenticationBloc();
@@ -42,82 +42,75 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Proxmox',
-      theme: ThemeData(
-          brightness: Brightness.light,
-          fontFamily: "Open Sans",
-          primarySwatch: Colors.blue,
-          primaryTextTheme: TextTheme(
-            title:
-                TextStyle(fontFamily: "Open Sans", fontWeight: FontWeight.w700),
-          )),
-      onGenerateRoute: (context) {
-        if (authbloc.state.value is Unauthenticated) {
-          return MaterialPageRoute(
-            builder: (context) {
-              return PveLoginPage(
-                loginBloc: PveLoginBloc(),
-                authenticationBloc: authbloc,
-              );
-            },
-          );
-        }
-        if (authbloc.state.value is Authenticated) {
-          final state = authbloc.state.value as Authenticated;
-          switch (context.name) {
-            case PveCreateVmWizard.routeName:
-              return MaterialPageRoute(
-                fullscreenDialog: true,
-                settings: context,
-                builder: (_) {
-                  return Provider<proxclient.Client>.value(
-                      value: state.apiClient, child: PveCreateVmWizard());
-                },
-              );
-            case PveConsoleWidget.routeName:
-              return MaterialPageRoute(
-                fullscreenDialog: true,
-                settings: context,
-                builder: (_) {
-                  return Provider<proxclient.Client>.value(
-                      value: state.apiClient, child: PveConsoleWidget(
-                        nodeid: 'localhost',
-                      ));
-                },
-              );
-            default:
-              return MaterialPageRoute(
-                settings: context,
-                builder: (context) {
-                  return NotFoundPage();
-                },
-              );
+    return Provider.value(
+      value: authbloc,
+      child: MaterialApp(
+        title: 'Proxmox',
+        theme: ThemeData(
+            brightness: Brightness.light,
+            fontFamily: "Open Sans",
+            primarySwatch: Colors.blue,
+            primaryTextTheme: TextTheme(
+              title: TextStyle(
+                  fontFamily: "Open Sans", fontWeight: FontWeight.w700),
+            )),
+        onGenerateRoute: (context) {
+          if (authbloc.state.value is Unauthenticated) {
+            return MaterialPageRoute(
+              builder: (context) {
+                return PveLoginPage(
+                  loginBloc: PveLoginBloc(),
+                  authenticationBloc: authbloc,
+                );
+              },
+            );
           }
-        }
-      },
-      home: RootPage(
-        authbloc: authbloc,
+          if (authbloc.state.value is Authenticated) {
+            final state = authbloc.state.value as Authenticated;
+            switch (context.name) {
+              case PveCreateVmWizard.routeName:
+                return MaterialPageRoute(
+                  fullscreenDialog: true,
+                  settings: context,
+                  builder: (_) {
+                    return Provider<proxclient.Client>.value(
+                        value: state.apiClient, child: PveCreateVmWizard());
+                  },
+                );
+              case PveConsoleWidget.routeName:
+                return MaterialPageRoute(
+                  fullscreenDialog: true,
+                  settings: context,
+                  builder: (_) {
+                    return Provider<proxclient.Client>.value(
+                        value: state.apiClient,
+                        child: PveConsoleWidget(
+                          nodeid: 'localhost',
+                        ));
+                  },
+                );
+              default:
+                return MaterialPageRoute(
+                  settings: context,
+                  builder: (context) {
+                    return NotFoundPage();
+                  },
+                );
+            }
+          }
+        },
+        home: RootPage(),
       ),
     );
   }
 }
 
-class RootPage extends StatefulWidget {
-  RootPage({Key key, this.authbloc}) : super(key: key);
-
-  final PveAuthenticationBloc authbloc;
-
-  @override
-  _RootPageState createState() => _RootPageState();
-}
-
-class _RootPageState extends State<RootPage> {
-  PveAuthenticationBloc get _authbloc => widget.authbloc;
+class RootPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Object>(
-        stream: _authbloc.state,
+    final authBloc = Provider.of<PveAuthenticationBloc>(context);
+    return StreamBuilder<PveAuthenticationState>(
+        stream: authBloc.state,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final state = snapshot.data;
@@ -125,7 +118,7 @@ class _RootPageState extends State<RootPage> {
             if (state is Unauthenticated) {
               return PveLoginPage(
                 loginBloc: PveLoginBloc(),
-                authenticationBloc: _authbloc,
+                authenticationBloc: authBloc,
               );
             }
             if (state is Authenticated) {
@@ -137,13 +130,13 @@ class _RootPageState extends State<RootPage> {
                   Provider<PveResourceBloc>(
                     builder: (context) =>
                         PveResourceBloc(apiClient: state.apiClient)
-                        ..events.add(PollResources()),
+                          ..events.add(PollResources()),
                     dispose: (context, bloc) => bloc.dispose(),
                   ),
                   Provider<PveClusterStatusBloc>(
                     builder: (context) =>
                         PveClusterStatusBloc(apiClient: state.apiClient)
-                        ..events.add(UpdateClusterStatus()),
+                          ..events.add(UpdateClusterStatus()),
                     dispose: (context, bloc) => bloc.dispose(),
                   )
                 ],
