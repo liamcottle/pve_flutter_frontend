@@ -16,7 +16,7 @@ class _$PveLoginState extends PveLoginState {
   @override
   final bool isSuccess;
   @override
-  final bool isFailure;
+  final String errorMessage;
   @override
   final proxclient.Client apiClient;
 
@@ -28,7 +28,7 @@ class _$PveLoginState extends PveLoginState {
       this.isPasswordValid,
       this.isSubmitting,
       this.isSuccess,
-      this.isFailure,
+      this.errorMessage,
       this.apiClient})
       : super._() {
     if (isUsernameValid == null) {
@@ -43,8 +43,8 @@ class _$PveLoginState extends PveLoginState {
     if (isSuccess == null) {
       throw new BuiltValueNullFieldError('PveLoginState', 'isSuccess');
     }
-    if (isFailure == null) {
-      throw new BuiltValueNullFieldError('PveLoginState', 'isFailure');
+    if (errorMessage == null) {
+      throw new BuiltValueNullFieldError('PveLoginState', 'errorMessage');
     }
   }
 
@@ -63,7 +63,7 @@ class _$PveLoginState extends PveLoginState {
         isPasswordValid == other.isPasswordValid &&
         isSubmitting == other.isSubmitting &&
         isSuccess == other.isSuccess &&
-        isFailure == other.isFailure &&
+        errorMessage == other.errorMessage &&
         apiClient == other.apiClient;
   }
 
@@ -77,7 +77,7 @@ class _$PveLoginState extends PveLoginState {
                         isPasswordValid.hashCode),
                     isSubmitting.hashCode),
                 isSuccess.hashCode),
-            isFailure.hashCode),
+            errorMessage.hashCode),
         apiClient.hashCode));
   }
 
@@ -88,7 +88,7 @@ class _$PveLoginState extends PveLoginState {
           ..add('isPasswordValid', isPasswordValid)
           ..add('isSubmitting', isSubmitting)
           ..add('isSuccess', isSuccess)
-          ..add('isFailure', isFailure)
+          ..add('errorMessage', errorMessage)
           ..add('apiClient', apiClient))
         .toString();
   }
@@ -116,9 +116,9 @@ class PveLoginStateBuilder
   bool get isSuccess => _$this._isSuccess;
   set isSuccess(bool isSuccess) => _$this._isSuccess = isSuccess;
 
-  bool _isFailure;
-  bool get isFailure => _$this._isFailure;
-  set isFailure(bool isFailure) => _$this._isFailure = isFailure;
+  String _errorMessage;
+  String get errorMessage => _$this._errorMessage;
+  set errorMessage(String errorMessage) => _$this._errorMessage = errorMessage;
 
   proxclient.Client _apiClient;
   proxclient.Client get apiClient => _$this._apiClient;
@@ -132,7 +132,7 @@ class PveLoginStateBuilder
       _isPasswordValid = _$v.isPasswordValid;
       _isSubmitting = _$v.isSubmitting;
       _isSuccess = _$v.isSuccess;
-      _isFailure = _$v.isFailure;
+      _errorMessage = _$v.errorMessage;
       _apiClient = _$v.apiClient;
       _$v = null;
     }
@@ -160,7 +160,7 @@ class PveLoginStateBuilder
             isPasswordValid: isPasswordValid,
             isSubmitting: isSubmitting,
             isSuccess: isSuccess,
-            isFailure: isFailure,
+            errorMessage: errorMessage,
             apiClient: apiClient);
     replace(_$result);
     return _$result;

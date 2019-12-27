@@ -28,13 +28,18 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
   }
 
   Stream<PveLoginState> _mapUsernameChangedToState(String username) async* {
-    //TODO implement username validator?
+//TODO implement username validator?
     yield latestState.rebuild((b) => b
+    ..isUsernameValid = true
+    ..errorMessage = ""
+);
   }
 
   Stream<PveLoginState> _mapPasswordChangedToState(String password) async* {
-    //TODO implement password validator?
+//TODO implement password validator?
     yield latestState.rebuild((b) => b
+      ..isPasswordValid = true
+      ..errorMessage = ""
     );
   }
 
@@ -46,6 +51,10 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
     try {
       final client = await proxclient.authenticate(username, password);
       yield PveLoginState.success(apiClient: client);
+    } on proxclient.ProxmoxApiException catch (e) {
+      yield PveLoginState.failure(e.message);
+    } catch (e) {
+      yield PveLoginState.failure("An error occured");
     }
   }
 }

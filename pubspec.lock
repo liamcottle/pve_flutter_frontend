@@ -380,7 +380,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "5ccfb124e1d2c27af1087c0323da5d583cb26779"
+      resolved-ref: bd7f08d30b2284045e4002bf460fb61d9767a3be
       url: "gitolite3@proxdev.maurer-it.com:staff/t.marx/proxmox_dart_api_client"
     source: git
     version: "0.0.0"

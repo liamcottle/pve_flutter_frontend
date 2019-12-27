@@ -10,7 +10,8 @@ abstract class PveLoginState
   bool get isPasswordValid;
   bool get isSubmitting;
   bool get isSuccess;
-  bool get isFailure;
+  String get errorMessage;
+  bool get isFailure => errorMessage != null && errorMessage.isNotEmpty;
   @nullable
   proxclient.Client get apiClient;
 
@@ -27,7 +28,7 @@ abstract class PveLoginState
       ..isPasswordValid = true
       ..isSubmitting = false
       ..isSuccess = false
-      ..isFailure = false);
+      ..errorMessage = "");
   }
 
   factory PveLoginState.loading() {
@@ -36,16 +37,16 @@ abstract class PveLoginState
       ..isPasswordValid = true
       ..isSubmitting = true
       ..isSuccess = false
-      ..isFailure = false);
+      ..errorMessage = "");
   }
 
-  factory PveLoginState.failure() {
+  factory PveLoginState.failure(String errorMessage) {
     return PveLoginState((b) => b
       ..isUsernameValid = true
       ..isPasswordValid = true
       ..isSubmitting = false
       ..isSuccess = false
-      ..isFailure = true);
+      ..errorMessage = errorMessage);
   }
 
   factory PveLoginState.success({apiClient: proxclient.Client}) {
@@ -54,7 +55,7 @@ abstract class PveLoginState
       ..isPasswordValid = true
       ..isSubmitting = false
       ..isSuccess = true
-      ..isFailure = false
+      ..errorMessage = ""
       ..apiClient = apiClient);
   }
 }
