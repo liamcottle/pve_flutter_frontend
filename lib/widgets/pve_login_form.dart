@@ -32,6 +32,21 @@ class _PveLoginFormState extends State<PveLoginForm> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loginBloc.state
+        .where((state) => state.isFailure)
+        .listen((state) => Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text(
+                state.errorMessage ?? "Error",
+                style: Theme.of(context).textTheme.button,
+              ),
+              backgroundColor: Theme.of(context).errorColor,
+              behavior: SnackBarBehavior.floating,
+            )));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<PveLoginState>(
       stream: _loginBloc.state,
