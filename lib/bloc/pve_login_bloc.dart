@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 import 'package:pve_flutter_frontend/events/pve_login_events.dart';
 import 'package:pve_flutter_frontend/states/pve_login_states.dart';
 import 'package:pve_flutter_frontend/utils/validators.dart';
@@ -8,41 +9,12 @@ import 'package:rxdart/rxdart.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
     as proxclient;
 
-class PveLoginBloc {
-  final PublishSubject<PveLoginEvent> _eventSubject =
-      PublishSubject<PveLoginEvent>();
 
-  BehaviorSubject<PveLoginState> _stateSubject;
-
+class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
   PveLoginState get initialState => PveLoginState.empty();
-  StreamSink<PveLoginEvent> get events => _eventSubject.sink;
-  Stream<PveLoginState> get state => _stateSubject.stream;
 
-  PveLoginBloc() {
-    _stateSubject = BehaviorSubject<PveLoginState>.seeded(initialState);
-
-    _eventSubject
-        .where((event) {
-          return (event is! LoginWithCredentialsPressed);
-        })
-        .debounceTime(Duration(milliseconds: 250))
-        .switchMap((event) => _eventToState(event))
-        .forEach((PveLoginState state) {
-          _stateSubject.add(state);
-        });
-
-    _eventSubject
-        .where((event) {
-          return (event is LoginWithCredentialsPressed);
-        })
-        .switchMap((event) => _eventToState(event))
-        .forEach((PveLoginState state) {
-          if (_stateSubject.isClosed) return;
-          _stateSubject.add(state);
-        });
-  }
-
-  Stream<PveLoginState> _eventToState(PveLoginEvent event) async* {
+  @override
+  Stream<PveLoginState> processEvents(PveLoginEvent event) async* {
     if (event is UsernameChanged) {
       yield* _mapUsernameChangedToState(event.username);
     } else if (event is PasswordChanged) {
@@ -57,13 +29,12 @@ class PveLoginBloc {
 
   Stream<PveLoginState> _mapUsernameChangedToState(String username) async* {
     //TODO implement username validator?
-    yield _stateSubject.value.rebuild((b) => b..isUsernameValid = true);
+    yield latestState.rebuild((b) => b
   }
 
   Stream<PveLoginState> _mapPasswordChangedToState(String password) async* {
     //TODO implement password validator?
-    yield _stateSubject.value.rebuild(
-      (b) => b..isPasswordValid = true,
+    yield latestState.rebuild((b) => b
     );
   }
 
@@ -75,15 +46,6 @@ class PveLoginBloc {
     try {
       final client = await proxclient.authenticate(username, password);
       yield PveLoginState.success(apiClient: client);
-    } catch (e, trace) {
-      print("ERROR Login:$e");
-      print(trace);
-      yield PveLoginState.failure();
     }
-  }
-
-  void dispose() {
-    _eventSubject.close();
-    _stateSubject.close();
   }
 }
