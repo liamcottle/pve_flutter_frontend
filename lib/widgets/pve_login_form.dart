@@ -55,55 +55,55 @@ class _PveLoginFormState extends State<PveLoginForm> {
         //_hostnameController.text = widget.hostname;
         if (snapshot.hasData) {
           final state = snapshot.data;
-          return Form(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset('assets/images/Proxmox_logo_white_orange_800.png'),
-                const SizedBox(height: 20),
-                //TODO handle Platfrom specific visibility
-                TextFormField(
-                  decoration: const InputDecoration(
-                      icon: Icon(Icons.person),
-                      labelText: 'Hostname/IP',
-                      labelStyle: TextStyle(color: Color(0xFFFFFFFF))),
-                  controller: _hostnameController,
+          return Theme(
+            data: ThemeData.dark(),
+            child: Form(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                      'assets/images/Proxmox_logo_white_orange_800.png'),
+                  SizedBox(height: 20),
+                  //TODO handle Platfrom specific visibility
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.domain),
+                        labelText: 'Hostname/IP',),
+                    controller: _hostnameController,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.person),
+                        labelText: 'Username',),
+                    controller: _usernameController,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.lock),
+                        labelText: 'Password',),
+                    controller: _passwordController,
+                    obscureText: true,
+                    autovalidate: true,
+                    autocorrect: false,
+                    validator: (_) {
+                      return !state.isPasswordValid ? 'Invalid Password' : null;
+                    },
                 ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      icon: Icon(Icons.person),
-                      labelText: 'Username',
-                      labelStyle: TextStyle(color: Color(0xFFFFFFFF))),
-                  controller: _usernameController,
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      icon: Icon(Icons.lock),
-                      labelText: 'Password',
-                      labelStyle: TextStyle(color: Color(0xFFFFFFFF))),
-                  controller: _passwordController,
-                  obscureText: true,
-                  autovalidate: true,
-                  autocorrect: false,
-                  validator: (_) {
-                    return !state.isPasswordValid ? 'Invalid Password' : null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                RaisedButton(
-                  onPressed: isLoginButtonEnabled(state)
-                      ? _onLoginButtonPressed
-                      : null,
-                  color: const Color(0xFFE47225),
-                  textColor: const Color(0xFFFFFFFF),
-                  child: Text('Login'),
-                ),
-                Container(
-                  child:
-                      state.isSubmitting ? CircularProgressIndicator() : null,
-                ),
-              ],
+                  SizedBox(height: 20),
+                  RaisedButton(
+                    onPressed: isLoginButtonEnabled(state)
+                        ? _onLoginButtonPressed
+                        : null,
+                    color: Color(0xFFE47225),
+                    child: Text('Login'),
+                  ),
+                  Container(
+                    child:
+                        state.isSubmitting ? CircularProgressIndicator() : null,
+                  ),
+                ],
+              ),
             ),
           );
         } else {
