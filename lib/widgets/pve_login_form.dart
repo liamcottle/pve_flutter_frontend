@@ -89,7 +89,10 @@ class _PveLoginFormState extends State<PveLoginForm> {
                     validator: (_) {
                       return !state.isPasswordValid ? 'Invalid Password' : null;
                     },
-                ),
+                    onFieldSubmitted: (text) => isLoginButtonEnabled(state)
+                        ? _onLoginButtonPressed()
+                        : null,
+                  ),
                   SizedBox(height: 20),
                   RaisedButton(
                     onPressed: isLoginButtonEnabled(state)
