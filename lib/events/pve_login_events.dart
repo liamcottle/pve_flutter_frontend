@@ -20,15 +20,24 @@ class PasswordChanged extends PveLoginEvent {
   String toString() => 'PasswordChanged { password: $password }';
 }
 
+class OriginChanged extends PveLoginEvent {
+  final String origin;
+
+  OriginChanged({@required this.origin});
+
+  @override
+  String toString() => 'HostnameChanged { password: $origin }';
+}
 
 class LoginWithCredentialsPressed extends PveLoginEvent {
   final String username;
   final String password;
+  final String origin;
 
-  LoginWithCredentialsPressed({@required this.username, @required this.password});
+  LoginWithCredentialsPressed({@required this.username, @required this.password, this.origin});
 
   @override
   String toString() {
-    return 'LoginWithCredentialsPressed { email: $username, password: $password }';
+    return 'LoginWithCredentialsPressed { email: $username, password: $password, hostname: $origin }';
   }
 }

@@ -18,9 +18,10 @@ import 'package:pve_flutter_frontend/widgets/pve_console_widget.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final authBloc = PveAuthenticationBloc();
   try {
-    var credentials = proxclient.Credentials.fromPlatformStorage();
+    var credentials = await proxclient.Credentials.fromPlatformStorage();
     var apiClient = proxclient.Client(credentials);
     apiClient.refreshCredentials();
     authBloc.events.add(LoggedIn(apiClient));

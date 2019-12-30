@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
 import 'package:pve_flutter_frontend/events/pve_login_events.dart';
@@ -5,12 +6,10 @@ import 'package:pve_flutter_frontend/states/pve_login_states.dart';
 
 class PveLoginForm extends StatefulWidget {
   final PveLoginBloc loginBloc;
-  //final String hostname;
 
   PveLoginForm({
     Key key,
     @required this.loginBloc,
-    //@required this.hostname,
   }) : super(key: key);
 
   @override
@@ -18,7 +17,7 @@ class PveLoginForm extends StatefulWidget {
 }
 
 class _PveLoginFormState extends State<PveLoginForm> {
-  final _hostnameController = TextEditingController();
+  final _originController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -29,6 +28,7 @@ class _PveLoginFormState extends State<PveLoginForm> {
     super.initState();
     _passwordController.addListener(_onPasswordChanged);
     _usernameController.addListener(_onUsernameChanged);
+    _originController.addListener(_onOriginChanged);
   }
 
   @override
@@ -39,9 +39,9 @@ class _PveLoginFormState extends State<PveLoginForm> {
         .listen((state) => Scaffold.of(context).showSnackBar(SnackBar(
               content: Text(
                 state.errorMessage ?? "Error",
-                style: Theme.of(context).textTheme.button,
+                style: ThemeData.dark().textTheme.button,
               ),
-              backgroundColor: Theme.of(context).errorColor,
+              backgroundColor: ThemeData.dark().errorColor,
               behavior: SnackBarBehavior.floating,
             )));
   }
@@ -52,11 +52,10 @@ class _PveLoginFormState extends State<PveLoginForm> {
       stream: _loginBloc.state,
       initialData: PveLoginState.empty(),
       builder: (BuildContext context, AsyncSnapshot<PveLoginState> snapshot) {
-        //_hostnameController.text = widget.hostname;
         if (snapshot.hasData) {
           final state = snapshot.data;
           return Theme(
-            data: ThemeData.dark(),
+            data: ThemeData.dark().copyWith(accentColor: Color(0xFFE47225)),
             child: Form(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -65,12 +64,14 @@ class _PveLoginFormState extends State<PveLoginForm> {
                   Image.asset(
                       'assets/images/Proxmox_logo_white_orange_800.png'),
                   SizedBox(height: 20),
-                  //TODO handle Platfrom specific visibility
+                  //TODO change this when there's a more official way to determine web e.g. Platform.isWeb or similar
+                  if(!kIsWeb)
                   TextFormField(
                     decoration: InputDecoration(
                         icon: Icon(Icons.domain),
-                        labelText: 'Hostname/IP',),
-                    controller: _hostnameController,
+                        labelText: 'Origin',
+                        hintText: 'e.g. https://ip-of-your-pve-host:8006'),
+                    controller: _originController,
                   ),
                   TextFormField(
                     decoration: InputDecoration(
@@ -136,10 +137,17 @@ class _PveLoginFormState extends State<PveLoginForm> {
     );
   }
 
+  void _onOriginChanged() {
+    _loginBloc.events.add(
+      OriginChanged(origin: _originController.text),
+    );
+  }
+
   _onLoginButtonPressed() {
     _loginBloc.events.add(LoginWithCredentialsPressed(
       username: _usernameController.text + "@pam",
       password: _passwordController.text,
+      origin: _originController.text
     ));
   }
 }
