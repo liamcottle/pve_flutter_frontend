@@ -29,7 +29,8 @@
 .pub/
 /build/
 .flutter-plugins-dependencies
-
+# avoid commiting generated files
+*.g.dart
 
 # Android related
 **/android/**/gradle-wrapper.jar
