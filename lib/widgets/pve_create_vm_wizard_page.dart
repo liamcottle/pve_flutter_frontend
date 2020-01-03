@@ -12,8 +12,7 @@ import 'package:pve_flutter_frontend/bloc/pve_node_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_qemu_create_wizard_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_storage_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_vm_name_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_qemu_create_model.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_storage_content_model.dart';
+import 'package:pve_flutter_frontend/states/pve_qemu_create_wizard_state.dart';
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 import 'package:pve_flutter_frontend/widgets/pve_bridge_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_cd_selector_widget.dart';
@@ -21,8 +20,7 @@ import 'package:pve_flutter_frontend/widgets/pve_guest_id_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_guest_os_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_network_model_selector.dart';
 import 'package:pve_flutter_frontend/widgets/pve_node_selector_widget.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/widgets/pve_storage_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_vm_name_widget.dart';
 
@@ -60,7 +58,7 @@ class PveCreateVmWizard extends StatelessWidget {
   ];
   @override
   Widget build(BuildContext context) {
-    final apiClient = Provider.of<proxclient.Client>(context);
+    final apiClient = Provider.of<ProxmoxApiClient>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -69,9 +67,8 @@ class PveCreateVmWizard extends StatelessWidget {
       body: MultiProvider(
         providers: [
           Provider<PveQemuCreateWizardBloc>(
-            builder: (context) => PveQemuCreateWizardBloc(
-                apiClient: apiClient, stepCount: stepWidgets.length)
-              ..events.add(GoToStep(0)),
+            create: (context) => PveQemuCreateWizardBloc(
+                apiClient: apiClient, stepCount: stepWidgets.length),
             dispose: (context, value) => value.dispose(),
           ),
         ],
@@ -83,14 +80,9 @@ class PveCreateVmWizard extends StatelessWidget {
                     initialData: bloc.state.value,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        print(bloc.qemu);
                         final state = snapshot.data;
+                        print(state);
                         final steps = getSteps(state);
-                        if (state.currentStep == stepWidgets.length) {
-                          Navigator.pop(context);
-                          return null;
-                        }
-
                         return Stepper(
                           type: layout != ProxmoxLayout.slim
                               ? StepperType.horizontal
@@ -200,7 +192,7 @@ class _ProxmoxStepChildWidgetState extends State<ProxmoxStepChildWidget> {
   }
 
   Widget build(BuildContext context) {
-    final qemu = wizard.qemu;
+    final qemu = wizard.latestState;
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
           width: MediaQuery.of(context).size.width * 0.7,
@@ -297,21 +289,18 @@ class _GeneralState extends State<_General> {
     wizard.addToValidation(guestIdSelectorBloc.state);
     wizard.addToValidation(nodeSelectorBloc.state);
 
-    vmNameBloc.events.add(OnChange(wizard.qemu?.name ?? ""));
+    vmNameBloc.events.add(OnChange(wizard.latestState.name ?? ""));
 
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
-      wizard.qemu = wizard.qemu?.rebuild((b) => b
-            ..vmid = int.parse(guestIdSelectorBloc.state.value.value)
-            ..node = nodeSelectorBloc.state.value.value.nodeName
-            ..name = vmNameBloc.state.value.value) ??
-          PveNodeQemuCreateModel((b) => b
-            ..node = nodeSelectorBloc.state.value.value.nodeName
-            ..vmid = int.parse(guestIdSelectorBloc.state.value.value)
-            ..name = vmNameBloc.state.value.value);
+      var nextStep = wizard.latestState.rebuild((b) => b
+        ..currentStep = stepIndex
+        ..vmid = int.parse(guestIdSelectorBloc.state.value.value)
+        ..node = nodeSelectorBloc.state.value.value.nodeName
+        ..name = vmNameBloc.state.value.value);
 
       wizard.clearValidation();
-      wizard.events.add(GoToStep(stepIndex));
+      wizard.events.add(GoToStep(nextStep));
     });
   }
 
@@ -375,7 +364,7 @@ class _OSState extends State<_OS> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     wizard = Provider.of<PveQemuCreateWizardBloc>(context);
-    gBloc.events.add(ChangeOsType(wizard.qemu.ostype ?? OSType.l26));
+    gBloc.events.add(ChangeOsType(wizard.latestState.ostype ?? OSType.l26));
     cdBloc = PveCdSelectorBloc();
 
     wizard.addToValidation(cdBloc.state);
@@ -383,13 +372,14 @@ class _OSState extends State<_OS> {
 
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
-      wizard.qemu = wizard.qemu?.rebuild((b) => b
+      var nextStep = wizard.latestState.rebuild((b) => b
+        ..currentStep = stepIndex
         ..cdrom = cdBloc.state.value.file
         ..media = cdBloc.state.value.value
         ..ostype = gBloc.state.value.value);
 
       wizard.clearValidation();
-      wizard.events.add(GoToStep(stepIndex));
+      wizard.events.add(GoToStep(nextStep));
     });
   }
 
@@ -445,13 +435,16 @@ class _SystemState extends State<_System> {
     wizard.inStepValidityChanged.add(true);
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
-      wizard.qemu = wizard.qemu?.rebuild((b) => b..scsihw = scsiHwModel);
+      final nextStep = wizard.latestState.rebuild((b) => b
+        ..currentStep = stepIndex
+        ..scsihw = scsiHwModel);
 
       wizard.clearValidation();
-      wizard.events.add(GoToStep(stepIndex));
+      wizard.events.add(GoToStep(nextStep));
     });
 
-    scsiHwModel = wizard.qemu.scsihw ?? ScsiControllerModel.virtioScsiPci;
+    scsiHwModel =
+        wizard.latestState.scsihw ?? ScsiControllerModel.virtioScsiPci;
   }
 
   @override
@@ -521,23 +514,24 @@ class _HardDiskState extends State<_HardDisk> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final apiClient = Provider.of<proxclient.Client>(context);
+    final apiClient = Provider.of<ProxmoxApiClient>(context);
 
     wizard = Provider.of<PveQemuCreateWizardBloc>(context);
     storageSelectorBloc = PveStorageSelectorBloc(
         apiClient: apiClient,
-        targetNode: wizard.qemu.node,
+        targetNode: wizard.latestState.node,
         content: PveStorageContentType.images)
       ..events.add(LoadStoragesEvent());
     wizard.addToValidation(storageSelectorBloc.state);
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
-      wizard.qemu = wizard.qemu?.rebuild((b) => b
+      final nextStep = wizard.latestState.rebuild((b) => b
+        ..currentStep = stepIndex
         ..scsi0 =
             '${storageSelectorBloc.latestState.value.id}:${diskSizeController.text}');
 
       wizard.clearValidation();
-      wizard.events.add(GoToStep(stepIndex));
+      wizard.events.add(GoToStep(nextStep));
     });
   }
 
@@ -657,12 +651,13 @@ class _CPUState extends State<_CPU> {
     wizard.inStepValidityChanged.add(true);
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
-      wizard.qemu = wizard.qemu?.rebuild((b) => b
+      final nextStep = wizard.latestState.rebuild((b) => b
+        ..currentStep = stepIndex
         ..sockets = int.parse(socketTextController.text)
         ..cores = int.parse(coreTextController.text));
 
       wizard.clearValidation();
-      wizard.events.add(GoToStep(stepIndex));
+      wizard.events.add(GoToStep(nextStep));
     });
   }
 
@@ -727,11 +722,12 @@ class _MemoryState extends State<_Memory> {
     wizard.inStepValidityChanged.add(true);
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
-      wizard.qemu = wizard.qemu
-          ?.rebuild((b) => b..memory = int.parse(memoryTextController.text));
+      final nextStep = wizard.latestState.rebuild((b) => b
+        ..currentStep = stepIndex
+        ..memory = int.parse(memoryTextController.text));
 
       wizard.clearValidation();
-      wizard.events.add(GoToStep(stepIndex));
+      wizard.events.add(GoToStep(nextStep));
     });
   }
 
@@ -779,22 +775,23 @@ class _NetworkState extends State<_Network> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final apiClient = Provider.of<proxclient.Client>(context);
+    final apiClient = Provider.of<ProxmoxApiClient>(context);
     wizard = Provider.of<PveQemuCreateWizardBloc>(context);
     bridgeBloc = PveBridgeSelectorBloc(
-        apiClient: apiClient, targetNode: wizard.qemu.node)
+        apiClient: apiClient, targetNode: wizard.latestState.node)
       ..events.add(LoadBridgesEvent());
     firewall = true;
     interfaceModel = 'virtio';
     wizard.addToValidation(bridgeBloc.state);
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
-      wizard.qemu = wizard.qemu?.rebuild((b) => b
+      final nextStep = wizard.latestState.rebuild((b) => b
+        ..currentStep = stepIndex
         ..net0 =
             '$interfaceModel,bridge=${bridgeBloc.latestState.value.iface},firewall=${firewall ? 1 : 0}');
 
       wizard.clearValidation();
-      wizard.events.add(GoToStep(stepIndex));
+      wizard.events.add(GoToStep(nextStep));
     });
   }
 

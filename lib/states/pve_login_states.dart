@@ -1,6 +1,5 @@
 import 'package:built_value/built_value.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 part 'pve_login_states.g.dart';
 
@@ -13,8 +12,7 @@ abstract class PveLoginState
   String get errorMessage;
   bool get isFailure => errorMessage != null && errorMessage.isNotEmpty;
   @nullable
-  proxclient.Client get apiClient;
-
+  ProxmoxApiClient get apiClient;
 
   bool get isFormValid => isUsernameValid && isPasswordValid;
 
@@ -49,7 +47,7 @@ abstract class PveLoginState
       ..errorMessage = errorMessage);
   }
 
-  factory PveLoginState.success({apiClient: proxclient.Client}) {
+  factory PveLoginState.success({apiClient: ProxmoxApiClient}) {
     return PveLoginState((b) => b
       ..isUsernameValid = true
       ..isPasswordValid = true

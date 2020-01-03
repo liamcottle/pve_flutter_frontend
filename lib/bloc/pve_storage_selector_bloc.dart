@@ -1,19 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_storage_model.dart';
-import 'package:pve_flutter_frontend/models/serializers.dart';
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_storage_content_model.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveStorageSelectorBloc
     extends ProxmoxBaseBloc<PveStorageSelectorEvent, PveStorageSelectorState> {
-  final proxclient.Client apiClient;
+  final ProxmoxApiClient apiClient;
 
   bool fetchEnabledStoragesOnly;
 
@@ -74,29 +68,8 @@ class PveStorageSelectorBloc
   Future<List<PveNodesStorageModel>> getStorages(
       bool fetchEnabledStoragesOnly, String targetNode) async {
 
-    var url = Uri.parse(proxclient.getPlatformAwareOrigin() +
-        '/api2/json/nodes/$targetNode/storage');
-    Map<String, dynamic> queryParameters = {};
-
-    if (fetchEnabledStoragesOnly) {
-      queryParameters['enabled'] = '1';
-    }
-
-    if (content != null) {
-      queryParameters['content'] = describeEnum(content);
-    }
-
-    url = url.replace(queryParameters: queryParameters);
-
-    var response = await apiClient.get(url);
-
-    var data = (json.decode(response.body)['data'] as List).map((f) {
-      return serializers.deserializeWith(PveNodesStorageModel.serializer, f);
-    });
-
-    var storages = data.toList();
+    var storages = await apiClient.getNodeStorage(targetNode, enabled: fetchEnabledStoragesOnly);
     storages.sort((a, b) => a.id.compareTo(b.id));
-
     return storages;
   }
 

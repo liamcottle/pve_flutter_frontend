@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_guest_os_selector_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_qemu_create_model.dart';
+import 'package:pve_flutter_frontend/states/pve_qemu_create_wizard_state.dart';
 
 class PveGuestOsSelector extends StatelessWidget {
   @override

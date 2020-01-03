@@ -3,16 +3,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_model.dart';
-import 'package:pve_flutter_frontend/models/serializers.dart';
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
 
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveNodeSelectorBloc
     extends ProxmoxBaseBloc<PveNodeSelectorEvent, PveNodeSelectorState> {
-  final proxclient.Client apiClient;
+  final ProxmoxApiClient apiClient;
 
   final bool onlyOnline;
 
@@ -43,15 +40,9 @@ class PveNodeSelectorBloc
   }
 
   Future<List<PveNodesModel>> getNodes(bool onlyOnline) async {
-    var response = await apiClient.get(
-        Uri.parse(proxclient.getPlatformAwareOrigin() + '/api2/json/nodes'));
-    var data = (json.decode(response.body)['data'] as List).map((f) {
-      return serializers.deserializeWith(PveNodesModel.serializer, f);
-    });
-    if (onlyOnline) data = data.where((node) => node.status == "online");
-    var nodes = data.toList();
+    var nodes = await apiClient.getNodes();
+    if (onlyOnline) nodes = nodes.where((node) => node.status == "online").toList();
     nodes.sort((a, b) => a.nodeName.compareTo(b.nodeName));
-
     return nodes;
   }
 }

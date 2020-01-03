@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_storage_selector_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_storage_model.dart';
 
 class PveStorageSelector extends StatelessWidget {
   final String labelText;

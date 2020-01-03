@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:built_collection/built_collection.dart';
 import 'package:meta/meta.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_cluster_status_model.dart';
-import 'package:pve_flutter_frontend/models/pve_state_cluster_status.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
-import 'package:pve_flutter_frontend/models/serializers.dart';
+import 'package:pve_flutter_frontend/states/pve_state_cluster_status.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveClusterStatusBloc
     extends ProxmoxBaseBloc<PveClusterStatusEvent, PveClusterStatusState> {
-  final proxclient.Client apiClient;
+  final ProxmoxApiClient apiClient;
   PveClusterStatusState get initialState => null;
   Timer updateTimer;
 
@@ -33,23 +29,12 @@ class PveClusterStatusBloc
   Stream<PveClusterStatusState> processEvents(
       PveClusterStatusEvent event) async* {
     if (event is UpdateClusterStatus) {
-      final status = await getClusterStatus();
+      final status = await apiClient.getClusterStatus();
       yield PveClusterStatusState((b) => b..model.addAll(status));
     }
   }
 
-  Future<List<PveClusterStatusModel>> getClusterStatus() async {
-    var url = Uri.parse(
-        proxclient.getPlatformAwareOrigin() + '/api2/json/cluster/status');
 
-    var response = await apiClient.get(url);
-
-    var data = (json.decode(response.body)['data'] as List).map((f) {
-      return serializers.deserializeWith(PveClusterStatusModel.serializer, f);
-    });
-
-    return data.toList();
-  }
 
   @override
   void dispose(){

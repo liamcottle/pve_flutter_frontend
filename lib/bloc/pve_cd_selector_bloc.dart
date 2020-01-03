@@ -1,6 +1,6 @@
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_qemu_create_model.dart';
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
+import 'package:pve_flutter_frontend/states/pve_qemu_create_wizard_state.dart';
 
 
 class PveCdSelectorBloc

@@ -1,17 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_cluster_resources_model.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
-import 'package:pve_flutter_frontend/models/serializers.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveResourceBloc
     extends ProxmoxBaseBloc<PveResourceEvents, PveResourceState> {
-  final proxclient.Client apiClient;
+  final ProxmoxApiClient apiClient;
 
   PveResourceBloc({@required this.apiClient});
 
@@ -22,7 +18,8 @@ class PveResourceBloc
 
   @override
   void doOnListen() {
-    updateTimer = Timer.periodic(Duration(seconds: 5), (timer) => events.add(PollResources()));
+    updateTimer = Timer.periodic(
+        Duration(seconds: 5), (timer) => events.add(PollResources()));
   }
 
   @override
@@ -35,7 +32,8 @@ class PveResourceBloc
   @override
   Stream<PveResourceState> processEvents(event) async* {
     if (event is PollResources) {
-      final resources = await getResources();
+      final resources = await apiClient.getResources();
+      resources.sort((a, b) => a.id.compareTo(b.id));
       yield PveResourceState(resources: resources);
     }
 
@@ -45,39 +43,19 @@ class PveResourceBloc
     }
   }
 
-  Future<List<PveClusterResourcesModel>> getResources() async {
-    var url = Uri.parse(
-        proxclient.getPlatformAwareOrigin() + '/api2/json/cluster/resources');
-    Map<String, dynamic> queryParameters = {};
-
-    url = url.replace(queryParameters: queryParameters);
-
-    var response = await apiClient.get(url);
-
-    var data = (json.decode(response.body)['data'] as List).map((f) {
-      return serializers.deserializeWith(
-          PveClusterResourcesModel.serializer, f);
-    });
-
-    var resources = data.toList();
-    resources.sort((a, b) => a.id.compareTo(b.id));
-
-    return resources;
-  }
-
   Future<void> startResource(
       ResourceAction action, PveClusterResourcesModel resource) async {
     Uri url;
-    if(resource.type == "qemu" || resource.type == "lxc"){
-        url = Uri.parse(proxclient.getPlatformAwareOrigin() +
-            '/api2/json/nodes/${resource.node}/${resource.type}/${resource.vmid}/status/' +
-            describeEnum(action));
+    if (resource.type == "qemu" || resource.type == "lxc") {
+      url = Uri.parse(await getPlatformAwareOrigin() +
+          '/api2/json/nodes/${resource.node}/${resource.type}/${resource.vmid}/status/' +
+          describeEnum(action));
     }
 
     if (resource.type == "node") {
-      url = Uri.parse(proxclient.getPlatformAwareOrigin() +
-            '/api2/json/nodes/${resource.node}/status/?command=' +
-            describeEnum(action));
+      url = Uri.parse(await getPlatformAwareOrigin() +
+          '/api2/json/nodes/${resource.node}/status/?command=' +
+          describeEnum(action));
     }
     var response = await apiClient.post(url);
   }

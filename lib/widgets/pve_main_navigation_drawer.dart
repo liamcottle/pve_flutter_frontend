@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_state_cluster_status.dart';
+import 'package:pve_flutter_frontend/states/pve_state_cluster_status.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/cluster_status_widget.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_tree_widget.dart';

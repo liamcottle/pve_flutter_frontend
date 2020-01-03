@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveAuthenticationBloc extends ProxmoxBaseBloc<PveAuthenticationEvent,PveAuthenticationState>{
 
@@ -37,7 +36,7 @@ class AppStarted extends PveAuthenticationEvent {
 }
 
 class LoggedIn extends PveAuthenticationEvent {
-  final proxclient.Client apiClient;
+  final ProxmoxApiClient apiClient;
 
   LoggedIn(this.apiClient);
 
@@ -59,7 +58,7 @@ class Uninitialized extends PveAuthenticationState {
 }
 
 class Authenticated extends PveAuthenticationState {
-  final proxclient.Client apiClient;
+  final ProxmoxApiClient apiClient;
 
   Authenticated(this.apiClient);
 

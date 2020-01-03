@@ -22,7 +22,7 @@ void main() async {
   final authBloc = PveAuthenticationBloc();
   try {
     var credentials = await proxclient.Credentials.fromPlatformStorage();
-    var apiClient = proxclient.Client(credentials);
+    var apiClient = proxclient.ProxmoxApiClient(credentials);
     apiClient.refreshCredentials();
     authBloc.events.add(LoggedIn(apiClient));
   } catch (_) {
@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
                   fullscreenDialog: true,
                   settings: context,
                   builder: (_) {
-                    return Provider<proxclient.Client>.value(
+                    return Provider<proxclient.ProxmoxApiClient>.value(
                         value: state.apiClient, child: PveCreateVmWizard());
                   },
                 );
@@ -83,7 +83,7 @@ class MyApp extends StatelessWidget {
                   fullscreenDialog: true,
                   settings: context,
                   builder: (_) {
-                    return Provider<proxclient.Client>.value(
+                    return Provider<proxclient.ProxmoxApiClient>.value(
                         value: state.apiClient,
                         child: PveConsoleWidget(
                           nodeid: 'localhost',
@@ -125,7 +125,7 @@ class RootPage extends StatelessWidget {
             if (state is Authenticated) {
               return MultiProvider(
                 providers: [
-                  Provider<proxclient.Client>.value(
+                  Provider<proxclient.ProxmoxApiClient>.value(
                     value: state.apiClient,
                   ),
                   Provider<PveResourceBloc>(

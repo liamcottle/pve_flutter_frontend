@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_bridge_selector_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_network_model.dart';
 
 
 
@@ -28,7 +28,7 @@ class PveBridgeSelector extends StatelessWidget{
               labelText: labelText,
               helperText: ' ',
             ),
-            items: <DropdownMenuItem<PveNodeNetworkReadModel>>[
+            items: <DropdownMenuItem<PveNodeNetworkModel>>[
               for (var bridge in state?.bridges)
                 DropdownMenuItem(
                   child: Row(
@@ -43,7 +43,7 @@ class PveBridgeSelector extends StatelessWidget{
                   value: bridge,
                 )
             ],
-            onChanged: (PveNodeNetworkReadModel selection) =>
+            onChanged: (PveNodeNetworkModel selection) =>
                 _bBloc.events
                     .add(BridgeSelectedEvent(selection)),
             value: state.value,

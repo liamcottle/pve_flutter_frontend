@@ -3,16 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cd_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_file_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_storage_selector_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_qemu_create_model.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_storage_content_model.dart';
+import 'package:pve_flutter_frontend/states/pve_qemu_create_wizard_state.dart';
 import 'package:pve_flutter_frontend/widgets/pve_file_selector_widget.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveCdSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final client = Provider.of<proxclient.Client>(context);
+    final client = Provider.of<ProxmoxApiClient>(context);
     final cdBloc = Provider.of<PveCdSelectorBloc>(context);
 
     return StreamBuilder<PveCdSelectorState>(

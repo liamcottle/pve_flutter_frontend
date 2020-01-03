@@ -3,14 +3,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_storage_content_model.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
-import 'package:pve_flutter_frontend/models/serializers.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveFileSelectorBloc
     extends ProxmoxBaseBloc<PveFileSelectorEvent, PveFileSelectorState> {
-  final proxclient.Client apiClient;
+  final ProxmoxApiClient apiClient;
 
   String nodeId;
 
@@ -58,22 +55,7 @@ class PveFileSelectorBloc
   Future<List<PveNodesStorageContentModel>> loadStorageContent(
       PveStorageContentType type,
       [String filterVolid]) async {
-    var url = Uri.parse(proxclient.getPlatformAwareOrigin() +
-        '/api2/json/nodes/$nodeId/storage/$storageId/content');
-
-    Map<String, dynamic> queryParameters = {};
-
-    if (type != null) {
-      queryParameters['content'] = describeEnum(type.toString());
-    }
-    url = url.replace(queryParameters: queryParameters);
-
-    var response = await apiClient.get(url);
-
-    var data = (json.decode(response.body)['data'] as List).map((f) {
-      return serializers.deserializeWith(
-          PveNodesStorageContentModel.serializer, f);
-    });
+    final data = await apiClient.getNodeStorageContent(nodeId, storageId, content: type);
 
     if (filterVolid != null && filterVolid.isNotEmpty) {
       return data.where((item) => item.volid.contains(filterVolid)).toList();

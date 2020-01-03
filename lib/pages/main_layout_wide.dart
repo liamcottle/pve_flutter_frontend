@@ -7,8 +7,7 @@ import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
 import 'package:pve_flutter_frontend/widgets/pve_main_navigation_drawer.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_overview_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 
@@ -40,7 +39,7 @@ class _MainLayoutWideState extends State<MainLayoutWide> {
 
   @override
   Widget build(BuildContext context) {
-    final client = Provider.of<proxclient.Client>(context);
+    final client = Provider.of<ProxmoxApiClient>(context);
 
     return Scaffold(
         key: _scaffoldKey,

@@ -2,20 +2,17 @@ import 'dart:async';
 
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:pve_flutter_frontend/models/pve_nodes_qemu_create_model.dart';
+import 'package:pve_flutter_frontend/states/pve_qemu_create_wizard_state.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
-    as proxclient;
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
     PveQemuCreateWizardState> {
-  PveNodeQemuCreateModel qemu;
-
   final int stepCount;
 
-  final proxclient.Client apiClient;
+  final ProxmoxApiClient apiClient;
 
   // This stream can be used to inform listerns that there was a validity change
   // somewhere which they need to react on, e.g. the continue button needs to be
@@ -38,7 +35,8 @@ class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
   StreamSubscription<bool> _stepStateCombinedSubscription;
 
   @override
-  PveQemuCreateWizardState get initialState => PveQemuCreateWizardState(0);
+  PveQemuCreateWizardState get initialState =>
+      PveQemuCreateWizardState((b) => b..currentStep = 0);
 
   PveQemuCreateWizardBloc({@required this.apiClient, @required this.stepCount});
 
@@ -47,11 +45,12 @@ class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
       PveQemuCreateWizardEvent event) async* {
     if (event is GoToStep) {
       inStepValidityChanged.add(false);
-      if (event.stepIndex == stepCount) {
-        await createVirtualMachine(qemu);
-        yield PveQemuCreateWizardState(event.stepIndex);
+      if (event.updatedState.currentStep == stepCount) {
+        await createVirtualMachine(latestState);
+        yield event.updatedState;
       } else {
-        yield PveQemuCreateWizardState(event.stepIndex);
+        print("goto:${event.updatedState}");
+        yield event.updatedState;
       }
     }
   }
@@ -77,8 +76,9 @@ class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
     _stepStreamsToValidate.clear();
   }
 
-  Future<void> createVirtualMachine(PveNodeQemuCreateModel qemuConfig) async {
-    var url = Uri.parse(proxclient.getPlatformAwareOrigin() +
+//TODO merge into api client
+  Future<void> createVirtualMachine(PveQemuCreateWizardState qemuConfig) async {
+    var url = Uri.parse(await getPlatformAwareOrigin() +
         '/api2/json/nodes/${qemuConfig.node}/qemu');
 
     Map<String, String> payload = {
@@ -94,6 +94,7 @@ class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
       'memory': qemuConfig.memory.toString(),
       'net0': qemuConfig.net0,
     };
+    payload.removeWhere((key, value) => value == null || value.isEmpty);
     var response = await apiClient.post(url,
         headers: {'content-type': 'application/x-www-form-urlencoded'},
         body: payload);
@@ -101,16 +102,10 @@ class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
   }
 }
 
-class PveQemuCreateWizardState {
-  final int currentStep;
-
-  PveQemuCreateWizardState(this.currentStep);
-}
-
 abstract class PveQemuCreateWizardEvent {}
 
 class GoToStep extends PveQemuCreateWizardEvent {
-  final int stepIndex;
+  final PveQemuCreateWizardState updatedState;
 
-  GoToStep(this.stepIndex);
+  GoToStep(this.updatedState);
 }
