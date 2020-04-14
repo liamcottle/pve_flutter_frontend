@@ -13,6 +13,7 @@ import 'package:pve_flutter_frontend/bloc/pve_qemu_create_wizard_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_storage_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_vm_name_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_qemu_create_wizard_state.dart';
+import 'package:pve_flutter_frontend/states/pve_storage_selector_state.dart';
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 import 'package:pve_flutter_frontend/widgets/pve_bridge_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_cd_selector_widget.dart';
@@ -519,16 +520,16 @@ class _HardDiskState extends State<_HardDisk> {
     wizard = Provider.of<PveQemuCreateWizardBloc>(context);
     storageSelectorBloc = PveStorageSelectorBloc(
         apiClient: apiClient,
-        targetNode: wizard.latestState.node,
-        content: PveStorageContentType.images)
+        init: PveStorageSelectorState.init(nodeID: wizard.latestState.node)
+            .rebuild((b) => b..content = PveStorageContentType.images))
       ..events.add(LoadStoragesEvent());
-    wizard.addToValidation(storageSelectorBloc.state);
+    //wizard.addToValidation(storageSelectorBloc.state);
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
       final nextStep = wizard.latestState.rebuild((b) => b
-        ..currentStep = stepIndex
-        ..scsi0 =
-            '${storageSelectorBloc.latestState.value.id}:${diskSizeController.text}');
+        ..currentStep = stepIndex);
+        // ..scsi0 =
+        //     '${storageSelectorBloc.latestState.value.id}:${diskSizeController.text}');
 
       wizard.clearValidation();
       wizard.events.add(GoToStep(nextStep));

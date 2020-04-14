@@ -4,61 +4,55 @@ import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
+import 'package:pve_flutter_frontend/states/pve_file_selector_state.dart';
 
 class PveFileSelectorBloc
     extends ProxmoxBaseBloc<PveFileSelectorEvent, PveFileSelectorState> {
   final ProxmoxApiClient apiClient;
-
-  String nodeId;
-
-  String storageId;
-
-  PveStorageContentType fileType;
-
+  final PveFileSelectorState init;
   @override
-  PveFileSelectorState get initialState => PveFileSelectorState();
+  PveFileSelectorState get initialState => init;
 
-  PveFileSelectorBloc(
-      {@required this.apiClient,
-      this.nodeId = 'localhost',
-      this.storageId,
-      this.fileType});
+  PveFileSelectorBloc({@required this.apiClient, @required this.init});
 
   @override
   Stream<PveFileSelectorState> processEvents(event) async* {
     if (event is LoadStorageContent) {
-      final content = await loadStorageContent(fileType);
-      yield state.value.copyWith(content: content);
+      if (latestState.nodeID != null && latestState.storageID != null) {
+        final content = await loadStorageContent(latestState);
+        yield latestState.rebuild((b) => b..content.replace(content));
+      }
     }
 
     if (event is ChangeStorage) {
-      storageId = event.storageId;
-      final content = await loadStorageContent(fileType);
-      yield state.value.copyWith(content: content, search: false);
+      yield latestState.rebuild((b) => b..storageID = event.storageId);
+      events.add(LoadStorageContent());
     }
 
     if (event is ToggleGridListView) {
-      yield state.value.copyWith(gridView: !state.value.gridView);
+      yield latestState.rebuild((b) => b..gridView = !b.gridView);
     }
 
     if (event is ToggleSearch) {
-      final content = await loadStorageContent(fileType);
-      yield state.value.copyWith(content: content, search: !state.value.search);
+      yield latestState.rebuild((b) => b..search = !b.search);
     }
 
     if (event is FilterContent) {
-      final content = await loadStorageContent(fileType, event.searchTerm);
-      yield state.value.copyWith(content: content);
+      yield latestState.rebuild((b) => b..volidFilter = event.searchTerm);
+      events.add(LoadStorageContent());
     }
   }
 
   Future<List<PveNodesStorageContentModel>> loadStorageContent(
-      PveStorageContentType type,
-      [String filterVolid]) async {
-    final data = await apiClient.getNodeStorageContent(nodeId, storageId, content: type);
+      PveFileSelectorState state) async {
+    final data = await apiClient.getNodeStorageContent(
+        state.nodeID, state.storageID,
+        content: state.fileType);
 
-    if (filterVolid != null && filterVolid.isNotEmpty) {
-      return data.where((item) => item.volid.contains(filterVolid)).toList();
+    if (state.volidFilter != null && state.volidFilter.isNotEmpty) {
+      return data
+          .where((item) => item.volid.contains(state.volidFilter))
+          .toList();
     } else {
       return data.toList();
     }
@@ -89,27 +83,4 @@ class FilterContent extends PveFileSelectorEvent {
   final String searchTerm;
 
   FilterContent({this.searchTerm});
-}
-
-class PveFileSelectorState {
-  final List<PveNodesStorageContentModel> content;
-  final bool gridView;
-  final bool search;
-
-  PveFileSelectorState({
-    this.content,
-    this.gridView = false,
-    this.search = false,
-  });
-
-  PveFileSelectorState copyWith({
-    List<PveNodesStorageContentModel> content,
-    bool gridView,
-    bool search,
-  }) {
-    return PveFileSelectorState(
-        content: content ?? this.content,
-        gridView: gridView ?? this.gridView,
-        search: search ?? this.search);
-  }
 }

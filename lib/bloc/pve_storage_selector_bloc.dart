@@ -2,80 +2,83 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
+import 'package:pve_flutter_frontend/states/pve_storage_selector_state.dart';
 
 class PveStorageSelectorBloc
     extends ProxmoxBaseBloc<PveStorageSelectorEvent, PveStorageSelectorState> {
   final ProxmoxApiClient apiClient;
-
-  bool fetchEnabledStoragesOnly;
-
-  PveStorageContentType content;
-
-  String targetNode;
-
+  final PveStorageSelectorState init;
   @override
-  PveStorageSelectorState get initialState => PveStorageSelectorState();
+  PveStorageSelectorState get initialState => init;
 
-  PveStorageSelectorBloc(
-      {this.fetchEnabledStoragesOnly = true,
-      @required this.apiClient,
-      this.targetNode = 'localhost',
-      this.content});
+  PveStorageSelectorBloc({
+    @required this.apiClient,
+    @required this.init,
+  });
 
   @override
   Stream<PveStorageSelectorState> processEvents(
       PveStorageSelectorEvent event) async* {
     if (event is LoadStoragesEvent) {
-      final storages = await getStorages(fetchEnabledStoragesOnly, targetNode);
-      yield PveStorageSelectorState(
-          storages: storages,
-          selectedStorage: storages?.first,
-          error: storages.isEmpty ? "No storage available" : null);
+      final storages = await getStorages(latestState);
+
+      var selected = storages.singleWhere(
+          (element) => element.id == latestState.selected?.id,
+          orElse: () => null);
+
+      if (selected == null && latestState.selected != null) {
+        yield* yieldErrorState('Selected storage no longer available');
+      }
+
+      if (storages.length == 1 && selected == null) {
+        selected = storages.single;
+      }
+      if (selected != null) {
+        yield latestState.rebuild((b) => b
+          ..isBlank = false
+          ..isLoading = false
+          ..storages.replace(storages)
+          ..selected.replace(selected));
+      } else {
+        yield latestState.rebuild((b) => b
+          ..isBlank = false
+          ..isLoading = false
+          ..storages.replace(storages)
+          ..selected = null);
+      }
     }
 
     if (event is StorageSelectedEvent) {
-      final storages = await getStorages(fetchEnabledStoragesOnly, targetNode);
-
-      // to make sure it's the same object
-      var selection =
-          storages.where((item) => item.id == event.storage.id).single;
-      yield PveStorageSelectorState(
-          storages: storages, selectedStorage: selection);
+      if (event.storageID == null) {
+        yield latestState.rebuild((b) => b..selected.replace(event.storage));
+      } else {
+        final storage =
+            latestState.storages.singleWhere((s) => s.id == event.storageID);
+        yield latestState.rebuild((b) => b..selected.replace(storage));
+      }
+      events.add(LoadStoragesEvent());
     }
 
-    if (event is ChangeTargetNode) {
-      targetNode = event.targetNode;
-      final storages = await getStorages(fetchEnabledStoragesOnly, targetNode);
-      try {
-        var selection =
-            storages.where((item) => item.id == state.value.value.id).single;
-        yield PveStorageSelectorState(
-          storages: storages,
-          selectedStorage: selection,
-        );
-      } on StateError {
-        yield PveStorageSelectorState(
-            storages: storages,
-            selectedStorage: null,
-            error: "Please select other Storage");
-        return;
-      }
+    if (event is NodeChanged) {
+      yield latestState.rebuild((b) => b..nodeID = event.nodeID);
+      events.add(LoadStoragesEvent());
     }
   }
 
   Future<List<PveNodesStorageModel>> getStorages(
-      bool fetchEnabledStoragesOnly, String targetNode) async {
-
-    var storages = await apiClient.getNodeStorage(targetNode, enabled: fetchEnabledStoragesOnly);
+      PveStorageSelectorState state) async {
+    var storages = await apiClient.getNodeStorage(state.nodeID,
+        content: state.content,
+        enabled: state.enabledOnly,
+        storageId: state.storage);
     storages.sort((a, b) => a.id.compareTo(b.id));
     return storages;
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  Stream<PveStorageSelectorState> yieldErrorState(String errorText) async* {
+    yield latestState.rebuild((b) => b..errorMessage = errorText);
+    yield latestState.rebuild((b) => b..errorMessage = "");
   }
 }
 
@@ -86,22 +89,12 @@ class LoadStoragesEvent extends PveStorageSelectorEvent {}
 
 class StorageSelectedEvent extends PveStorageSelectorEvent {
   final PveNodesStorageModel storage;
-
-  StorageSelectedEvent(this.storage);
+  final String storageID;
+  StorageSelectedEvent({this.storage, this.storageID});
 }
 
-class ChangeTargetNode extends PveStorageSelectorEvent {
-  final String targetNode;
+class NodeChanged extends PveStorageSelectorEvent {
+  final String nodeID;
 
-  ChangeTargetNode(this.targetNode);
-}
-
-//STATES
-
-class PveStorageSelectorState extends PveFormFieldState<PveNodesStorageModel> {
-  final List<PveNodesStorageModel> storages;
-
-  PveStorageSelectorState(
-      {this.storages, PveNodesStorageModel selectedStorage, String error})
-      : super(value: selectedStorage, errorText: error);
+  NodeChanged(this.nodeID);
 }

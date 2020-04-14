@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_file_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_storage_selector_bloc.dart';
+import 'package:pve_flutter_frontend/states/pve_file_selector_state.dart';
+import 'package:pve_flutter_frontend/states/pve_storage_selector_state.dart';
 
 import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 
 class PveFileSelector extends StatefulWidget {
   final PveFileSelectorBloc fBloc;
@@ -42,7 +46,7 @@ class _PveFileSelectorState extends State<PveFileSelector> {
   }
 }
 
-class PveFileSelectorWidget extends StatefulWidget {
+class PveFileSelectorWidget extends StatelessWidget {
   final PveFileSelectorBloc fBloc;
   final PveStorageSelectorBloc sBloc;
 
@@ -53,47 +57,34 @@ class PveFileSelectorWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _PveFileSelectorWidgetState createState() => _PveFileSelectorWidgetState();
-}
-
-class _PveFileSelectorWidgetState extends State<PveFileSelectorWidget> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    widget.sBloc.state
-        .where((state) =>
-            (state?.value?.id != widget.fBloc.storageId) &&
-            state?.value != null)
-        .listen(
-            (state) => widget.fBloc.events.add(ChangeStorage(state.value.id)));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Color.fromARGB(255, 243, 246, 255),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: <Widget>[
-            Text(
-              "Storage",
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-            Container(
-              height: 200,
-              child: StreamBuilder<PveStorageSelectorState>(
-                  stream: widget.sBloc.state,
-                  initialData: widget.sBloc.state.value,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.data.storages != null) {
-                      final state = snapshot.data;
+    return StreamListener<PveStorageSelectorState>(
+      stream: sBloc.state,
+      onStateChange: (storageSelectorState) {
+        fBloc.events.add(ChangeStorage(storageSelectorState.selected?.id));
+      },
+      child: Card(
+        color: Color.fromARGB(255, 243, 246, 255),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: <Widget>[
+              Text(
+                "Storage",
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+              Container(
+                height: 200,
+                child: ProxmoxStreamBuilder<PveStorageSelectorBloc,
+                        PveStorageSelectorState>(
+                    bloc: sBloc,
+                    builder: (context, state) {
                       return ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.storages.length,
                           itemBuilder: (context, index) {
                             var storage = state.storages[index];
-                            var isSelected = storage.id == state.value.id;
+                            var isSelected = storage.id == state.selected?.id;
                             var storageIcon =
                                 getStorageIcon(storage.type, isSelected);
                             return Container(
@@ -107,8 +98,8 @@ class _PveFileSelectorWidgetState extends State<PveFileSelectorWidget> {
                                   elevation: isSelected ? 4 : 1,
                                   child: InkWell(
                                       onTap: () {
-                                        widget.sBloc.events
-                                            .add(StorageSelectedEvent(storage));
+                                        sBloc.events.add(StorageSelectedEvent(
+                                            storage: storage));
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
@@ -162,75 +153,71 @@ class _PveFileSelectorWidgetState extends State<PveFileSelectorWidget> {
                               ),
                             );
                           });
-                    }
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }),
-            ),
-            Expanded(
-              child: StreamBuilder<PveFileSelectorState>(
-                  stream: widget.fBloc.state,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final state = snapshot.data;
-                      return Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                "Content",
-                                style: TextStyle(
-                                    color: Color.fromARGB(255, 159, 171, 207),
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  IconButton(
-                                    color: Color.fromARGB(255, 152, 162, 201),
-                                    icon: Icon(Icons.search),
-                                    onPressed: () =>
-                                        widget.fBloc.events.add(ToggleSearch()),
-                                  ),
-                                  IconButton(
-                                    color: Color.fromARGB(255, 152, 162, 201),
-                                    icon: Icon(
-                                      state.gridView
-                                          ? Icons.view_list
-                                          : Icons.view_module,
-                                    ),
-                                    onPressed: () => widget.fBloc.events
-                                        .add(ToggleGridListView()),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          if (state.search)
-                          TextField(
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: 'Search',
-                                  ),
-                                  onChanged: (searchTerm) => widget.fBloc.events
-                                      .add(FilterContent(
-                                          searchTerm: searchTerm)),
+                    }),
+              ),
+              Expanded(
+                child: StreamBuilder<PveFileSelectorState>(
+                    stream: fBloc.state,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final state = snapshot.data;
+                        return Column(
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  "Content",
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 159, 171, 207),
+                                      fontWeight: FontWeight.bold),
                                 ),
-                          Expanded(
-                              child: FileSelectorContentView(
-                            gridView: state.gridView,
-                            content: state.content,
-                          ))
-                        ],
+                                Row(
+                                  children: <Widget>[
+                                    IconButton(
+                                      color: Color.fromARGB(255, 152, 162, 201),
+                                      icon: Icon(Icons.search),
+                                      onPressed: () =>
+                                          fBloc.events.add(ToggleSearch()),
+                                    ),
+                                    IconButton(
+                                      color: Color.fromARGB(255, 152, 162, 201),
+                                      icon: Icon(
+                                        state.gridView
+                                            ? Icons.view_list
+                                            : Icons.view_module,
+                                      ),
+                                      onPressed: () => fBloc.events
+                                          .add(ToggleGridListView()),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            if (state.search)
+                              TextField(
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Search',
+                                ),
+                                onChanged: (searchTerm) => fBloc.events
+                                    .add(FilterContent(searchTerm: searchTerm)),
+                              ),
+                            Expanded(
+                                child: FileSelectorContentView(
+                              gridView: state.gridView,
+                              content: state.content.toList(),
+                            ))
+                          ],
+                        );
+                      }
+                      return Center(
+                        child: CircularProgressIndicator(),
                       );
-                    }
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }),
-            ),
-          ],
+                    }),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -278,37 +265,39 @@ class FileSelectorContentView extends StatelessWidget {
     }
 
     if (gridView) {
-      return GridView.builder(
-        itemCount: content.length,
-        itemBuilder: (context, index) => GridTile(
-          child: Card(
-            child: InkWell(
-              onTap: () => Navigator.pop(context, content[index]),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.sd_card,
-                    size: 72,
-                    color: Color.fromARGB(255, 152, 162, 201),
-                  ),
-                  FractionallySizedBox(
-                    widthFactor: 0.8,
-                    child: Text(
-                      Renderers.renderStorageContent(content[index].volid),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+      return ProxmoxLayoutBuilder(builder: (context, layout) {
+        final wide = layout != ProxmoxLayout.slim;
+        return GridView.builder(
+          itemCount: content.length,
+          itemBuilder: (context, index) => GridTile(
+            child: Card(
+              child: InkWell(
+                onTap: () => Navigator.pop(context, content[index]),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.sd_card,
+                      color: Color.fromARGB(255, 152, 162, 201),
                     ),
-                  ),
-                  Text(Renderers.formatSize(content[index].size))
-                ],
+                    FractionallySizedBox(
+                      widthFactor: 0.8,
+                      child: Text(
+                        Renderers.renderStorageContent(content[index].volid),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(Renderers.formatSize(content[index].size))
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
-      );
+          gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: wide ? 5 : 3),
+        );
+      });
     }
 
     return ListView.builder(
@@ -319,15 +308,12 @@ class FileSelectorContentView extends StatelessWidget {
             Icons.sd_card,
             color: Color.fromARGB(255, 152, 162, 201),
           ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Text(
-                Renderers.renderStorageContent(content[index].volid),
-              ),
-              Text(Renderers.formatSize(content[index].size))
-            ],
+          title: Text(
+            Renderers.renderStorageContent(content[index].volid),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
+          trailing: Text(Renderers.formatSize(content[index].size)),
           onTap: () => Navigator.pop(context, content[index]),
         ),
       ),
