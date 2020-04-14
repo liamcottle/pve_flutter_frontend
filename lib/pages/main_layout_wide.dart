@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
-import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
+import 'package:pve_flutter_frontend/widgets/pve_help_icon_button_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_main_navigation_drawer.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_overview_widget.dart';
-import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
@@ -47,20 +46,16 @@ class _MainLayoutWideState extends State<MainLayoutWide> {
         appBar: AppBar(
           title: Text("Proxmox"),
           actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.help),
-              tooltip: "Documantation",
-              onPressed: () {},
+            PveHelpIconButton(
+              docPath: 'index.html',
             ),
-            Provider<PveTaskLogBloc>(
-                create: (context) => PveTaskLogBloc(apiClient: client)
-                  ..events.add(LoadRecentTasks()),
-                dispose: (context, value) => value.dispose(),
-                child: LogButton()),
+            LogButton(),
             IconButton(
               icon: Icon(Icons.input),
               tooltip: "Logout",
-              onPressed: () => Provider.of<PveAuthenticationBloc>(context).events.add(LoggedOut()),
+              onPressed: () => Provider.of<PveAuthenticationBloc>(context)
+                  .events
+                  .add(LoggedOut()),
             )
           ],
         ),
@@ -71,7 +66,6 @@ class _MainLayoutWideState extends State<MainLayoutWide> {
 class LogButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final taskBloc = Provider.of<PveTaskLogBloc>(context);
     return IconButton(
       icon: Icon(Icons.view_list),
       tooltip: "Recent Tasks",
@@ -81,9 +75,7 @@ class LogButton extends StatelessWidget {
             builder: (otherContext) => Container(
                 height: MediaQuery.of(context).size.height * 0.25,
                 width: MediaQuery.of(context).size.width,
-                child: PVETaskLog(
-                  bloc: taskBloc,
-                )));
+                child: Container()));
       },
     );
   }
