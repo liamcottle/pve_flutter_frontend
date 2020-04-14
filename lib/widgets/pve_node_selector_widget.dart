@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_node_selector_bloc.dart';
+import 'package:pve_flutter_frontend/states/pve_node_selector_state.dart';
 
 class PveNodeSelector extends StatelessWidget {
   final String labelText;
@@ -16,15 +17,11 @@ class PveNodeSelector extends StatelessWidget {
       initialData: _pveNodeSelectorBloc.state.value,
       builder:
           (BuildContext context, AsyncSnapshot<PveNodeSelectorState> snapshot) {
-        if (snapshot.hasData && snapshot.data.nodes != null) {
+        if (snapshot.hasData && snapshot.data.availableNodes.isNotEmpty) {
           final state = snapshot.data;
 
-          return DropdownButtonFormField(
-            decoration: InputDecoration(
-              labelText: labelText,
-              helperText: ' ',
-            ),
-            items: state.nodes
+          return DropdownButton(
+            items: state.availableNodes
                 .map((item) => DropdownMenuItem(
                       child: Row(
                         children: <Widget>[
@@ -35,19 +32,15 @@ class PveNodeSelector extends StatelessWidget {
                           Text(item.renderCpuUsage())
                         ],
                       ),
-                      value: item,
+                      value: item.nodeName,
                     ))
                 .toList(),
-            selectedItemBuilder: (context) =>
-                state.nodes.map((item) => Text(item.nodeName)).toList(),
-            onChanged: (PveNodesModel selectedNode) => _pveNodeSelectorBloc
-                .events
+            selectedItemBuilder: (context) => state.availableNodes
+                .map((item) => Text(item.nodeName))
+                .toList(),
+            onChanged: (String selectedNode) => _pveNodeSelectorBloc.events
                 .add(NodeSelectedEvent(selectedNode)),
-            value: state.value,
-            autovalidate: true,
-            validator: (_) {
-              return state?.errorText;
-            },
+            value: state.selectedNode.nodeName,
           );
         }
 

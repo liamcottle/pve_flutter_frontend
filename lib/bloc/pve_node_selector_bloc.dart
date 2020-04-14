@@ -1,47 +1,58 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
-import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
-
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
+import 'package:pve_flutter_frontend/states/pve_node_selector_state.dart';
 
 class PveNodeSelectorBloc
     extends ProxmoxBaseBloc<PveNodeSelectorEvent, PveNodeSelectorState> {
   final ProxmoxApiClient apiClient;
-
-  final bool onlyOnline;
-
+  final PveNodeSelectorState init;
   @override
-  PveNodeSelectorState get initialState => PveNodeSelectorState();
+  PveNodeSelectorState get initialState => init;
 
-  PveNodeSelectorBloc({this.onlyOnline = true, @required this.apiClient});
+  PveNodeSelectorBloc({@required this.apiClient, @required this.init});
 
   @override
   Stream<PveNodeSelectorState> processEvents(
       PveNodeSelectorEvent event) async* {
     if (event is LoadNodesEvent) {
-      final nodes = await getNodes(onlyOnline);
-      yield PveNodeSelectorState(
-          nodes: nodes,
-          selectedNode: nodes?.first,
-          error: nodes.isEmpty ? "No nodes available" : null);
+      final nodes = await apiClient.getNodes();
+
+      nodes.sort((a, b) => a.nodeName.compareTo(b.nodeName));
+      yield latestState.rebuild((b) => b..nodes.replace(nodes));
     }
 
     if (event is NodeSelectedEvent) {
-      final nodes = await getNodes(onlyOnline);
+      final sl = latestState.nodes
+          .firstWhere((element) => element.nodeName == event.nodeName);
+      yield latestState.rebuild((b) => b..selectedNode.replace(sl));
+    }
 
-      // to make sure it's the same object
-      var selection =
-          nodes.where((item) => item.nodeName == event.node.nodeName).single;
-      yield PveNodeSelectorState(nodes: nodes, selectedNode: selection);
+    if (event is ExcludeOfflineNodes) {
+      yield latestState.rebuild((b) => b..onlineValidator = !b.onlineValidator);
+    }
+
+    if (event is UpdateAllowedNodes) {
+      print(event.nodes);
+      yield latestState.rebuild((b) => b..allowedNodes.replace(event.nodes));
+    }
+
+    if (event is UpdateDisallowedNodes) {
+      yield latestState.rebuild((b) => b..disallowedNodes.replace(event.nodes));
+    }
+
+    if (event is ResetNodeSelector) {
+      yield init;
+      events.add(LoadNodesEvent());
     }
   }
 
   Future<List<PveNodesModel>> getNodes(bool onlyOnline) async {
     var nodes = await apiClient.getNodes();
-    if (onlyOnline) nodes = nodes.where((node) => node.status == "online").toList();
+    if (onlyOnline)
+      nodes = nodes.where((node) => node.status == "online").toList();
     nodes.sort((a, b) => a.nodeName.compareTo(b.nodeName));
     return nodes;
   }
@@ -52,14 +63,23 @@ abstract class PveNodeSelectorEvent {}
 class LoadNodesEvent extends PveNodeSelectorEvent {}
 
 class NodeSelectedEvent extends PveNodeSelectorEvent {
-  final PveNodesModel node;
+  final String nodeName;
 
-  NodeSelectedEvent(this.node);
+  NodeSelectedEvent(this.nodeName);
 }
 
-class PveNodeSelectorState extends PveFormFieldState<PveNodesModel> {
-  final List<PveNodesModel> nodes;
+class ExcludeOfflineNodes extends PveNodeSelectorEvent {}
 
-  PveNodeSelectorState({this.nodes, PveNodesModel selectedNode, String error})
-      : super(value: selectedNode, errorText: error);
+class UpdateAllowedNodes extends PveNodeSelectorEvent {
+  final Set<String> nodes;
+
+  UpdateAllowedNodes(this.nodes);
 }
+
+class UpdateDisallowedNodes extends PveNodeSelectorEvent {
+  final Set<String> nodes;
+
+  UpdateDisallowedNodes(this.nodes);
+}
+
+class ResetNodeSelector extends PveNodeSelectorEvent {}

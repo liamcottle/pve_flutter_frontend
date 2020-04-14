@@ -287,7 +287,7 @@ class _GeneralState extends State<_General> {
 
     wizard.addToValidation(vmNameBloc.state);
     wizard.addToValidation(guestIdSelectorBloc.state);
-    wizard.addToValidation(nodeSelectorBloc.state);
+    //wizard.addToValidation(nodeSelectorBloc.state);
 
     vmNameBloc.events.add(OnChange(wizard.latestState.name ?? ""));
 
@@ -296,7 +296,7 @@ class _GeneralState extends State<_General> {
       var nextStep = wizard.latestState.rebuild((b) => b
         ..currentStep = stepIndex
         ..vmid = int.parse(guestIdSelectorBloc.state.value.value)
-        ..node = nodeSelectorBloc.state.value.value.nodeName
+        //..node = nodeSelectorBloc.state.value.value.nodeName
         ..name = vmNameBloc.state.value.value);
 
       wizard.clearValidation();
