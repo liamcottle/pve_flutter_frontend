@@ -4,6 +4,7 @@ import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_lxc_overview_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_node_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_qemu_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
 import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
 import 'package:pve_flutter_frontend/states/pve_lxc_overview_state.dart';
+import 'package:pve_flutter_frontend/states/pve_node_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_qemu_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
@@ -26,6 +28,7 @@ import 'package:pve_flutter_frontend/widgets/pve_console_widget.dart';
 
 import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
 import 'package:pve_flutter_frontend/widgets/pve_lxc_overview.dart';
+import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_qemu_overview.dart';
 
 void main() async {
@@ -167,6 +170,40 @@ class MyApp extends StatelessWidget {
                     ],
                     child: PveLxcOverview(
                       guestID: guestID,
+                    ),
+                  );
+                },
+              );
+            }
+
+            if (PveNodeOverview.routeName.hasMatch(context.name)) {
+              final match = PveNodeOverview.routeName.firstMatch(context.name);
+              final nodeID = match?.group(1);
+              print(nodeID);
+              return MaterialPageRoute(
+                fullscreenDialog: false,
+                settings: context,
+                builder: (_) {
+                  return MultiProvider(
+                    providers: [
+                      Provider<PveNodeOverviewBloc>(
+                        create: (context) => PveNodeOverviewBloc(
+                          apiClient: state.apiClient,
+                          nodeID: nodeID,
+                          init: PveNodeOverviewState.init(),
+                        )..events.add(UpdateNodeStatus()),
+                        dispose: (context, bloc) => bloc.dispose(),
+                      ),
+                      Provider<PveTaskLogBloc>(
+                        create: (context) => PveTaskLogBloc(
+                            apiClient: state.apiClient,
+                            init: PveTaskLogState.init(nodeID))
+                          ..events.add(LoadTasks()),
+                        dispose: (context, bloc) => bloc.dispose(),
+                      )
+                    ],
+                    child: PveNodeOverview(
+                      nodeID: nodeID,
                     ),
                   );
                 },
