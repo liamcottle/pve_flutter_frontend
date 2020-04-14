@@ -49,13 +49,16 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Proxmox',
         theme: ThemeData(
-            brightness: Brightness.light,
-            fontFamily: "Open Sans",
-            primarySwatch: Colors.blue,
-            primaryTextTheme: TextTheme(
-              title: TextStyle(
-                  fontFamily: "Open Sans", fontWeight: FontWeight.w700),
-            )),
+          brightness: Brightness.light,
+          fontFamily: "Open Sans",
+          primarySwatch: Colors.blue,
+          primaryColor: Color(0xFF00617F),
+          primaryTextTheme: TextTheme(
+            headline6:
+                TextStyle(fontFamily: "Open Sans", fontWeight: FontWeight.w700),
+          ),
+          scaffoldBackgroundColor: Colors.white,
+        ),
         onGenerateRoute: (context) {
           if (authbloc.state.value is Unauthenticated) {
             return MaterialPageRoute(
