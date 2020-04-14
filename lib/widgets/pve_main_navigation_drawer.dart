@@ -52,10 +52,12 @@ class PveMainNavigationDrawer extends StatelessWidget {
                           .map((resource) => ProxmoxTreeItem(
                               id: resource.id,
                               headerValue: resource.displayName,
-                              icon: Renderers.getDefaultResourceIcon(
+                              icon: Icon(
+                                Renderers.getDefaultResourceIcon(
                                   resource.type,
-                                  resource.shared,
-                                  resource.status),
+                                  shared: resource.shared,
+                                ),
+                              ),
                               children: snapshot.data.resources
                                   .where((child) =>
                                       child.node != null &&
@@ -63,12 +65,15 @@ class PveMainNavigationDrawer extends StatelessWidget {
                                       child.type != resource.type)
                                   .map((child) {
                                 return ProxmoxTreeItem(
-                                    id: child.id,
-                                    headerValue: child.displayName,
-                                    icon: Renderers.getDefaultResourceIcon(
-                                        child.type,
-                                        child.shared,
-                                        child.status));
+                                  id: child.id,
+                                  headerValue: child.displayName,
+                                  icon: Icon(
+                                    Renderers.getDefaultResourceIcon(
+                                      child.type,
+                                      shared: child.shared,
+                                    ),
+                                  ),
+                                );
                               }).toList()))
                           .toList(),
                     ),

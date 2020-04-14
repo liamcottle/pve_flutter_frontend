@@ -31,8 +31,10 @@ class PveResourceOverview extends StatelessWidget {
                 rows: snapshot.data.resources
                     .where((resource) => resource.type != "pool")
                     .map((resource) => DataRow(cells: [
-                          DataCell(Renderers.getDefaultResourceIcon(
-                              resource.type, resource.shared, resource.status)),
+                          DataCell(Icon(Renderers.getDefaultResourceIcon(
+                            resource.type,
+                            shared: resource.shared,
+                          ))),
                           DataCell(Text(resource.displayName)),
                           DataCell(Text(resource.node ?? "")),
                           DataCell(Row(

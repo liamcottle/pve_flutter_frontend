@@ -21,27 +21,21 @@ class Renderers {
     return volid.replaceAll(RegExp(r"^.*:(.*\/)?"), '');
   }
 
-  static Icon getDefaultResourceIcon(String type, bool shared, String status) {
+  static IconData getDefaultResourceIcon(String type, {bool shared = false}) {
     switch (type) {
       case "node":
-        return Icon(Icons.storage);
+        return Icons.storage;
       case "qemu":
-        return Icon(Icons.desktop_windows);
+        return Icons.desktop_windows;
 
       case "lxc":
-        return Icon(Icons.layers);
+        return FontAwesomeIcons.cube;
       case "storage":
-        return shared
-            ? Icon(
-                Icons.folder_shared,
-                color: status != 'available' ? Colors.orange : Colors.green,
-              )
-            : Icon(FontAwesomeIcons.database,
-                color: status != 'available' ? Colors.orange : Colors.green);
+        return shared ? Icons.folder_shared : FontAwesomeIcons.database;
       case "pool":
-        return Icon(Icons.label);
+        return Icons.label;
       default:
-        return Icon(Icons.build);
+        return Icons.build;
     }
   }
 }
