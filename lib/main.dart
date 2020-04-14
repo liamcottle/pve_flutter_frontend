@@ -26,9 +26,10 @@ void main() async {
   try {
     var credentials = await proxclient.Credentials.fromPlatformStorage();
     var apiClient = proxclient.ProxmoxApiClient(credentials);
-    apiClient.refreshCredentials();
+    await apiClient.refreshCredentials();
     authBloc.events.add(LoggedIn(apiClient));
-  } catch (_) {
+  } catch (e) {
+    print(e);
     authBloc.events.add(LoggedOut());
   }
 
