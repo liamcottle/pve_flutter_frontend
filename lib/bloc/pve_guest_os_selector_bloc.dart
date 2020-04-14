@@ -1,6 +1,6 @@
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
-import 'package:pve_flutter_frontend/states/pve_qemu_create_wizard_state.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveGuestOsSelectorBloc
     extends ProxmoxBaseBloc<PveGuestOsSelectorEvent, PveGuestOsSelectorState> {

@@ -1,7 +1,7 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 part 'pve_qemu_create_wizard_state.g.dart';
 
 // vmid: 100
@@ -90,86 +90,4 @@ abstract class PveQemuCreateWizardState
 
   @nullable
   int get sockets;
-}
-
-@BuiltValueEnum(wireName: 'arch')
-class ProcessorArch extends EnumClass {
-  static Serializer<ProcessorArch> get serializer => _$processorArchSerializer;
-
-  static const ProcessorArch x86_64 = _$x86_64;
-  static const ProcessorArch aarch64 = _$aarch64;
-
-  const ProcessorArch._(String name) : super(name);
-
-  static BuiltSet<ProcessorArch> get values => _$paValues;
-  static ProcessorArch valueOf(String name) => _$paValueOf(name);
-}
-
-@BuiltValueEnum(wireName: 'bios')
-class Bios extends EnumClass {
-  static Serializer<Bios> get serializer => _$biosSerializer;
-
-  static const Bios seabios = _$seabios;
-  static const Bios ovmf = _$ovmf;
-
-  const Bios._(String name) : super(name);
-
-  static BuiltSet<Bios> get values => _$biValues;
-  static Bios valueOf(String name) => _$biValueOf(name);
-}
-
-@BuiltValueEnum(wireName: 'ostype')
-class OSType extends EnumClass {
-  static Serializer<OSType> get serializer => _$oSTypeSerializer;
-
-  static const OSType other = _$other;
-  static const OSType wxp = _$wxp;
-  static const OSType w2k = _$w2k;
-  static const OSType w2k3 = _$w2k3;
-  static const OSType w2k8 = _$w2k8;
-  static const OSType wvista = _$wvista;
-  static const OSType win7 = _$win7;
-  static const OSType win8 = _$win8;
-  static const OSType win10 = _$win10;
-  static const OSType l24 = _$l24;
-  static const OSType l26 = _$l26;
-  static const OSType solaris = _$solaris;
-
-  const OSType._(String name) : super(name);
-
-  static BuiltSet<OSType> get values => _$osValues;
-  static OSType valueOf(String name) => _$osValueOf(name);
-}
-
-@BuiltValueEnum(wireName: 'scsihw')
-class ScsiControllerModel extends EnumClass {
-  static Serializer<ScsiControllerModel> get serializer =>
-      _$scsiControllerModelSerializer;
-
-  static const ScsiControllerModel lsi = _$lsi;
-  static const ScsiControllerModel lsi53c810 = _$lsi53c810;
-  @BuiltValueField(wireName: 'virtio-scsi-pci')
-  static const ScsiControllerModel virtioScsiPci = _$virtioScsiPci;
-  @BuiltValueField(wireName: 'virtio-scsi-single')
-  static const ScsiControllerModel virtioScsiSingle = _$virtioScsiSingle;
-  static const ScsiControllerModel megasas = _$megasas;
-  static const ScsiControllerModel pvscsi = _$pvscsi;
-
-  const ScsiControllerModel._(String name) : super(name);
-
-  static BuiltSet<ScsiControllerModel> get values => _$scValues;
-  static ScsiControllerModel valueOf(String name) => _$scValueOf(name);
-}
-
-class CdType extends EnumClass {
-  static Serializer<CdType> get serializer => _$cdTypeSerializer;
-
-  static const CdType iso = _$iso;
-  static const CdType cdrom = _$cdrom;
-  static const CdType none = _$none;
-
-  const CdType._(String name) : super(name);
-
-  static BuiltSet<CdType> get values => _$values;
-  static CdType valueOf(String name) => _$valueOf(name);
 }

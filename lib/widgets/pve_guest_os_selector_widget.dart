@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_guest_os_selector_bloc.dart';
-import 'package:pve_flutter_frontend/states/pve_qemu_create_wizard_state.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class PveGuestOsSelector extends StatelessWidget {
   @override
@@ -16,13 +16,15 @@ class PveGuestOsSelector extends StatelessWidget {
             decoration: InputDecoration(labelText: 'Guest OS'),
             items: gBloc.osChoices.keys
                 .map((choice) => DropdownMenuItem(
-                    value: choice,
-                    child:
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
+                      value: choice,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
                           getIcon(gBloc.osChoices[choice]['type']),
-                          Text(gBloc.osChoices[choice]['desc'])])))
+                          Text(gBloc.osChoices[choice]['desc']),
+                        ],
+                      ),
+                    ))
                 .toList(),
             onChanged: (choice) {
               gBloc.events.add(ChangeOsType(choice));
@@ -35,11 +37,11 @@ class PveGuestOsSelector extends StatelessWidget {
   }
 
   Widget getIcon(String osGroup) {
-    if (osGroup == "Microsoft Windows"){
+    if (osGroup == "Microsoft Windows") {
       return Icon(FontAwesomeIcons.windows);
     }
 
-    if (osGroup == "Linux"){
+    if (osGroup == "Linux") {
       return Icon(FontAwesomeIcons.linux);
     }
 
