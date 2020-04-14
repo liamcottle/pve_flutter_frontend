@@ -19,6 +19,7 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_action_card_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_guest_migrate_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_guest_overview_header.dart';
+import 'package:pve_flutter_frontend/widgets/pve_lxc_power_settings_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
 
@@ -94,7 +95,20 @@ class PveLxcOverview extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
                             ActionCard(
-                                icon: Icon(
+                              icon: Icon(
+                                Icons.power_settings_new,
+                                size: 55,
+                                color: Colors.white24,
+                              ),
+                              title: 'Power Settings',
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) => PveLxcPowerSettings(
+                                          lxcBloc: lxcBloc,
+                                        ),
+                                    fullscreenDialog: true),
+                              ),
+                            ),
                                   FontAwesomeIcons.paperPlane,
                                   size: 55,
                                   color: Colors.white24,
