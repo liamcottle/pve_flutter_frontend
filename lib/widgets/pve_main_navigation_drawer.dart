@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
-import 'package:pve_flutter_frontend/states/pve_state_cluster_status.dart';
+import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/cluster_status_widget.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_tree_widget.dart';
@@ -102,19 +102,23 @@ class PveMainNavigationDrawer extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: StreamBuilder<PveClusterStatusState>(
-                          stream: Provider.of<PveClusterStatusBloc>(context).state,
-                          initialData: Provider.of<PveClusterStatusBloc>(context).state.value,
-                          builder: (context, snapshot) {
-                            final state = snapshot.data;
-                            return ClusterStatus(
-                              isHealthy: state.healthy,
-                              healthyColor: Colors.greenAccent,
-                              warningColor: Colors.orangeAccent,
-                              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                              version: state.cluster.version.toString(),
-                            );
-                          }
-                        ),
+                            stream: Provider.of<PveClusterStatusBloc>(context)
+                                .state,
+                            initialData:
+                                Provider.of<PveClusterStatusBloc>(context)
+                                    .state
+                                    .value,
+                            builder: (context, snapshot) {
+                              final state = snapshot.data;
+                              return ClusterStatus(
+                                isHealthy: state.healthy,
+                                healthyColor: Colors.greenAccent,
+                                warningColor: Colors.orangeAccent,
+                                backgroundColor:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                version: state.cluster.version.toString(),
+                              );
+                            }),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

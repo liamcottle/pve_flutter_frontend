@@ -7,8 +7,7 @@ class ClusterStatus extends StatelessWidget {
     this.healthyColor = Colors.greenAccent,
     this.warningColor = Colors.orangeAccent,
     this.backgroundColor = Colors.transparent,
-    this.version = "unkown"
-
+    this.version
   }) : super(key: key);
 
   final bool isHealthy;
@@ -38,7 +37,7 @@ class ClusterStatus extends StatelessWidget {
       ),
       duration: Duration(seconds: 1),
       child: Center(
-        child: Text(version),
+        child: Text(version ?? ""),
       ),
     );
   }

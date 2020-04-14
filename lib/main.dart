@@ -8,6 +8,7 @@ import 'package:pve_flutter_frontend/pages/404_page.dart';
 import 'package:pve_flutter_frontend/pages/login_page.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
+import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
 import 'package:pve_flutter_frontend/widgets/pve_create_vm_wizard_page.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
     as proxclient;
@@ -135,9 +136,10 @@ class RootPage extends StatelessWidget {
                     dispose: (context, bloc) => bloc.dispose(),
                   ),
                   Provider<PveClusterStatusBloc>(
-                    builder: (context) =>
-                        PveClusterStatusBloc(apiClient: state.apiClient)
-                          ..events.add(UpdateClusterStatus()),
+                    create: (context) => PveClusterStatusBloc(
+                        apiClient: state.apiClient,
+                        init: PveClusterStatusState.init())
+                      ..events.add(UpdateClusterStatus()),
                     dispose: (context, bloc) => bloc.dispose(),
                   )
                 ],
