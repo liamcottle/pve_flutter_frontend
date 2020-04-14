@@ -34,20 +34,27 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  icon ??
-                      Icon(
-                        Icons.storage,
-                        color: selected ? Colors.white : Colors.blueGrey[300],
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 10.0),
+                    child: icon ??
+                        Icon(
+                          Icons.storage,
+                          color: selected ? Colors.white : Colors.blueGrey[300],
+                        ),
+                  ),
                   Text(usedValue,
                       style: TextStyle(
-                          color: textColor ?? selected ? Colors.white : Colors.black,
+                          color: textColor ?? selected
+                              ? Colors.white
+                              : Colors.black,
                           fontWeight: FontWeight.bold)),
                 ],
               ),
               Text("Total: $totalValue",
                   style: TextStyle(
-                      color: textColor ?? selected ? Colors.white70 : Colors.blueGrey[300],
+                      color: textColor ?? selected
+                          ? Colors.white70
+                          : Colors.blueGrey[300],
                       fontWeight: FontWeight.bold))
             ],
           ),
@@ -63,12 +70,12 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
   }
 
   AlwaysStoppedAnimation<Color> getUsageAwareColor(double usedPercent) {
-    if (usedPercent <= 0.25) {
+    if (usedPercent <= 0.5) {
       return AlwaysStoppedAnimation<Color>(Colors.greenAccent);
     }
 
-    if (0.25 < usedPercent && usedPercent <= 0.75) {
-      return AlwaysStoppedAnimation<Color>(Colors.yellowAccent);
+    if (0.5 < usedPercent && usedPercent <= 0.75) {
+      return AlwaysStoppedAnimation<Color>(Colors.yellow);
     }
     if (usedPercent > 0.75) {
       return AlwaysStoppedAnimation<Color>(Colors.red);
