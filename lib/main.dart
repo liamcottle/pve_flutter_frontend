@@ -3,13 +3,17 @@ import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_qemu_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
 import 'package:pve_flutter_frontend/pages/404_page.dart';
 import 'package:pve_flutter_frontend/pages/login_page.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
 import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
+import 'package:pve_flutter_frontend/states/pve_qemu_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
+import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_create_vm_wizard_page.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
@@ -19,6 +23,7 @@ import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 import 'package:pve_flutter_frontend/widgets/pve_console_widget.dart';
 
 import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
+import 'package:pve_flutter_frontend/widgets/pve_qemu_overview.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -94,6 +99,41 @@ class MyApp extends StatelessWidget {
           }
           if (authbloc.state.value is Authenticated) {
             final state = authbloc.state.value as Authenticated;
+            if (PveQemuOverview.routeName.hasMatch(context.name)) {
+              final match = PveQemuOverview.routeName.firstMatch(context.name);
+              final nodeID = match?.group(1);
+              final guestID = match?.group(2);
+
+              return MaterialPageRoute(
+                fullscreenDialog: false,
+                settings: context,
+                builder: (_) {
+                  return MultiProvider(
+                    providers: [
+                      Provider<PveQemuOverviewBloc>(
+                        create: (context) => PveQemuOverviewBloc(
+                          guestID: guestID,
+                          apiClient: state.apiClient,
+                          init: PveQemuOverviewState.init(nodeID),
+                        )..events.add(UpdateQemuStatus()),
+                        dispose: (context, bloc) => bloc.dispose(),
+                      ),
+                      Provider<PveTaskLogBloc>(
+                        create: (context) => PveTaskLogBloc(
+                            apiClient: state.apiClient,
+                            init: PveTaskLogState.init(nodeID))
+                          ..events.add(FilterTasksByGuestID(guestID: guestID))
+                          ..events.add(LoadTasks()),
+                        dispose: (context, bloc) => bloc.dispose(),
+                      )
+                    ],
+                    child: PveQemuOverview(
+                      guestID: guestID,
+                    ),
+                  );
+                },
+              );
+            }
             switch (context.name) {
               case PveCreateVmWizard.routeName:
                 return MaterialPageRoute(
