@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_lxc_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_qemu_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
@@ -11,6 +12,7 @@ import 'package:pve_flutter_frontend/pages/login_page.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
 import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
+import 'package:pve_flutter_frontend/states/pve_lxc_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_qemu_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
@@ -23,6 +25,7 @@ import 'package:pve_flutter_frontend/utils/proxmox_layout_builder.dart';
 import 'package:pve_flutter_frontend/widgets/pve_console_widget.dart';
 
 import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
+import 'package:pve_flutter_frontend/widgets/pve_lxc_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_qemu_overview.dart';
 
 void main() async {
@@ -128,6 +131,41 @@ class MyApp extends StatelessWidget {
                       )
                     ],
                     child: PveQemuOverview(
+                      guestID: guestID,
+                    ),
+                  );
+                },
+              );
+            }
+            if (PveLxcOverview.routeName.hasMatch(context.name)) {
+              final match = PveLxcOverview.routeName.firstMatch(context.name);
+              final nodeID = match?.group(1);
+              final guestID = match?.group(2);
+
+              return MaterialPageRoute(
+                fullscreenDialog: false,
+                settings: context,
+                builder: (_) {
+                  return MultiProvider(
+                    providers: [
+                      Provider<PveLxcOverviewBloc>(
+                        create: (context) => PveLxcOverviewBloc(
+                          guestID: guestID,
+                          apiClient: state.apiClient,
+                          init: PveLxcOverviewState.init(nodeID),
+                        )..events.add(UpdateLxcStatus()),
+                        dispose: (context, bloc) => bloc.dispose(),
+                      ),
+                      Provider<PveTaskLogBloc>(
+                        create: (context) => PveTaskLogBloc(
+                            apiClient: state.apiClient,
+                            init: PveTaskLogState.init(nodeID))
+                          ..events.add(FilterTasksByGuestID(guestID: guestID))
+                          ..events.add(LoadTasks()),
+                        dispose: (context, bloc) => bloc.dispose(),
+                      )
+                    ],
+                    child: PveLxcOverview(
                       guestID: guestID,
                     ),
                   );
