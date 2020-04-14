@@ -34,16 +34,18 @@ class _PveLoginFormState extends State<PveLoginForm> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loginBloc.state
-        .where((state) => state.isFailure)
-        .listen((state) => Scaffold.of(context).showSnackBar(SnackBar(
+    _loginBloc.state.where((state) => state.isFailure).listen(
+          (state) => Scaffold.of(context).showSnackBar(
+            SnackBar(
               content: Text(
                 state.errorMessage ?? "Error",
                 style: ThemeData.dark().textTheme.button,
               ),
               backgroundColor: ThemeData.dark().errorColor,
               behavior: SnackBarBehavior.floating,
-            )));
+            ),
+          ),
+        );
   }
 
   @override
@@ -65,24 +67,26 @@ class _PveLoginFormState extends State<PveLoginForm> {
                       'assets/images/Proxmox_logo_white_orange_800.png'),
                   SizedBox(height: 20),
                   //TODO change this when there's a more official way to determine web e.g. Platform.isWeb or similar
-                  if(!kIsWeb)
+                  if (!kIsWeb)
+                    TextFormField(
+                      decoration: InputDecoration(
+                          icon: Icon(Icons.domain),
+                          labelText: 'Origin',
+                          hintText: 'e.g. https://ip-of-your-pve-host:8006'),
+                      controller: _originController,
+                    ),
                   TextFormField(
                     decoration: InputDecoration(
-                        icon: Icon(Icons.domain),
-                        labelText: 'Origin',
-                        hintText: 'e.g. https://ip-of-your-pve-host:8006'),
-                    controller: _originController,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.person),
-                        labelText: 'Username',),
+                      icon: Icon(Icons.person),
+                      labelText: 'Username',
+                    ),
                     controller: _usernameController,
                   ),
                   TextFormField(
                     decoration: InputDecoration(
-                        icon: Icon(Icons.lock),
-                        labelText: 'Password',),
+                      icon: Icon(Icons.lock),
+                      labelText: 'Password',
+                    ),
                     controller: _passwordController,
                     obscureText: true,
                     autovalidate: true,
@@ -145,9 +149,8 @@ class _PveLoginFormState extends State<PveLoginForm> {
 
   _onLoginButtonPressed() {
     _loginBloc.events.add(LoginWithCredentialsPressed(
-      username: _usernameController.text + "@pam",
-      password: _passwordController.text,
-      origin: _originController.text
-    ));
+        username: _usernameController.text.trim() + "@pam",
+        password: _passwordController.text,
+        origin: _originController.text.trim()));
   }
 }
