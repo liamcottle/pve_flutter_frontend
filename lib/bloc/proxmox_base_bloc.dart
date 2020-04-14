@@ -16,8 +16,9 @@ abstract class ProxmoxBaseBloc<E, S> {
   bool get hasListener => _stateSubject.hasListener;
 
   S get latestState => _stateSubject.stream.value;
-
   S get initialState;
+
+  S penultimate;
 
   void doOnListen() {}
   void doOnCancel() {}
@@ -41,6 +42,7 @@ abstract class ProxmoxBaseBloc<E, S> {
     eventPipe(_eventSubject,
             (event) => processEvents(event).handleError(_errorHandler))
         .forEach((S state) {
+      penultimate = latestState;
       if (_stateSubject.isClosed) return;
       _stateSubject.add(state);
     });
