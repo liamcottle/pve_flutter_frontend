@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
+import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 
 class PveResourceOverview extends StatelessWidget {
@@ -55,16 +56,16 @@ class PveResourceOverview extends StatelessWidget {
                 color: Colors.red,
               ),
               tooltip: "Turn off",
-              onPressed: () => rbloc.events.add(
-                  PerformActionOnResource(ResourceAction.shutdown, resource)),
+              onPressed: () => rbloc.events.add(PerformActionOnResource(
+                  PveClusterResourceAction.shutdown, resource)),
             ),
             IconButton(
               icon: Icon(
                 Icons.autorenew,
               ),
               tooltip: "Reboot",
-              onPressed: () => rbloc.events.add(
-                  PerformActionOnResource(ResourceAction.reboot, resource)),
+              onPressed: () => rbloc.events.add(PerformActionOnResource(
+                  PveClusterResourceAction.reboot, resource)),
             ),
           ];
         }
@@ -78,8 +79,8 @@ class PveResourceOverview extends StatelessWidget {
                 Icons.power_settings_new,
                 color: Colors.red,
               ),
-              onPressed: () => rbloc.events.add(
-                  PerformActionOnResource(ResourceAction.shutdown, resource)),
+              onPressed: () => rbloc.events.add(PerformActionOnResource(
+                  PveClusterResourceAction.shutdown, resource)),
               tooltip: "Shutdown",
             ),
             IconButton(
@@ -88,8 +89,8 @@ class PveResourceOverview extends StatelessWidget {
                 color: Colors.red,
               ),
               tooltip: "Unplug",
-              onPressed: () => rbloc.events
-                  .add(PerformActionOnResource(ResourceAction.stop, resource)),
+              onPressed: () => rbloc.events.add(PerformActionOnResource(
+                  PveClusterResourceAction.stop, resource)),
             ),
           ];
         }
@@ -99,8 +100,8 @@ class PveResourceOverview extends StatelessWidget {
               Icons.power_settings_new,
               color: Colors.green,
             ),
-            onPressed: () => rbloc.events
-                .add(PerformActionOnResource(ResourceAction.start, resource)),
+            onPressed: () => rbloc.events.add(PerformActionOnResource(
+                PveClusterResourceAction.start, resource)),
             tooltip: "Start",
           ),
         ];
@@ -113,8 +114,8 @@ class PveResourceOverview extends StatelessWidget {
                 Icons.power_settings_new,
                 color: Colors.red,
               ),
-              onPressed: () => rbloc.events
-                  .add(PerformActionOnResource(ResourceAction.stop, resource)),
+              onPressed: () => rbloc.events.add(PerformActionOnResource(
+                  PveClusterResourceAction.stop, resource)),
               tooltip: "Shutdown",
             ),
             IconButton(
@@ -123,8 +124,8 @@ class PveResourceOverview extends StatelessWidget {
                 color: Colors.red,
               ),
               tooltip: "Unplug",
-              onPressed: () => rbloc.events.add(
-                  PerformActionOnResource(ResourceAction.shutdown, resource)),
+              onPressed: () => rbloc.events.add(PerformActionOnResource(
+                  PveClusterResourceAction.shutdown, resource)),
             ),
           ];
         }
@@ -135,8 +136,8 @@ class PveResourceOverview extends StatelessWidget {
               color: Colors.green,
             ),
             tooltip: "Start",
-            onPressed: () => rbloc.events
-                .add(PerformActionOnResource(ResourceAction.start, resource)),
+            onPressed: () => rbloc.events.add(PerformActionOnResource(
+                PveClusterResourceAction.start, resource)),
           )
         ];
       case "storage":

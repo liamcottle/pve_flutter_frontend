@@ -9,6 +9,8 @@ import 'package:pve_flutter_frontend/pages/login_page.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
 import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
+import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_create_vm_wizard_page.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart'
     as proxclient;
@@ -31,10 +33,22 @@ void main() async {
   }
 
   ProxmoxGlobalErrorBloc();
+  Provider.debugCheckInvalidValueType = null;
 
-  runApp(MyApp(
-    authbloc: authBloc,
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider.value(value: authBloc),
+        Provider<PveResourceBloc>(
+          create: (context) => PveResourceBloc(init: PveResourceState.init()),
+          dispose: (context, bloc) => bloc.dispose(),
+        ),
+      ],
+      child: MyApp(
+        authbloc: authBloc,
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -44,8 +58,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Provider.value(
-      value: authbloc,
+    return StreamListener(
+      stream: authbloc.state,
+      onStateChange: (state) {
+        if (state is Authenticated) {
+          Provider.of<PveResourceBloc>(context)
+            ..apiClient = state.apiClient
+            ..events.add(PollResources());
+        }
+      },
       child: MaterialApp(
         title: 'Proxmox',
         theme: ThemeData(
@@ -131,12 +152,6 @@ class RootPage extends StatelessWidget {
                 providers: [
                   Provider<proxclient.ProxmoxApiClient>.value(
                     value: state.apiClient,
-                  ),
-                  Provider<PveResourceBloc>(
-                    builder: (context) =>
-                        PveResourceBloc(apiClient: state.apiClient)
-                          ..events.add(PollResources()),
-                    dispose: (context, bloc) => bloc.dispose(),
                   ),
                   Provider<PveClusterStatusBloc>(
                     create: (context) => PveClusterStatusBloc(
