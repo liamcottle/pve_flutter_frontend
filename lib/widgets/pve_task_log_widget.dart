@@ -1,167 +1,143 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
+import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 
-class PVETaskLog extends StatefulWidget {
-  final PveTaskLogBloc bloc;
-
-  const PVETaskLog({Key key, this.bloc}) : super(key: key);
-
-  @override
-  _PVETaskLogState createState() => _PVETaskLogState();
-}
-
-class _PVETaskLogState extends State<PVETaskLog> {
-  PveTaskLogBloc get _taskBloc => widget.bloc;
-
-  @override
-  void dispose() {
-    _taskBloc.dispose();
-    super.dispose();
-  }
-
+class PveTaskLog extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  PveTaskLog({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: <Widget>[
-            Align(
-              alignment: Alignment.topRight,
-              child: IconButton(
-                icon: Icon(Icons.close),
-                tooltip: 'Close log',
-                onPressed: () {
-                  // this works, because showBottomSheet creates a LocalHistoryEntry
-                  // the same behavior is triggerd by the browser back button
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-            Expanded(
-              child: StreamBuilder<PVETaskLogState>(
-                  stream: _taskBloc?.state,
-                  initialData: _taskBloc.state.value,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<PVETaskLogState> snapshot) {
-                    if (snapshot.data is LoadedRecentTasks) {
-                      final tasks = (snapshot.data as LoadedRecentTasks).tasks;
-                      return Column(
-                        children: <Widget>[
-                          Row(
+    final bloc = Provider.of<PveTaskLogBloc>(context);
+    return ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
+        bloc: bloc,
+        builder: (context, state) {
+          if (state.tasks != null) {
+            return SafeArea(
+              child: Scaffold(
+                key: _scaffoldKey,
+                appBar: AppBar(
+                  leading: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  actions: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.more_vert),
+                      onPressed: () =>
+                          _scaffoldKey.currentState.openEndDrawer(),
+                    )
+                  ],
+                ),
+                endDrawer: Drawer(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Filters',
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              labelText: 'by user',
+                              filled: true,
+                              prefixIcon: Icon(Icons.person)),
+                          onFieldSubmitted: (newValue) {
+                            bloc.events.add(FilterTasksByUser(newValue));
+                            bloc.events.add(LoadTasks());
+                          },
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              labelText: 'by type',
+                              filled: true,
+                              prefixIcon: Icon(Icons.description)),
+                          onFieldSubmitted: (newValue) {
+                            bloc.events.add(FilterTasksByType(newValue));
+                            bloc.events.add(LoadTasks());
+                          },
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(labelText: 'Source'),
+                          value: 'all',
+                          icon: Icon(Icons.arrow_downward),
+                          iconSize: 24,
+                          elevation: 16,
+                          onChanged: (String newValue) {
+                            bloc.events.add(FilterTasksBySource(newValue));
+                            bloc.events.add(LoadTasks());
+                          },
+                          items: <String>[
+                            'all',
+                            'active',
+                            'archive',
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Container(child: Text(value)),
+                            );
+                          }).toList(),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        FormField(
+                          builder: (FormFieldState<bool> formFieldState) => Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Container(
-                                width: 150,
-                                child: Text("Start time"),
-                              ),
-                              Container(
-                                width: 150,
-                                child: Text("End time"),
-                              ),
-                              Expanded(
-                                child: Text("Node"),
-                              ),
-                              Container(
-                                width: 150,
-                                child: Text("User"),
-                              ),
-                              Container(
-                                width: 150,
-                                child: Text("Status"),
+                              Text("Only errors"),
+                              Checkbox(
+                                value: state.onlyErrors,
+                                onChanged: (value) {
+                                  formFieldState.didChange(value);
+                                  bloc.events.add(FilterTasksByError());
+                                  bloc.events.add(LoadTasks());
+                                },
                               ),
                             ],
                           ),
-                          Divider(),
-                          Expanded(
-                            child: ListView.builder(
-                                itemCount: tasks.length,
-                                itemBuilder: (context, index) => Row(
-                                      children: <Widget>[
-                                        Container(
-                                          width: 150,
-                                          child: tasks[index].startTime != null
-                                              ? Text(
-                                                  tasks[index]
-                                                      .startTime
-                                                      .toIso8601String(),
-                                                )
-                                              : Text(""),
-                                        ),
-                                        Container(
-                                          width: 150,
-                                          child: Center(
-                                            child: tasks[index].endTime != null
-                                                ? Text(tasks[index]
-                                                    .endTime
-                                                    ?.toIso8601String())
-                                                : CircularProgressIndicator(),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(tasks[index].node),
-                                        ),
-                                        Container(
-                                          width: 150,
-                                          child: Text(tasks[index].user),
-                                        ),
-                                        Container(
-                                          width: 150,
-                                          child: PveTaskLogStatusWidget(
-                                              status: tasks[index].status),
-                                        ),
-                                      ],
-                                    )),
-                          )
-                        ],
-                      );
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                body: NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scrollInfo) {
+                    if (scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent) {
+                      bloc.events.add(LoadMoreTasks());
                     }
+                    return false;
+                  },
+                  child: state.tasks.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: state.tasks.length,
+                          itemBuilder: (context, index) => PveTaskExpansionTile(
+                            task: state.tasks[index],
+                          ),
+                        )
+                      : Center(
+                          child: Text("No tasks found"),
+                        ),
+                ),
+              ),
+            );
+          }
 
-                    if (snapshot.data is NoTaskLogsAvailable) {
-                      return Center(
-                        child: Text("No task logs available"),
-                      );
-                    }
-
-                    return Center(child: CircularProgressIndicator());
-                  }),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PveTaskLogStatusWidget extends StatelessWidget {
-  final String status;
-
-  const PveTaskLogStatusWidget({Key key, this.status}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    if (status != null) {
-      switch (status) {
-        case "OK":
-          return Chip(
-            label: Text(
-              "ok",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            backgroundColor: Colors.lightGreenAccent,
-            padding: EdgeInsets.fromLTRB(20, 3, 20, 3),
-          );
-
-        default:
-          return Chip(
-            label: Text("error"),
-            backgroundColor: Colors.red,
-            padding: EdgeInsets.fromLTRB(20, 3, 20, 3),
-          );
-      }
-    } else {
-      return Chip(
-        label: Text("running"),
-      );
-    }
+          return Container();
+        });
   }
 }
