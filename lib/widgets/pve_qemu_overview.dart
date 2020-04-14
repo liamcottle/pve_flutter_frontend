@@ -14,6 +14,7 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart'
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_action_card_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_guest_overview_header.dart';
+import 'package:pve_flutter_frontend/widgets/pve_qemu_options_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_qemu_power_settings_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
@@ -97,6 +98,16 @@ class PveQemuOverview extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(_createShutdownRoute(bloc)),
                         ),
+                        ActionCard(
+                          icon: Icon(
+                            Icons.settings,
+                            size: 55,
+                            color: Colors.white24,
+                          ),
+                          title: 'Options',
+                          onTap: () => Navigator.of(context)
+                              .push(_createOptionsRoute(bloc)),
+                        ),
                       ],
                     ),
                   ),
@@ -159,6 +170,29 @@ class PveQemuOverview extends StatelessWidget {
       pageBuilder: (context, animation, secondaryAnimation) => Provider.value(
         value: bloc,
         child: PveQemuPowerSettings(),
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: Tween<double>(
+            begin: 0.0,
+            end: 1.0,
+          ).animate(
+            CurvedAnimation(
+              parent: animation,
+              curve: Curves.fastOutSlowIn,
+            ),
+          ),
+          child: child,
+        );
+      },
+    );
+  }
+
+  Route _createOptionsRoute(PveQemuOverviewBloc bloc) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => Provider.value(
+        value: bloc,
+        child: PveQemuOptions(),
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return ScaleTransition(
