@@ -69,6 +69,16 @@ class PveFileSelectorWidget extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: <Widget>[
+              AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.black,
+                    ),
+                    onPressed: () => Navigator.of(context).pop()),
+              ),
               Text(
                 "Storage",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
@@ -294,8 +304,8 @@ class FileSelectorContentView extends StatelessWidget {
               ),
             ),
           ),
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: wide ? 5 : 3),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: wide ? 5 : 3),
         );
       });
     }
