@@ -19,7 +19,7 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
   @override
   void doOnListen() {
     updateTasks = Timer.periodic(Duration(seconds: 4), (timer) {
-        events.add(LoadTasks());
+      events.add(LoadTasks());
     });
   }
 
@@ -36,21 +36,33 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
     yield latestState.rebuild((b) => b..isBlank = false);
 
     if (event is LoadTasks) {
-      final nodeTaskResponse = await getNodeTasks(latestState);
+      var nodeTaskResponse;
+      yield latestState.rebuild((b) => b..isLoading = true);
+
+      if (latestState.tasks.length > 0) {
+        nodeTaskResponse =
+            await getNodeTasks(latestState, limit: latestState.tasks.length);
+      } else {
+        nodeTaskResponse = await getNodeTasks(latestState);
+      }
 
       yield latestState.rebuild((b) => b
         ..tasks.replace(nodeTaskResponse.tasks)
-        ..total = nodeTaskResponse.total);
+        ..total = nodeTaskResponse.total
+        ..isLoading = false);
     }
 
     if (event is LoadMoreTasks) {
-      if (latestState.total > latestState.tasks.length) {
+      if ((latestState.total > latestState.tasks.length) &&
+          !latestState.isLoading) {
+        yield latestState.rebuild((b) => b..isLoading = true);
         final nodeTaskResponse =
-            await getNodeTasks(latestState, nextPage: latestState.tasks.length);
+            await getNodeTasks(latestState, start: latestState.tasks.length);
 
         yield latestState.rebuild((b) => b
           ..tasks.addAll(nodeTaskResponse.tasks)
-          ..total = nodeTaskResponse.total);
+          ..total = nodeTaskResponse.total
+          ..isLoading = false);
       }
     }
 
@@ -76,16 +88,16 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
   }
 
   Future<NodeTasksResponse> getNodeTasks(PveTaskLogState state,
-      {int nextPage}) async {
+      {int start, int limit = 50}) async {
     return await apiClient.getNodeTasks(
       state.nodeID,
-      limit: state.limit?.toString(),
+      limit: limit?.toString(),
       guestId: state.guestID,
       source: state.source,
       userfilter: state.userFilter,
       typefilter: state.typeFilter,
       errors: state.onlyErrors,
-      start: nextPage?.toString(),
+      start: start?.toString(),
     );
   }
 }

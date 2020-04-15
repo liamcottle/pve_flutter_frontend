@@ -116,9 +116,11 @@ class PveTaskLog extends StatelessWidget {
                 ),
                 body: NotificationListener<ScrollNotification>(
                   onNotification: (ScrollNotification scrollInfo) {
-                    if (scrollInfo.metrics.pixels ==
-                        scrollInfo.metrics.maxScrollExtent) {
-                      bloc.events.add(LoadMoreTasks());
+                    if (scrollInfo.metrics.pixels >=
+                        (0.9 * scrollInfo.metrics.maxScrollExtent)) {
+                      if (!state.isLoading) {
+                        bloc.events.add(LoadMoreTasks());
+                      }
                     }
                     return false;
                   },
