@@ -138,7 +138,6 @@ class MobileDashboard extends StatelessWidget {
             ),
             actions: <Widget>[
               PveHelpIconButton(docPath: 'index.html'),
-              LogButton(),
               IconButton(
                 icon: Icon(Icons.input),
                 tooltip: "Logout",
