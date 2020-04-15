@@ -16,7 +16,7 @@ class PveQemuPowerSettings extends StatelessWidget {
     return ProxmoxStreamBuilder<PveQemuOverviewBloc, PveQemuOverviewState>(
         bloc: bloc,
         builder: (context, state) {
-          final qemuStatus = state.currentStatus.getQemuStatus();
+          final qemuStatus = state.currentStatus?.getQemuStatus();
           final disableShutdown = qemuStatus != PveResourceStatusType.running;
           return Scaffold(
           backgroundColor: Color(0xFF00617F),
