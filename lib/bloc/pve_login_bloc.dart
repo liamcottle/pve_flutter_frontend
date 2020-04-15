@@ -45,8 +45,7 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
   Stream<PveLoginState> _mapOriginChangedToState(String origin) async* {
     proxclient.storePlatformAwareOrigin(origin);
 //TODO implement origin validator?
-    yield latestState.rebuild((b) => b
-      ..errorMessage = "");
+    yield latestState.rebuild((b) => b..errorMessage = "");
   }
 
   Stream<PveLoginState> _mapLoginWithCredentialsPressedToState(
@@ -60,7 +59,7 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
     } catch (e, trace) {
       print(e);
       print(trace);
-      yield PveLoginState.failure("An error occured");
+      yield PveLoginState.failure(e.toString());
     }
   }
 }
