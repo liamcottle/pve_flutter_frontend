@@ -33,7 +33,7 @@ dependencies:
   url_launcher: ^5.4.1
   intl: ^0.16.1
   proxmox_dart_api_client:
-    path: ../pve_dart_api_client
+    path: ../proxmox_dart_api_client
 
 dev_dependencies:
   flutter_test:

@@ -355,7 +355,7 @@ packages:
   proxmox_dart_api_client:
     dependency: "direct main"
     description:
-      path: "../pve_dart_api_client"
+      path: "../proxmox_dart_api_client"
       relative: true
     source: path
     version: "0.0.0"
