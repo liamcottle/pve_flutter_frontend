@@ -19,6 +19,7 @@ class PveQemuPowerSettings extends StatelessWidget {
           final qemuStatus = state.currentStatus.getQemuStatus();
           final disableShutdown = qemuStatus != PveResourceStatusType.running;
           return Scaffold(
+          backgroundColor: Color(0xFF00617F),
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
