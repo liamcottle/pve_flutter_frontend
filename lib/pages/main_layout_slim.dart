@@ -317,24 +317,22 @@ class MobileResourceOverview extends StatelessWidget {
                   ],
                 ),
                 onTap: resource.getStatus() == PveResourceStatusType.running
-                    ? () => showDialog(
-                          context: context,
-                          builder: (context) => PveFileSelector(
-                            fBloc: PveFileSelectorBloc(
+                    ? () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => PveFileSelector(
+                              fBloc: PveFileSelectorBloc(
+                                  apiClient: client,
+                                  init: PveFileSelectorState.init(
+                                          nodeID: resource.node)
+                                      .rebuild((b) =>
+                                          b..storageID = resource.storage)),
+                              sBloc: PveStorageSelectorBloc(
                                 apiClient: client,
-                                init: PveFileSelectorState.init(
+                                init: PveStorageSelectorState.init(
                                         nodeID: resource.node)
-                                    .rebuild((b) =>
-                                        b..storageID = resource.storage)),
-                            sBloc: PveStorageSelectorBloc(
-                              apiClient: client,
-                              init: PveStorageSelectorState.init(
-                                      nodeID: resource.node)
-                                  .rebuild(
-                                      (b) => b..storage = resource.storage),
-                            )..events.add(LoadStoragesEvent()),
-                          ),
-                        )
+                                    .rebuild(
+                                        (b) => b..storage = resource.storage),
+                              )..events.add(LoadStoragesEvent()),
+                            )))
                     : null,
               );
             },
