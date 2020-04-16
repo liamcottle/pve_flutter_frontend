@@ -61,9 +61,11 @@ class PveTaskExpansionTile extends StatelessWidget {
                     .push(_createTaskLogRoute(taskLogBloc, showMorePage)),
                 child: Text('More Tasks'),
               ),
-            //TODO enhance UX
             FlatButton(
               onPressed: () => showModalBottomSheet(
+                  shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(10))),
                   context: context,
                   builder: (context) => Provider(
                         create: (context) => PveTaskLogViewerBloc(
@@ -83,16 +85,57 @@ class PveTaskExpansionTile extends StatelessWidget {
                                       child: Text("Waiting for data.."));
                                 }
 
-                                return SingleChildScrollView(
+                                return Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.5,
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        child: Align(
+                                          alignment: Alignment.topCenter,
+                                          child: Container(
+                                            width: 40,
+                                            height: 3,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
                                       if (state.status != null)
-                                        Text(state.status.status.name),
+                                        ListTile(
+                                          title: Text('Status'),
+                                          subtitle:
+                                              Text(state.status.status.name),
+                                        ),
+                                      Divider(),
                                       if (state.log != null)
-                                        ...state.log.lines
-                                            .map((l) => Text(l.lineText))
+                                        Expanded(
+                                          child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(14.0),
+                                              child: ListView.separated(
+                                                  itemCount:
+                                                      state.log.lines.length,
+                                                  separatorBuilder: (context,
+                                                          index) =>
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                vertical: 1.0),
+                                                        child: CustomPaint(
+                                                          painter:
+                                                              LineDashedPainter(),
+                                                        ),
+                                                      ),
+                                                  itemBuilder:
+                                                      (context, index) => Text(
+                                                          state.log.lines[index]
+                                                              .lineText))),
+                                        )
                                     ],
                                   ),
                                 );
@@ -126,4 +169,26 @@ class PveTaskExpansionTile extends StatelessWidget {
       },
     );
   }
+}
+
+class LineDashedPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()
+      ..strokeWidth = 1
+      ..color = Colors.black26;
+    var max = 35;
+    var dashWidth = 5;
+    var dashSpace = 5;
+    double startX = 0;
+    while (max >= 0) {
+      canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
+      final space = (dashSpace + dashWidth);
+      startX += space;
+      max -= space;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
