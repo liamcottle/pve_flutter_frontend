@@ -139,12 +139,14 @@ class MobileDashboard extends StatelessWidget {
             actions: <Widget>[
               PveHelpIconButton(docPath: 'index.html'),
               IconButton(
-                icon: Icon(Icons.input),
-                tooltip: "Logout",
-                onPressed: () => Provider.of<PveAuthenticationBloc>(context)
-                    .events
-                    .add(LoggedOut()),
-              )
+                  icon: Icon(Icons.input),
+                  tooltip: "Logout",
+                  onPressed: () {
+                    Provider.of<PveAuthenticationBloc>(context)
+                        .events
+                        .add(LoggedOut());
+                    Navigator.of(context).pushNamed('/login');
+                  })
             ],
           ),
           ProxmoxStreamBuilder<PveClusterStatusBloc, PveClusterStatusState>(
