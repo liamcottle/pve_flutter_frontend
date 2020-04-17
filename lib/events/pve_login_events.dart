@@ -34,10 +34,13 @@ class LoginWithCredentialsPressed extends PveLoginEvent {
   final String password;
   final String origin;
 
-  LoginWithCredentialsPressed({@required this.username, @required this.password, this.origin});
+  LoginWithCredentialsPressed(
+      {@required this.username, @required this.password, this.origin});
 
   @override
   String toString() {
     return 'LoginWithCredentialsPressed { email: $username, password: $password, hostname: $origin }';
   }
 }
+
+class LoadOrigin extends PveLoginEvent {}

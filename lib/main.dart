@@ -8,11 +8,13 @@ import 'package:pve_flutter_frontend/bloc/pve_node_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_qemu_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
+import 'package:pve_flutter_frontend/events/pve_login_events.dart';
 import 'package:pve_flutter_frontend/pages/404_page.dart';
 import 'package:pve_flutter_frontend/pages/login_page.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
 import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
+import 'package:pve_flutter_frontend/states/pve_login_state.dart';
 import 'package:pve_flutter_frontend/states/pve_lxc_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_node_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_qemu_overview_state.dart';
@@ -93,12 +95,23 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
         ),
         onGenerateRoute: (context) {
-          if (authbloc.state.value is Unauthenticated) {
+          if (authbloc.state.value is Unauthenticated ||
+              context.name == '/login') {
             return MaterialPageRoute(
               builder: (context) {
-                return PveLoginPage(
-                  loginBloc: PveLoginBloc(),
-                  authenticationBloc: authbloc,
+                return MultiProvider(
+                  providers: [
+                    Provider<PveLoginBloc>(
+                      create: (context) =>
+                          PveLoginBloc(init: PveLoginState.init(''))
+                            ..events.add(LoadOrigin()),
+                      dispose: (context, bloc) => bloc.dispose(),
+                    ),
+                    Provider.value(
+                      value: authbloc,
+                    )
+                  ],
+                  child: PveLoginPage(),
                 );
               },
             );
@@ -210,6 +223,31 @@ class MyApp extends StatelessWidget {
               );
             }
             switch (context.name) {
+              case '/':
+                return MaterialPageRoute(
+                  fullscreenDialog: true,
+                  settings: context,
+                  builder: (context) => MultiProvider(
+                    providers: [
+                      Provider<proxclient.ProxmoxApiClient>.value(
+                        value: state.apiClient,
+                      ),
+                      Provider<PveClusterStatusBloc>(
+                        create: (context) => PveClusterStatusBloc(
+                            apiClient: state.apiClient,
+                            init: PveClusterStatusState.init())
+                          ..events.add(UpdateClusterStatus()),
+                        dispose: (context, bloc) => bloc.dispose(),
+                      )
+                    ],
+                    child: ProxmoxLayoutBuilder(
+                      builder: (context, layout) => layout != ProxmoxLayout.slim
+                          ? MainLayoutWide()
+                          : MainLayoutSlim(),
+                    ),
+                  ),
+                );
+                break;
               case PveCreateVmWizard.routeName:
                 return MaterialPageRoute(
                   fullscreenDialog: true,
@@ -219,6 +257,8 @@ class MyApp extends StatelessWidget {
                         value: state.apiClient, child: PveCreateVmWizard());
                   },
                 );
+                break;
+
               case PveConsoleWidget.routeName:
                 return MaterialPageRoute(
                   fullscreenDialog: true,
@@ -231,6 +271,8 @@ class MyApp extends StatelessWidget {
                         ));
                   },
                 );
+                break;
+
               default:
                 return MaterialPageRoute(
                   settings: context,
@@ -241,55 +283,8 @@ class MyApp extends StatelessWidget {
             }
           }
         },
-        home: RootPage(),
+        initialRoute: '/',
       ),
     );
-  }
-}
-
-class RootPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final authBloc = Provider.of<PveAuthenticationBloc>(context);
-    return StreamBuilder<PveAuthenticationState>(
-        stream: authBloc.state,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final state = snapshot.data;
-
-            if (state is Unauthenticated) {
-              return PveLoginPage(
-                loginBloc: PveLoginBloc(),
-                authenticationBloc: authBloc,
-              );
-            }
-            if (state is Authenticated) {
-              return MultiProvider(
-                providers: [
-                  Provider<proxclient.ProxmoxApiClient>.value(
-                    value: state.apiClient,
-                  ),
-                  Provider<PveClusterStatusBloc>(
-                    create: (context) => PveClusterStatusBloc(
-                        apiClient: state.apiClient,
-                        init: PveClusterStatusState.init())
-                      ..events.add(UpdateClusterStatus()),
-                    dispose: (context, bloc) => bloc.dispose(),
-                  )
-                ],
-                child: ProxmoxLayoutBuilder(
-                  builder: (context, layout) => layout != ProxmoxLayout.slim
-                      ? MainLayoutWide()
-                      : MainLayoutSlim(),
-                ),
-              );
-            }
-
-            if (state is Uninitialized) {
-              return Container();
-            }
-          }
-          return Container();
-        });
   }
 }

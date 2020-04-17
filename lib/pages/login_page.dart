@@ -1,37 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
+import 'package:pve_flutter_frontend/states/pve_login_state.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
+
 import 'package:pve_flutter_frontend/widgets/pve_login_form.dart';
 
-class PveLoginPage extends StatefulWidget {
-  final PveLoginBloc loginBloc;
-  final PveAuthenticationBloc authenticationBloc;
-  static const routeName = '/login';
-
-  PveLoginPage({
-    Key key,
-    @required this.loginBloc,
-    @required this.authenticationBloc,
-  }) : super(key: key);
-
-  @override
-  State<PveLoginPage> createState() => _PveLoginPageState();
-}
-
-class _PveLoginPageState extends State<PveLoginPage> {
-  PveLoginBloc get _loginBloc => widget.loginBloc;
-  PveAuthenticationBloc get _authenticationBloc => widget.authenticationBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _loginBloc.state.where((state) => state.isSuccess).forEach(
-        (loginSucceded) => _authenticationBloc.events.add(
-            LoggedIn(loginSucceded.apiClient)));
-  }
-
+class PveLoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final lBloc = Provider.of<PveLoginBloc>(context);
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -47,19 +26,23 @@ class _PveLoginPageState extends State<PveLoginPage> {
           child: Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 400),
-              child: PveLoginForm(
-                loginBloc: _loginBloc,
+              child: ProxmoxStreamBuilder<PveLoginBloc, PveLoginState>(
+                bloc: lBloc,
+                builder: (context, state) {
+                  if (state.isBlank) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return PveLoginForm(
+                    savedOrigin: state.origin,
+                  );
+                },
               ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _loginBloc.dispose();
-    super.dispose();
   }
 }

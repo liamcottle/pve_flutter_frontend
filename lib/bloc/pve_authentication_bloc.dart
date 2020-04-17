@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
-class PveAuthenticationBloc extends ProxmoxBaseBloc<PveAuthenticationEvent,PveAuthenticationState>{
-
+class PveAuthenticationBloc
+    extends ProxmoxBaseBloc<PveAuthenticationEvent, PveAuthenticationState> {
   @override
   PveAuthenticationState get initialState => Unauthenticated();
 
@@ -20,15 +20,13 @@ class PveAuthenticationBloc extends ProxmoxBaseBloc<PveAuthenticationEvent,PveAu
       yield Authenticated(event.apiClient);
     }
     if (event is LoggedOut) {
+      await storeTicket('');
       yield Unauthenticated();
     }
   }
-
-
 }
 
-abstract class PveAuthenticationEvent {
-}
+abstract class PveAuthenticationEvent {}
 
 class AppStarted extends PveAuthenticationEvent {
   @override
@@ -49,8 +47,7 @@ class LoggedOut extends PveAuthenticationEvent {
   String toString() => 'LoggedOut';
 }
 
-abstract class PveAuthenticationState{
-}
+abstract class PveAuthenticationState {}
 
 class Uninitialized extends PveAuthenticationState {
   @override
