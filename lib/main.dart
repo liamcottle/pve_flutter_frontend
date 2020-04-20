@@ -196,14 +196,16 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(
                 fullscreenDialog: false,
                 settings: context,
-                builder: (_) {
+                builder: (context) {
+                  final rbloc = Provider.of<PveResourceBloc>(context);
                   return MultiProvider(
                     providers: [
                       Provider<PveNodeOverviewBloc>(
                         create: (context) => PveNodeOverviewBloc(
                           apiClient: state.apiClient,
                           nodeID: nodeID,
-                          init: PveNodeOverviewState.init(),
+                          init: PveNodeOverviewState.init(
+                              rbloc.latestState.isStandalone),
                         )..events.add(UpdateNodeStatus()),
                         dispose: (context, bloc) => bloc.dispose(),
                       ),

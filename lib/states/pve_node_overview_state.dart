@@ -20,21 +20,27 @@ abstract class PveNodeOverviewState
   BuiltList<PveNodeServicesModel> get services;
   BuiltList<PveNodesAptUpdateModel> get updates;
   BuiltList<PveNodesDisksListModel> get disks;
+  bool get standalone;
 
-  bool get allServicesRunning => !services.any((s) => s.state != 'running');
-  bool get allDisksHealthy => !disks.any((s) => s.health != 'OK');
+  bool get allServicesRunning => !services.any((s) {
+        if (s.name == 'corosync' && standalone) {
+          return false;
+        }
+        return s.state != 'running';
+      });
 
   PveNodeOverviewState._();
 
   factory PveNodeOverviewState(
           [void Function(PveNodeOverviewStateBuilder) updates]) =
       _$PveNodeOverviewState;
-  factory PveNodeOverviewState.init() => PveNodeOverviewState((b) => b
+  factory PveNodeOverviewState.init(bool standalone) =>
+      PveNodeOverviewState((b) => b
         //base
         ..errorMessage = ''
         ..isBlank = true
         ..isLoading = false
         ..isSuccess = false
-      //class
-      );
+        //class
+        ..standalone = standalone);
 }

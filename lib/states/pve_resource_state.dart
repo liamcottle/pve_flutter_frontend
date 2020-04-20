@@ -55,6 +55,8 @@ abstract class PveResourceState
   PveClusterResourcesModel resourceByID(String id) =>
       resources.singleWhere((element) => element.id == id);
 
+  bool get isStandalone => nodes.length < 2;
+
   PveResourceState._();
 
   factory PveResourceState([void Function(PveResourceStateBuilder) updates]) =
