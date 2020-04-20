@@ -125,16 +125,19 @@ class PveLxcOverview extends StatelessWidget {
                                     fullscreenDialog: true),
                               ),
                             ),
-                            ActionCard(
-                                icon: Icon(
-                                  FontAwesomeIcons.paperPlane,
-                                  size: 55,
-                                  color: Colors.white24,
-                                ),
-                                title: 'Migrate',
-                                onTap: () => Navigator.of(context).push(
-                                    _createMigrationRoute(guestID, state.nodeID,
-                                        resourceBloc.apiClient))),
+                            if (!resourceBloc.latestState.isStandalone)
+                              ActionCard(
+                                  icon: Icon(
+                                    FontAwesomeIcons.paperPlane,
+                                    size: 55,
+                                    color: Colors.white24,
+                                  ),
+                                  title: 'Migrate',
+                                  onTap: () => Navigator.of(context).push(
+                                      _createMigrationRoute(
+                                          guestID,
+                                          state.nodeID,
+                                          resourceBloc.apiClient))),
                             ActionCard(
                               icon: Icon(
                                 FontAwesomeIcons.save,

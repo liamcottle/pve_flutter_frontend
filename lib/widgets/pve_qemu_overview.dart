@@ -33,10 +33,11 @@ class PveQemuOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = Provider.of<PveQemuOverviewBloc>(context);
+    final rBloc = Provider.of<PveResourceBloc>(context);
     final taskBloc = Provider.of<PveTaskLogBloc>(context);
     final width = MediaQuery.of(context).size.width;
     return StreamListener<PveResourceState>(
-      stream: Provider.of<PveResourceBloc>(context).state,
+      stream: rBloc.state,
       onStateChange: (globalResourceState) {
         final guest = globalResourceState.resourceByID('qemu/$guestID');
         if (guest.node != bloc.latestState.nodeID) {
@@ -113,17 +114,18 @@ class PveQemuOverview extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(_createOptionsRoute(bloc)),
                         ),
-                        ActionCard(
-                          icon: Icon(
-                            FontAwesomeIcons.paperPlane,
-                            size: 55,
-                            color: Colors.white24,
+                        if (!rBloc.latestState.isStandalone)
+                          ActionCard(
+                            icon: Icon(
+                              FontAwesomeIcons.paperPlane,
+                              size: 55,
+                              color: Colors.white24,
+                            ),
+                            title: 'Migrate',
+                            onTap: () => Navigator.of(context).push(
+                                _createMigrationRoute(
+                                    guestID, state.nodeID, bloc.apiClient)),
                           ),
-                          title: 'Migrate',
-                          onTap: () => Navigator.of(context).push(
-                              _createMigrationRoute(
-                                  guestID, state.nodeID, bloc.apiClient)),
-                        ),
                         ActionCard(
                           icon: Icon(
                             FontAwesomeIcons.save,
