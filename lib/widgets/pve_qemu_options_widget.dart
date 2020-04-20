@@ -111,9 +111,6 @@ class PveQemuOptions extends StatelessWidget {
                   ),
                 ),
               ),
-              floatingActionButton: FloatingActionButton.extended(
-                  onPressed: null, label: Text("Save"), icon: Icon(Icons.save)),
-              extendBody: true,
             );
           }
           return Center(
