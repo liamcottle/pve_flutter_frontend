@@ -156,7 +156,8 @@ class PveQemuOverview extends StatelessWidget {
                           ),
                           ListTile(
                             leading: Icon(FontAwesomeIcons.microchip),
-                            title: Text(config.bios ?? 'Default (SeaBIOS)'),
+                            title:
+                                Text(config.bios?.name ?? 'Default (SeaBIOS)'),
                             dense: true,
                           ),
                           ListTile(
