@@ -53,7 +53,9 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
       try {
         var uri = Uri.parse(origin);
         print(uri.pathSegments.length);
-        if (uri.pathSegments.length < 3 && Validators.isValidDnsName(origin)) {
+        if (uri.pathSegments.length < 3 &&
+            (Validators.isValidDnsName(origin) ||
+                Validators.isValidIPV4(origin))) {
           uri = uri.replace(host: origin);
         }
         if (!uri.hasPort) {
