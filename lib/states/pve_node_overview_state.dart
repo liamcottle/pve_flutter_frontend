@@ -28,6 +28,7 @@ abstract class PveNodeOverviewState
         }
         return s.state != 'running';
       });
+  bool get allDisksHealthy => !disks.any((s) => !isDiskHealthy(s));
 
   PveNodeOverviewState._();
 
@@ -43,4 +44,8 @@ abstract class PveNodeOverviewState
         ..isSuccess = false
         //class
         ..standalone = standalone);
+
+  bool isDiskHealthy(PveNodesDisksListModel disk) {
+    return ['OK', 'PASSED'].contains(disk.health);
+  }
 }

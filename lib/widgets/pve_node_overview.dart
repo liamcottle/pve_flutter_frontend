@@ -364,7 +364,10 @@ class PveNodeOverview extends StatelessWidget {
                                 .map(
                                   (d) => ListTile(
                                     dense: true,
-                                    leading: Icon(FontAwesomeIcons.solidHdd),
+                                    leading: Icon(FontAwesomeIcons.solidHdd,
+                                        color: state.isDiskHealthy(d)
+                                            ? Colors.grey
+                                            : Colors.red),
                                     title: Text(
                                         '${d.type.toUpperCase()}: ${d.devPath}'),
                                     subtitle: Text(
