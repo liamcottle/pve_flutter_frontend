@@ -94,7 +94,7 @@ class PveQemuOptions extends StatelessWidget {
                         subtitle: Text(config.agent ?? 'Default (disabled)'),
                       ),
                       SwitchListTile(
-                        title: Text("Use local time for RTC"),
+                        title: Text("Protection"),
                         value: config.protection ?? false,
                         onChanged: (v) => null,
                       ),
