@@ -104,6 +104,7 @@ class MobileDashboard extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
+            automaticallyImplyLeading: false,
             stretch: true,
             onStretchTrigger: () {
               // Function callback for stretch

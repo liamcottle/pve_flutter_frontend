@@ -44,7 +44,8 @@ class _PveLoginFormState extends State<PveLoginForm> {
       },
       child: StreamListener(
         stream: aBloc.state.where((state) => state is Authenticated),
-        onStateChange: (newState) => Navigator.of(context).pushNamed('/'),
+        onStateChange: (newState) =>
+            Navigator.of(context).pushReplacementNamed('/'),
         child: ProxmoxStreamBuilder<PveLoginBloc, PveLoginState>(
           errorHandler: false,
           bloc: lBloc,
