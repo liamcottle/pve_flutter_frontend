@@ -32,6 +32,7 @@ import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
 import 'package:pve_flutter_frontend/widgets/pve_lxc_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_qemu_overview.dart';
+import 'package:pve_flutter_frontend/widgets/pve_splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -95,6 +96,12 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
         ),
         onGenerateRoute: (context) {
+          if (authbloc.state.value is Uninitialized) {
+            return MaterialPageRoute(
+              builder: (context) => PveSplashScreen(),
+            );
+          }
+
           if (authbloc.state.value is Unauthenticated ||
               context.name == '/login') {
             return MaterialPageRoute(
