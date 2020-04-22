@@ -81,6 +81,9 @@ class MyApp extends StatelessWidget {
             ..apiClient = state.apiClient
             ..events.add(PollResources());
         }
+        if (state is Unauthenticated) {
+          Provider.of<PveResourceBloc>(context)..apiClient = null;
+        }
       },
       child: MaterialApp(
         title: 'Proxmox',
