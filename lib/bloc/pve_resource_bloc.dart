@@ -23,8 +23,8 @@ class PveResourceBloc
   @override
   void doOnListen() {
     if (apiClient != null) {
-      updateTimer = Timer.periodic(
-          Duration(seconds: 6), (timer) => events.add(PollResources()));
+      updateTimer = Timer.periodic(Duration(seconds: 3),
+          (timer) => apiClient != null ? events.add(PollResources()) : null);
     }
   }
 
