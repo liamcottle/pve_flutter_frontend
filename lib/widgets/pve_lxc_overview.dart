@@ -58,7 +58,7 @@ class PveLxcOverview extends StatelessWidget {
                       width: width,
                       guestID: guestID,
                       guestStatus: status?.getLxcStatus(),
-                      guestName: config?.hostname ?? 'undefined',
+                      guestName: config?.hostname ?? 'CT $guestID',
                       guestNodeID: state.nodeID,
                       guestType: 'lxc',
                     ),

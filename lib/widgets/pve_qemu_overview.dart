@@ -58,7 +58,7 @@ class PveQemuOverview extends StatelessWidget {
                   width: width,
                   guestID: guestID,
                   guestStatus: status?.getQemuStatus(),
-                  guestName: config?.name ?? 'undefined',
+                  guestName: config?.name ?? 'VM $guestID',
                   guestNodeID: state.nodeID,
                   guestType: 'qemu',
                 ),
