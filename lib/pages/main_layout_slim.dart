@@ -146,7 +146,7 @@ class MobileDashboard extends StatelessWidget {
                     Provider.of<PveAuthenticationBloc>(context)
                         .events
                         .add(LoggedOut());
-                    Navigator.of(context).pushNamed('/login');
+                    Navigator.of(context).pushReplacementNamed('/login');
                   })
             ],
           ),
