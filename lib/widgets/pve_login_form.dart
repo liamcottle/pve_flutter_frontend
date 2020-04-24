@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
 import 'package:pve_flutter_frontend/events/pve_login_events.dart';
 import 'package:pve_flutter_frontend/states/pve_login_state.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_package_info_widget.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:provider/provider.dart';
@@ -111,6 +112,7 @@ class _PveLoginFormState extends State<PveLoginForm> {
                       child:
                           state.isLoading ? CircularProgressIndicator() : null,
                     ),
+                    ProxmoxPackageInfo()
                   ],
                 ),
               ),
