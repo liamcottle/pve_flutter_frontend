@@ -4,11 +4,13 @@ import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
+import 'package:pve_flutter_frontend/bloc/pve_access_management_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_file_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_storage_selector_bloc.dart';
+import 'package:pve_flutter_frontend/states/pve_access_management_state.dart';
 import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
 import 'package:pve_flutter_frontend/states/pve_file_selector_state.dart';
 import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
@@ -56,6 +58,16 @@ class _MainLayoutSlimState extends State<MainLayoutSlim> {
                         )..events.add(PollResources()),
                     child: MobileResourceOverview());
                 break;
+              case 2:
+                return Provider(
+                  create: (context) => PveAccessManagementBloc(
+                      apiClient: apiClient,
+                      init: PveAccessManagementState.init(
+                          apiClient.credentials.username))
+                    ..events.add(LoadUsers()),
+                  child: MobileAccessManagement(),
+                );
+                break;
               default:
             }
           }
@@ -80,15 +92,23 @@ class PveMobileBottomNavigationbar extends StatelessWidget {
         backgroundColor: Colors.white,
         items: [
           BottomNavigationBarItem(
-              icon: Icon(
-                Icons.dashboard,
-              ),
-              title: Text("Dashboard")),
+            icon: Icon(
+              Icons.dashboard,
+            ),
+            title: Text("Dashboard"),
+          ),
           BottomNavigationBarItem(
-              icon: Icon(
-                Icons.developer_board,
-              ),
-              title: Text("Resources")),
+            icon: Icon(
+              Icons.developer_board,
+            ),
+            title: Text("Resources"),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.supervised_user_circle,
+            ),
+            title: Text("Access"),
+          ),
         ],
         currentIndex: pageSelector.value,
         onTap: (index) => pageSelector.add(index));
@@ -463,5 +483,184 @@ class AppBarFilterIconButton extends StatelessWidget {
           color: Colors.black,
         ),
         onPressed: () => Scaffold.of(context).openEndDrawer());
+  }
+}
+
+class MobileAccessManagement extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final aBloc = Provider.of<PveAccessManagementBloc>(context);
+    return DefaultTabController(
+      length: 4,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Permissions'),
+          //backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          automaticallyImplyLeading: false,
+          bottom: TabBar(isScrollable: true, tabs: [
+            Tab(
+              text: 'Users',
+              icon: Icon(Icons.person),
+            ),
+            Tab(
+              text: 'Groups',
+              icon: Icon(Icons.group),
+            ),
+            Tab(
+              text: 'Roles',
+              icon: Icon(Icons.lock_open),
+            ),
+            Tab(
+              text: 'Domains',
+              icon: Icon(Icons.domain),
+            )
+          ]),
+        ),
+        body: ProxmoxStreamBuilder<PveAccessManagementBloc,
+                PveAccessManagementState>(
+            bloc: aBloc,
+            builder: (context, aState) {
+              return TabBarView(children: [
+                ListView.builder(
+                    itemCount: aState.users.length,
+                    itemBuilder: (context, index) {
+                      final user = aState.users[index];
+                      return ListTile(
+                        title: Text(user.userid),
+                        subtitle: Text(user.email ?? ''),
+                        trailing: aState.apiUser == user.userid
+                            ? Icon(Icons.person_pin_circle)
+                            : null,
+                      );
+                    }),
+                ListView.builder(
+                    itemCount: aState.groups.length,
+                    itemBuilder: (context, index) {
+                      final group = aState.groups[index];
+                      final users =
+                          group.users.isNotEmpty ? group.users.split(',') : [];
+                      return ListTile(
+                        title: Text(group.groupid),
+                        subtitle: Text(group.comment ?? ''),
+                        trailing: Icon(Icons.arrow_right),
+                        onTap: () => showModalBottomSheet(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(10))),
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                              height: MediaQuery.of(context).size.height * 0.5,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                    child: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: Container(
+                                        width: 40,
+                                        height: 3,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  ListTile(
+                                    title:
+                                        Text('Group members (${users.length})'),
+                                  ),
+                                  Divider(),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(14.0),
+                                      child: ListView.builder(
+                                        itemCount: users.length,
+                                        itemBuilder: (context, index) =>
+                                            ListTile(
+                                          title: Text(users[index]),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
+                ListView.builder(
+                    itemCount: aState.roles.length,
+                    itemBuilder: (context, index) {
+                      final role = aState.roles[index];
+                      final perms = role.privs.split(',');
+                      return ListTile(
+                        title: Text(role.roleid),
+                        subtitle:
+                            Text(role.special ? 'Built in Role' : 'Custom'),
+                        trailing: Icon(Icons.arrow_right),
+                        onTap: () => showModalBottomSheet(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(10))),
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                              height: MediaQuery.of(context).size.height * 0.5,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                    child: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: Container(
+                                        width: 40,
+                                        height: 3,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  ListTile(
+                                    title: Text('Privileges (${perms.length})'),
+                                  ),
+                                  Divider(),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(14.0),
+                                      child: ListView.builder(
+                                        itemCount: perms.length,
+                                        itemBuilder: (context, index) =>
+                                            ListTile(
+                                          title: Text(perms[index]),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
+                ListView.builder(
+                    itemCount: aState.domains.length,
+                    itemBuilder: (context, index) {
+                      final domain = aState.domains[index];
+                      return ListTile(
+                        title: Text(domain.realm),
+                        subtitle: Text(domain.comment ?? ''),
+                        trailing: domain.tfa?.isNotEmpty ?? false
+                            ? Icon(Icons.looks_two)
+                            : null,
+                      );
+                    }),
+              ]);
+            }),
+        bottomNavigationBar: PveMobileBottomNavigationbar(),
+      ),
+    );
   }
 }
