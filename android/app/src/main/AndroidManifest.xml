@@ -10,7 +10,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="pve_flutter_frontend"
+        android:label="Proxmox Virtual Environment"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
