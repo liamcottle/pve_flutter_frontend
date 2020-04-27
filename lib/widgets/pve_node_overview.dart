@@ -444,7 +444,9 @@ class PveRRDChart extends StatelessWidget {
   final Iterable<Point<num>> data;
   final Widget icon;
   final Color lineColor;
-
+  final double staticMaximum;
+  final Color shadeColorTop;
+  final Color shadeColorBottom;
   const PveRRDChart({
     Key key,
     this.title,
@@ -452,6 +454,9 @@ class PveRRDChart extends StatelessWidget {
     this.data,
     this.icon,
     this.lineColor = Colors.white,
+    this.staticMaximum,
+    this.shadeColorTop = Colors.white,
+    this.shadeColorBottom = const Color(0x00FFFFFF),
   }) : super(key: key);
 
   @override
@@ -477,8 +482,12 @@ class PveRRDChart extends StatelessWidget {
           child: Container(
             width: MediaQuery.of(context).size.width,
             child: CustomPaint(
-              painter:
-                  ProxmoxLineChart(data: data?.toList(), lineColor: lineColor),
+              painter: ProxmoxLineChart(
+                  data: data?.toList(),
+                  lineColor: lineColor,
+                  staticMax: staticMaximum,
+                  shadeColorBottom: shadeColorBottom,
+                  shadeColorTop: shadeColorTop),
             ),
           ),
         ),

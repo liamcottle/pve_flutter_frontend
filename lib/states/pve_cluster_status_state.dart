@@ -22,6 +22,7 @@ abstract class PveClusterStatusState
 
   bool get healthy => !nodes.any((node) => !node.online);
 
+  bool get missingSubscription => nodes.any((node) => node.level == '');
   factory PveClusterStatusState.init() => PveClusterStatusState((b) => b
         //base
         ..errorMessage = ''

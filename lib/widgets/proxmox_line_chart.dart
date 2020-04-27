@@ -6,7 +6,16 @@ import 'package:flutter/material.dart';
 class ProxmoxLineChart extends CustomPainter {
   final List<Point> data;
   final Color lineColor;
-  ProxmoxLineChart({this.data, this.lineColor});
+  final Color shadeColorTop;
+  final Color shadeColorBottom;
+  final double staticMax;
+  ProxmoxLineChart({
+    this.data,
+    this.lineColor,
+    this.staticMax,
+    this.shadeColorTop = Colors.white,
+    this.shadeColorBottom = const Color(0x00FFFFFF),
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -19,7 +28,7 @@ class ProxmoxLineChart extends CustomPainter {
     var path = Path();
     final globalMaxima =
         data.map((e) => e.y).reduce((a, b) => max(a ?? 0, b ?? 0));
-    final points = convertDataToPoints(data, size, globalMaxima);
+    final points = convertDataToPoints(data, size, staticMax ?? globalMaxima);
     points.asMap().forEach((i, el) {
       if (i == 0) {
         path.moveTo(el.x, el.y);
@@ -42,18 +51,20 @@ class ProxmoxLineChart extends CustomPainter {
     canvas.drawPath(path, paint);
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
+    final shaderHeight =
+        globalMaxima > size.height ? size.height : globalMaxima;
     paint.shader = ui.Gradient.linear(
-        Offset(size.width, globalMaxima),
+        Offset(size.width, 0),
         Offset(0, 0),
         [
-          Color(0x00FFFFFF),
-          Colors.white,
+          shadeColorBottom,
+          shadeColorTop,
         ],
         [0.25, 1.0],
         TileMode.clamp,
         GradientRotation(pi / 2)
             .transform(
-                Rect.fromPoints(Offset(size.width, globalMaxima), Offset(0, 0)))
+                Rect.fromPoints(Offset(size.width, shaderHeight), Offset(0, 0)))
             .storage);
     paint.style = PaintingStyle.fill;
     canvas.drawPath(path, paint);

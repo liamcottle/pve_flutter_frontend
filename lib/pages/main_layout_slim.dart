@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -21,10 +23,9 @@ import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_file_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_help_icon_button_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
 import 'package:rxdart/rxdart.dart';
-
-import 'main_layout_wide.dart';
 
 class MainLayoutSlim extends StatefulWidget {
   @override
@@ -119,11 +120,13 @@ class MobileDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cBloc = Provider.of<PveClusterStatusBloc>(context);
+    final rBloc = Provider.of<PveResourceBloc>(context);
     return Scaffold(
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
+            pinned: true,
             automaticallyImplyLeading: false,
             stretch: true,
             onStretchTrigger: () {
@@ -139,22 +142,60 @@ class MobileDashboard extends StatelessWidget {
               ],
               centerTitle: false,
               title: Text("Proxmox"),
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment(0.0, 0.5),
-                        end: Alignment(0.0, 0.0),
-                        colors: <Color>[
-                          Color(0x60000000),
-                          Color(0x00000000),
+              background: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                child: ProxmoxStreamBuilder<PveResourceBloc, PveResourceState>(
+                    bloc: rBloc,
+                    builder: (context, rState) {
+                      var aggrMem = 0;
+                      var aggrMaxMem = 0;
+                      var memUsage = 0.0;
+                      rState.nodes.forEach((node) {
+                        aggrMem += node.mem ?? 0;
+                        aggrMaxMem += node.maxmem ?? 0;
+                      });
+
+                      var memString = Renderers.formatSize(aggrMem);
+                      if (aggrMaxMem != 0) {
+                        memUsage = aggrMem / aggrMaxMem;
+                      }
+                      var memAsPercent = (memUsage * 100).toStringAsFixed(2);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              rState.isStandalone ? 'Host' : 'Datacenter',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25),
+                            ),
+                          ),
+                          Expanded(
+                              child: PveRRDChart(
+                            title: 'Memory',
+                            subtitle: '$memString ($memAsPercent%)',
+                            data: [
+                              Point(0.0, aggrMem.toDouble()),
+                              Point(1.0, aggrMem.toDouble())
+                            ],
+                            icon: Icon(Icons.memory),
+                            staticMaximum: aggrMaxMem.toDouble(),
+                            lineColor:
+                                memUsage > 0.7 ? Colors.red : Colors.white,
+                            shadeColorBottom: memUsage > 0.7
+                                ? Color.fromARGB(0, 229, 112, 0)
+                                : Color.fromARGB(0, 255, 255, 255),
+                            shadeColorTop: memUsage > 0.7
+                                ? Color.fromARGB(255, 229, 112, 0)
+                                : Colors.white,
+                          )),
                         ],
-                      ),
-                    ),
-                  ),
-                ],
+                      );
+                    }),
               ),
             ),
             actions: <Widget>[
@@ -177,45 +218,133 @@ class MobileDashboard extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0),
                   sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                    Text(
-                      "Status",
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                    Text(cState.cluster?.name ?? "unkown"),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 20.0, 0, 20),
-                      child: ClusterStatus(
-                        isHealthy: cState.healthy,
-                        healthyColor: Colors.greenAccent,
-                        warningColor: Colors.orangeAccent,
-                        backgroundColor:
-                            Theme.of(context).scaffoldBackgroundColor,
-                        version: cState.cluster?.version?.toString(),
+                    if (cState.cluster != null) ...[
+                      Text(
+                        "Status",
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                      Text(cState.cluster?.name ?? "unkown"),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 20.0, 0, 20),
+                        child: ClusterStatus(
+                          isHealthy: cState.healthy,
+                          healthyColor: Colors.greenAccent,
+                          warningColor: Colors.orangeAccent,
+                          backgroundColor:
+                              Theme.of(context).scaffoldBackgroundColor,
+                          version: cState.cluster?.version?.toString(),
+                        ),
+                      ),
+                    ],
+                    Card(
+                      color: Colors.white,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Nodes',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                if (cState.missingSubscription)
+                                  Icon(Icons.report, color: Colors.red),
+                              ],
+                            ),
+                            subtitle: cState.missingSubscription
+                                ? Text('At least one node without subscription')
+                                : null,
+                          ),
+                          Divider(
+                            indent: 10,
+                            endIndent: 10,
+                          ),
+                          ...cState.nodes.map((node) {
+                            return PveNodeListTile(
+                              name: node.name,
+                              online: node.online,
+                              type: node.type,
+                              level: node.level,
+                              ip: node.ip,
+                            );
+                          }),
+                        ],
                       ),
                     ),
-                    Text(
-                      "Nodes",
-                      style: Theme.of(context).textTheme.subtitle1,
+                    Card(
+                      color: Colors.white,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Guests',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                //Text("PLACEHOLDER"),
+                              ],
+                            ),
+                            subtitle: Text('unkown'),
+                          ),
+                          Divider(
+                            indent: 10,
+                            endIndent: 10,
+                          ),
+                          ProxmoxStreamBuilder<PveResourceBloc,
+                              PveResourceState>(
+                            bloc: rBloc,
+                            builder: (context, rState) {
+                              final onlineVMs = rState.vms.where((e) =>
+                                  e.getStatus() ==
+                                  PveResourceStatusType.running);
+                              final onlineContainer = rState.container.where(
+                                  (e) =>
+                                      e.getStatus() ==
+                                      PveResourceStatusType.running);
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  ListTile(
+                                    title: Text("Virtual Machines"),
+                                    leading: Icon(
+                                        Renderers.getDefaultResourceIcon(
+                                            'qemu')),
+                                  ),
+                                  ListTile(
+                                    title: Text("Online"),
+                                    trailing: Text(onlineVMs.length.toString()),
+                                  ),
+                                  ListTile(
+                                    title: Text("LXC Container"),
+                                    leading: Icon(
+                                        Renderers.getDefaultResourceIcon(
+                                            'lxc')),
+                                  ),
+                                  ListTile(
+                                    title: Text("Online"),
+                                    trailing:
+                                        Text(onlineContainer.length.toString()),
+                                  )
+                                ],
+                              );
+                            },
+                          )
+                        ],
+                      ),
                     ),
-                    Divider(),
-                    ...cState.nodes.map((node) {
-                      return Card(
-                        child: PveNodeListTile(
-                          name: node.name,
-                          online: node.online,
-                          type: node.type,
-                          level: node.level,
-                          ip: node.ip,
-                        ),
-                      );
-                    })
                   ])),
                 );
-                // return SliverList(
-                //   delegate: SliverChildListDelegate([
-                //     Center(child: CircularProgressIndicator()),
-                //   ]),
-                // );
               }),
         ],
       ),
