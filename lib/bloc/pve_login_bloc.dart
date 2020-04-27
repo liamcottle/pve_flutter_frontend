@@ -38,6 +38,26 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
         ..origin = origin ?? ''
         ..isBlank = false);
     }
+
+    if (event is TfaCodeSubmitted) {
+      yield latestState.rebuild((b) => b..isLoading = true);
+      try {
+        await latestState.apiClient.finishTfaChallenge(event.code);
+        yield latestState.rebuild((b) => b
+          ..isLoading = false
+          ..isSuccess = true);
+      } on proxclient.ProxmoxApiException catch (e) {
+        yield latestState.rebuild((b) => b
+          ..errorMessage = e.message
+          ..isLoading = false);
+      } catch (e, trace) {
+        yield latestState.rebuild((b) => b
+          ..errorMessage = e.toString()
+          ..isLoading = false);
+        print(e);
+        print(trace);
+      }
+    }
   }
 
   Stream<PveLoginState> _mapUsernameChangedToState(String username) async* {
@@ -83,11 +103,18 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
     yield latestState.rebuild((b) => b..isLoading = true);
     try {
       final client = await proxclient.authenticate(username, password);
-
-      yield latestState.rebuild((b) => b
-        ..apiClient = client
-        ..isLoading = false
-        ..isSuccess = true);
+      if (client.credentials.tfa) {
+        yield latestState.rebuild((b) => b
+          ..apiClient = client
+          ..isLoading = false
+          ..isSuccess = false
+          ..showTfa = true);
+      } else {
+        yield latestState.rebuild((b) => b
+          ..apiClient = client
+          ..isLoading = false
+          ..isSuccess = true);
+      }
     } on proxclient.ProxmoxApiException catch (e) {
       yield latestState.rebuild((b) => b
         ..errorMessage = e.message

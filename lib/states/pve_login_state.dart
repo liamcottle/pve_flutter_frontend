@@ -16,6 +16,8 @@ abstract class PveLoginState
   bool get isPasswordValid => passwordFieldError.isEmpty;
   bool get isOriginValid => originFieldError.isEmpty;
 
+  bool get showTfa;
+
   @nullable
   ProxmoxApiClient get apiClient;
 
@@ -36,6 +38,7 @@ abstract class PveLoginState
       ..userNameFieldError = ''
       ..passwordFieldError = ''
       ..originFieldError = ''
-      ..origin = origin);
+      ..origin = origin
+      ..showTfa = false);
   }
 }

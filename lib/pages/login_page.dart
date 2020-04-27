@@ -5,6 +5,7 @@ import 'package:pve_flutter_frontend/states/pve_login_state.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 
 import 'package:pve_flutter_frontend/widgets/pve_login_form.dart';
+import 'package:pve_flutter_frontend/widgets/pve_login_tfa_form.dart';
 
 class PveLoginPage extends StatelessWidget {
   @override
@@ -33,6 +34,10 @@ class PveLoginPage extends StatelessWidget {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
+                  }
+
+                  if (state.showTfa) {
+                    return PveLoginTfaForm();
                   }
                   return PveLoginForm(
                     savedOrigin: state.origin,

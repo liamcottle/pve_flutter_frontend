@@ -44,3 +44,9 @@ class LoginWithCredentialsPressed extends PveLoginEvent {
 }
 
 class LoadOrigin extends PveLoginEvent {}
+
+class TfaCodeSubmitted extends PveLoginEvent {
+  final String code;
+
+  TfaCodeSubmitted(this.code);
+}
