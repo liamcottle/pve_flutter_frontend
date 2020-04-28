@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
@@ -48,6 +49,10 @@ void main() async {
   }
 
   ProxmoxGlobalErrorBloc();
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.dumpErrorToConsole(details);
+    if (kReleaseMode) ProxmoxGlobalErrorBloc().addError(details.exception);
+  };
   Provider.debugCheckInvalidValueType = null;
 
   runApp(
@@ -68,6 +73,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final PveAuthenticationBloc authbloc;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   MyApp({Key key, this.authbloc}) : super(key: key);
 
@@ -86,6 +92,7 @@ class MyApp extends StatelessWidget {
         }
       },
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'Proxmox',
         theme: ThemeData(
           brightness: Brightness.light,
@@ -98,6 +105,30 @@ class MyApp extends StatelessWidget {
           ),
           scaffoldBackgroundColor: Colors.white,
         ),
+        builder: (context, child) {
+          return StreamListener(
+            stream: ProxmoxGlobalErrorBloc().onError.distinct(),
+            onStateChange: (error) => showDialog<String>(
+              context: navigatorKey.currentState.overlay.context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  contentPadding:
+                      const EdgeInsets.fromLTRB(24.0, 12.0, 24.0, 16.0),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text('Error'),
+                      Icon(Icons.warning),
+                    ],
+                  ),
+                  content:
+                      Text(error?.toString() ?? 'An unexpected error occured!'),
+                );
+              },
+            ),
+            child: child,
+          );
+        },
         onGenerateRoute: (context) {
           if (authbloc.state.value is Uninitialized) {
             return MaterialPageRoute(
