@@ -4,6 +4,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_access_management_bloc.dart';
@@ -620,7 +621,7 @@ class MobileAccessManagement extends StatelessWidget {
   Widget build(BuildContext context) {
     final aBloc = Provider.of<PveAccessManagementBloc>(context);
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Permissions'),
@@ -631,6 +632,10 @@ class MobileAccessManagement extends StatelessWidget {
             Tab(
               text: 'Users',
               icon: Icon(Icons.person),
+            ),
+            Tab(
+              text: 'API Tokens',
+              icon: Icon(Icons.person_outline),
             ),
             Tab(
               text: 'Groups',
@@ -661,6 +666,20 @@ class MobileAccessManagement extends StatelessWidget {
                         trailing: aState.apiUser == user.userid
                             ? Icon(Icons.person_pin_circle)
                             : null,
+                      );
+                    }),
+                ListView.builder(
+                    itemCount: aState.tokens.length,
+                    itemBuilder: (context, index) {
+                      final token = aState.tokens[index];
+                      var expireDate = 'infinite';
+                      if (token.expire != null) {
+                        expireDate = DateFormat.yMd().format(token.expire);
+                      }
+
+                      return ListTile(
+                        title: Text('${token.userid} ${token.tokenid}'),
+                        subtitle: Text('Expires: $expireDate'),
                       );
                     }),
                 ListView.builder(

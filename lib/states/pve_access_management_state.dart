@@ -13,6 +13,7 @@ abstract class PveAccessManagementState
         Built<PveAccessManagementState, PveAccessManagementStateBuilder> {
   // Fields
   BuiltList<PveAccessUserModel> get users;
+  BuiltList<PveAccessUserTokenModel> get tokens;
   BuiltList<PveAccessGroupModel> get groups;
   BuiltList<PveAccessRoleModel> get roles;
   BuiltList<PveAccessDomainModel> get domains;
