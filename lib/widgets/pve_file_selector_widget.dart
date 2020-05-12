@@ -175,6 +175,7 @@ class PveFileSelectorWidget extends StatelessWidget {
                                 border: OutlineInputBorder(),
                                 labelText: 'Search',
                               ),
+                              autofocus: true,
                               onChanged: (searchTerm) => fBloc.events
                                   .add(FilterContent(searchTerm: searchTerm)),
                             ),
