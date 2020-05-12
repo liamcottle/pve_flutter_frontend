@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_file_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_storage_selector_bloc.dart';
@@ -319,7 +320,7 @@ class FileSelectorContentView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Icon(
-                      Icons.sd_card,
+                      getContentIcon(content[index].content),
                       color: Color.fromARGB(255, 152, 162, 201),
                     ),
                     FractionallySizedBox(
@@ -347,7 +348,7 @@ class FileSelectorContentView extends StatelessWidget {
       itemBuilder: (context, index) => Card(
         child: ListTile(
           leading: Icon(
-            Icons.sd_card,
+            getContentIcon(content[index].content),
             color: Color.fromARGB(255, 152, 162, 201),
           ),
           title: Text(
@@ -360,5 +361,24 @@ class FileSelectorContentView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData getContentIcon(PveStorageContentType content) {
+    switch (content) {
+      case PveStorageContentType.iso:
+        return FontAwesomeIcons.compactDisc;
+        break;
+      case PveStorageContentType.images:
+        return FontAwesomeIcons.hdd;
+        break;
+      case PveStorageContentType.rootdir:
+        return FontAwesomeIcons.solidHdd;
+        break;
+      case PveStorageContentType.backup:
+        return FontAwesomeIcons.save;
+        break;
+      default:
+        return FontAwesomeIcons.questionCircle;
+    }
   }
 }
