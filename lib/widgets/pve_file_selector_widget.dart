@@ -24,18 +24,37 @@ class _PveFileSelectorState extends State<PveFileSelector> {
   @override
   Widget build(BuildContext context) {
     return ProxmoxLayoutBuilder(
-        builder: (context, layout) => layout != ProxmoxLayout.slim
-            ? Center(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  width: MediaQuery.of(context).size.width * 0.8,
+      builder: (context, layout) => layout != ProxmoxLayout.slim
+          ? Center(
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.5,
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Card(
+                  color: Color.fromARGB(255, 243, 246, 255),
                   child: PveFileSelectorWidget(
                     fBloc: widget.fBloc,
                     sBloc: widget.sBloc,
                   ),
                 ),
-              )
-            : PveFileSelectorWidget(fBloc: widget.fBloc, sBloc: widget.sBloc));
+              ),
+            )
+          : Scaffold(
+              appBar: AppBar(
+                iconTheme: IconThemeData(color: Colors.black),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                title: Text(
+                  "Storage",
+                  style: TextStyle(
+                      // fontSize: 30,
+                      // fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
+              body: PveFileSelectorWidget(
+                  fBloc: widget.fBloc, sBloc: widget.sBloc),
+            ),
+    );
   }
 
   @override
@@ -63,32 +82,22 @@ class PveFileSelectorWidget extends StatelessWidget {
       onStateChange: (storageSelectorState) {
         fBloc.events.add(ChangeStorage(storageSelectorState.selected?.id));
       },
-      child: Card(
-        color: Color.fromARGB(255, 243, 246, 255),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: <Widget>[
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leading: IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.black,
-                    ),
-                    onPressed: () => Navigator.of(context).pop()),
-              ),
-              Text(
-                "Storage",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              ),
-              Container(
-                height: 200,
-                child: ProxmoxStreamBuilder<PveStorageSelectorBloc,
-                        PveStorageSelectorState>(
-                    bloc: sBloc,
-                    builder: (context, state) {
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 170,
+              child: ProxmoxStreamBuilder<PveStorageSelectorBloc,
+                      PveStorageSelectorState>(
+                  bloc: sBloc,
+                  builder: (context, state) {
+                    if (state.isLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (state.storages.length > 1) {
                       return ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.storages.length,
@@ -97,137 +106,91 @@ class PveFileSelectorWidget extends StatelessWidget {
                             var isSelected = storage.id == state.selected?.id;
                             var storageIcon =
                                 getStorageIcon(storage.type, isSelected);
-                            return Container(
-                              width: 300,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Card(
-                                  color: isSelected
-                                      ? Color(0xff3e4bf5)
-                                      : Colors.white,
-                                  elevation: isSelected ? 4 : 1,
-                                  child: InkWell(
-                                      onTap: () {
-                                        sBloc.events.add(StorageSelectedEvent(
-                                            storage: storage));
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: storageIcon,
-                                              ),
-                                              Text(
-                                                storage.id,
-                                                style: TextStyle(
-                                                    color: isSelected
-                                                        ? Colors.white
-                                                        : Colors.black,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                "(${storage.content})",
-                                                style: TextStyle(
-                                                  color: isSelected
-                                                      ? Colors.white54
-                                                      : Colors.black54,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Align(
-                                                  alignment: FractionalOffset
-                                                      .bottomCenter,
-                                                  child:
-                                                      ProxmoxCapacityIndicator(
-                                                    usedValue:
-                                                        Renderers.formatSize(
-                                                            storage.usedSpace),
-                                                    usedPercent:
-                                                        storage.usedPercent,
-                                                    totalValue:
-                                                        Renderers.formatSize(
-                                                            storage.totalSpace),
-                                                    selected: isSelected,
-                                                  ),
-                                                ),
-                                              ),
-                                            ]),
-                                      )),
-                                ),
-                              ),
-                            );
+                            return PveStorageCard(
+                                isSelected: isSelected,
+                                sBloc: sBloc,
+                                storage: storage,
+                                storageIcon: storageIcon);
                           });
-                    }),
-              ),
-              Expanded(
-                child: StreamBuilder<PveFileSelectorState>(
-                    stream: fBloc.state,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        final state = snapshot.data;
-                        return Column(
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  "Content",
-                                  style: TextStyle(
-                                      color: Color.fromARGB(255, 159, 171, 207),
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    IconButton(
-                                      color: Color.fromARGB(255, 152, 162, 201),
-                                      icon: Icon(Icons.search),
-                                      onPressed: () =>
-                                          fBloc.events.add(ToggleSearch()),
-                                    ),
-                                    IconButton(
-                                      color: Color.fromARGB(255, 152, 162, 201),
-                                      icon: Icon(
-                                        state.gridView
-                                            ? Icons.view_list
-                                            : Icons.view_module,
-                                      ),
-                                      onPressed: () => fBloc.events
-                                          .add(ToggleGridListView()),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                            if (state.search)
-                              TextField(
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: 'Search',
-                                ),
-                                onChanged: (searchTerm) => fBloc.events
-                                    .add(FilterContent(searchTerm: searchTerm)),
+                    }
+                    if (state.storages.length == 1) {
+                      var storage = state.storages[0];
+                      var isSelected = storage.id == state.selected?.id;
+                      var storageIcon =
+                          getStorageIcon(storage.type, isSelected);
+                      return PveStorageCard(
+                          isSelected: isSelected,
+                          sBloc: sBloc,
+                          storage: storage,
+                          storageIcon: storageIcon);
+                    }
+                    return Center(
+                      child: Text('No storage available'),
+                    );
+                  }),
+            ),
+            Expanded(
+              child: StreamBuilder<PveFileSelectorState>(
+                  stream: fBloc.state,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final state = snapshot.data;
+                      return Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                "Content",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 159, 171, 207),
+                                    fontWeight: FontWeight.bold),
                               ),
-                            Expanded(
-                                child: FileSelectorContentView(
-                              gridView: state.gridView,
-                              content: state.content.toList(),
-                            ))
-                          ],
-                        );
-                      }
-                      return Center(
-                        child: CircularProgressIndicator(),
+                              Row(
+                                children: <Widget>[
+                                  IconButton(
+                                    color: Color.fromARGB(255, 152, 162, 201),
+                                    icon: Icon(Icons.search),
+                                    onPressed: () =>
+                                        fBloc.events.add(ToggleSearch()),
+                                  ),
+                                  IconButton(
+                                    color: Color.fromARGB(255, 152, 162, 201),
+                                    icon: Icon(
+                                      state.gridView
+                                          ? Icons.view_list
+                                          : Icons.view_module,
+                                    ),
+                                    onPressed: () =>
+                                        fBloc.events.add(ToggleGridListView()),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                          if (state.search)
+                            TextField(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Search',
+                              ),
+                              onChanged: (searchTerm) => fBloc.events
+                                  .add(FilterContent(searchTerm: searchTerm)),
+                            ),
+                          Expanded(
+                              child: FileSelectorContentView(
+                            gridView: state.gridView,
+                            content: state.content.toList(),
+                          ))
+                        ],
                       );
-                    }),
-              ),
-            ],
-          ),
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }),
+            ),
+          ],
         ),
       ),
     );
@@ -249,6 +212,75 @@ class PveFileSelectorWidget extends StatelessWidget {
         color: selected ? Colors.white : Color.fromARGB(255, 243, 246, 255),
         elevation: 0,
         child: Icon(icon),
+      ),
+    );
+  }
+}
+
+class PveStorageCard extends StatelessWidget {
+  const PveStorageCard({
+    Key key,
+    @required this.isSelected,
+    @required this.sBloc,
+    @required this.storage,
+    @required this.storageIcon,
+  }) : super(key: key);
+
+  final bool isSelected;
+  final PveStorageSelectorBloc sBloc;
+  final PveNodesStorageModel storage;
+  final Widget storageIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 300,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          color: isSelected ? Theme.of(context).primaryColor : Colors.white,
+          elevation: isSelected ? 4 : 1,
+          child: InkWell(
+              onTap: () {
+                sBloc.events.add(StorageSelectedEvent(storage: storage));
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: storageIcon,
+                      ),
+                      Text(
+                        storage.id,
+                        style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        "(${storage.content})",
+                        style: TextStyle(
+                          color: isSelected ? Colors.white54 : Colors.black54,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Expanded(
+                        child: Align(
+                          alignment: FractionalOffset.bottomCenter,
+                          child: ProxmoxCapacityIndicator(
+                            usedValue: Renderers.formatSize(storage.usedSpace),
+                            usedPercent: storage.usedPercent,
+                            totalValue:
+                                Renderers.formatSize(storage.totalSpace),
+                            selected: isSelected,
+                          ),
+                        ),
+                      ),
+                    ]),
+              )),
+        ),
       ),
     );
   }

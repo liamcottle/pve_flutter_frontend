@@ -21,6 +21,7 @@ class PveStorageSelectorBloc
   Stream<PveStorageSelectorState> processEvents(
       PveStorageSelectorEvent event) async* {
     if (event is LoadStoragesEvent) {
+      yield latestState.rebuild((b) => b..isLoading = true);
       final storages = await getStorages(latestState);
 
       var selected = storages.singleWhere(
@@ -57,7 +58,6 @@ class PveStorageSelectorBloc
             latestState.storages.singleWhere((s) => s.id == event.storageID);
         yield latestState.rebuild((b) => b..selected.replace(storage));
       }
-      events.add(LoadStoragesEvent());
     }
 
     if (event is NodeChanged) {
