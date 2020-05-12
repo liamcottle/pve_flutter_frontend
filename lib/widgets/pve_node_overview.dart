@@ -296,7 +296,7 @@ class PveNodeOverview extends StatelessWidget {
                                       dense: true,
                                       title: Text('${s.title}'),
                                       subtitle: Text(
-                                          '${s.package}: ${s.oldVersion} -> ${s.oldVersion}'),
+                                          '${s.package}: ${s.oldVersion ?? ''} -> ${s.version}'),
                                       trailing: IconButton(
                                         icon: Icon(
                                           Icons.info,
