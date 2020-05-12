@@ -456,17 +456,27 @@ class MobileResourceOverview extends StatelessWidget {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(resource.node),
-                    ProxmoxCapacityIndicator(
-                      usedValue: Renderers.formatSize(resource.disk ?? 0),
-                      totalValue: Renderers.formatSize(resource.maxdisk ?? 0),
-                      usedPercent:
-                          (resource.disk ?? 0.0) / (resource.maxdisk ?? 100.0),
-                      icon: Icon(
-                        Renderers.getDefaultResourceIcon(resource.type,
-                            shared: resource.shared),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(resource.node),
+                        StatusChip(
+                          status: resource.getStatus(),
+                          fontzsize: 12,
+                        ),
+                      ],
                     ),
+                    if (resource.getStatus() == PveResourceStatusType.running)
+                      ProxmoxCapacityIndicator(
+                        usedValue: Renderers.formatSize(resource.disk ?? 0),
+                        totalValue: Renderers.formatSize(resource.maxdisk ?? 0),
+                        usedPercent: (resource.disk ?? 0.0) /
+                            (resource.maxdisk ?? 100.0),
+                        icon: Icon(
+                          Renderers.getDefaultResourceIcon(resource.type,
+                              shared: resource.shared),
+                        ),
+                      ),
                   ],
                 ),
                 onTap: resource.getStatus() == PveResourceStatusType.running
