@@ -120,10 +120,12 @@ class PveFileSelectorWidget extends StatelessWidget {
                       var storageIcon =
                           getStorageIcon(storage.type, isSelected);
                       return PveStorageCard(
-                          isSelected: isSelected,
-                          sBloc: sBloc,
-                          storage: storage,
-                          storageIcon: storageIcon);
+                        isSelected: isSelected,
+                        sBloc: sBloc,
+                        storage: storage,
+                        storageIcon: storageIcon,
+                        width: MediaQuery.of(context).size.width * 0.9,
+                      );
                     }
                     return Center(
                       child: Text('No storage available'),
@@ -226,17 +228,19 @@ class PveStorageCard extends StatelessWidget {
     @required this.sBloc,
     @required this.storage,
     @required this.storageIcon,
+    this.width = 300,
   }) : super(key: key);
 
   final bool isSelected;
   final PveStorageSelectorBloc sBloc;
   final PveNodesStorageModel storage;
   final Widget storageIcon;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300,
+      width: width,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Card(
