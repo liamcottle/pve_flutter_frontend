@@ -108,24 +108,37 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return StreamListener(
             stream: ProxmoxGlobalErrorBloc().onError.distinct(),
-            onStateChange: (error) => showDialog<String>(
-              context: navigatorKey.currentState.overlay.context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  contentPadding:
-                      const EdgeInsets.fromLTRB(24.0, 12.0, 24.0, 16.0),
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text('Error'),
-                      Icon(Icons.warning),
-                    ],
-                  ),
-                  content:
-                      Text(error?.toString() ?? 'An unexpected error occured!'),
+            onStateChange: (error) async {
+              if (!ProxmoxGlobalErrorBloc().dialogVisible) {
+                ProxmoxGlobalErrorBloc().dialogVisible = true;
+
+                await showDialog<String>(
+                  context: navigatorKey.currentState.overlay.context,
+                  builder: (BuildContext context) {
+                    return StreamBuilder<Object>(
+                        stream: ProxmoxGlobalErrorBloc().onError,
+                        initialData: error,
+                        builder: (context, snapshot) {
+                          return AlertDialog(
+                            contentPadding: const EdgeInsets.fromLTRB(
+                                24.0, 12.0, 24.0, 16.0),
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text('Error'),
+                                Icon(Icons.warning),
+                              ],
+                            ),
+                            content: SingleChildScrollView(
+                              child: Text(snapshot.data?.toString() ?? ''),
+                            ),
+                          );
+                        });
+                  },
                 );
-              },
-            ),
+                ProxmoxGlobalErrorBloc().dialogVisible = false;
+              }
+            },
             child: child,
           );
         },
