@@ -10,6 +10,7 @@ import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_line_chart.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_resource_data_card_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 import 'dart:math';
 
@@ -128,306 +129,233 @@ class PveNodeOverview extends StatelessWidget {
                       return Container();
                     },
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  'Summary',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                Text(Renderers.renderDuration(
-                                    Duration(seconds: status?.uptime ?? 0))),
-                              ],
-                            ),
-                            subtitle: Text(status?.pveversion ?? 'unkown'),
-                          ),
-                          Divider(
-                            indent: 10,
-                            endIndent: 10,
-                          ),
-                          ListTile(
-                            dense: true,
-                            title: Text(status?.kversion ?? 'unkown'),
-                            subtitle: Text('Kernel'),
-                          ),
-                          if (status?.cpuinfo != null)
-                            ListTile(
-                              dense: true,
-                              title: Text(
-                                  '${status.cpuinfo.cpus} x ${status.cpuinfo.model}'),
-                              subtitle: Text(
-                                  'CPU Information (Socket: ${status.cpuinfo.sockets})'),
-                            ),
-                          CheckboxListTile(
-                            dense: true,
-                            value: status?.ksm?.shared ?? false,
-                            title: Text('Kernel same-page merging (KSM)'),
-                            onChanged: (v) {},
-                          ),
-                          if (status?.rootfs != null) ...[
-                            Divider(
-                              indent: 10,
-                              endIndent: 10,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: ListTile(
-                                title: Text('HD space (root)'),
-                                subtitle: ProxmoxCapacityIndicator(
-                                  icon: Icon(
-                                    FontAwesomeIcons.solidHdd,
-                                    color: Colors.blueGrey[300],
-                                  ),
-                                  usedValue: Renderers.formatSize(
-                                      status.rootfs.used ?? 0),
-                                  totalValue: Renderers.formatSize(
-                                      status.rootfs.total ?? 0),
-                                  usedPercent: (status.rootfs.used ?? 0.0) /
-                                      (status.rootfs.total ?? 100.0),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
+                  PveResourceDataCardWidget(
+                    expandable: false,
+                    showTitleTrailing: true,
+                    title: Text(
+                      'Summary',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                        color: Colors.white,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            ExpansionTile(
-                              title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(
-                                    'Services',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                  if (!state.allServicesRunning)
-                                    Icon(Icons.warning)
-                                ],
+                    titleTrailing: Text(Renderers.renderDuration(
+                        Duration(seconds: status?.uptime ?? 0))),
+                    subtitle: Text(status?.pveversion ?? ''),
+                    children: [
+                      ListTile(
+                        dense: true,
+                        title: Text(status?.kversion ?? 'unkown'),
+                        subtitle: Text('Kernel'),
+                      ),
+                      if (status?.cpuinfo != null)
+                        ListTile(
+                          dense: true,
+                          title: Text(
+                              '${status.cpuinfo.cpus} x ${status.cpuinfo.model}'),
+                          subtitle: Text(
+                              'CPU Information (Socket: ${status.cpuinfo.sockets})'),
+                        ),
+                      CheckboxListTile(
+                        dense: true,
+                        value: status?.ksm?.shared ?? false,
+                        title: Text('Kernel same-page merging (KSM)'),
+                        onChanged: (v) {},
+                      ),
+                      if (status?.rootfs != null) ...[
+                        Divider(
+                          indent: 10,
+                          endIndent: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ListTile(
+                            title: Text('HD space (root)'),
+                            subtitle: ProxmoxCapacityIndicator(
+                              icon: Icon(
+                                FontAwesomeIcons.solidHdd,
+                                color: Colors.blueGrey[300],
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  if (state.allServicesRunning)
-                                    Text('All running'),
-                                  if (!state.allServicesRunning)
-                                    Text('One or more not running'),
-                                  Divider(),
-                                ],
-                              ),
-                              children: state.services
-                                  .map(
-                                    (s) => ListTile(
-                                      dense: true,
-                                      title: Text('${s.name}'),
-                                      subtitle: Text('${s.desc}'),
-                                      trailing: s.state != 'running'
-                                          ? Icon(Icons.stop)
-                                          : Icon(Icons.play_arrow),
-                                    ),
-                                  )
-                                  .toList()
-                                    ..sort((a, b) => (a.title as Text)
-                                        .data
-                                        .compareTo((b.title as Text).data)),
+                              usedValue:
+                                  Renderers.formatSize(status.rootfs.used ?? 0),
+                              totalValue: Renderers.formatSize(
+                                  status.rootfs.total ?? 0),
+                              usedPercent: (status.rootfs.used ?? 0.0) /
+                                  (status.rootfs.total ?? 100.0),
                             ),
-                          ],
-                        )),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                        color: Colors.white,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            ExpansionTile(
-                              title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(
-                                    'Updates',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                  if (state.updates?.isNotEmpty ?? false)
-                                    Icon(Icons.info_outline)
-                                ],
+                  PveResourceDataCardWidget(
+                    expandable: true,
+                    showTitleTrailing: !state.allServicesRunning,
+                    titleTrailing: Icon(Icons.warning),
+                    title: Text(
+                      'Services',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        if (state.allServicesRunning) Text('All running'),
+                        if (!state.allServicesRunning)
+                          Text('One or more not running'),
+                        Divider(),
+                      ],
+                    ),
+                    children: state.services
+                        .map(
+                          (s) => ListTile(
+                            dense: true,
+                            title: Text('${s.name}'),
+                            subtitle: Text('${s.desc}'),
+                            trailing: s.state != 'running'
+                                ? Icon(Icons.stop)
+                                : Icon(Icons.play_arrow),
+                          ),
+                        )
+                        .toList()
+                          ..sort((a, b) => (a.title as Text)
+                              .data
+                              .compareTo((b.title as Text).data)),
+                  ),
+                  PveResourceDataCardWidget(
+                    expandable: true,
+                    showTitleTrailing: state.updates?.isNotEmpty ?? false,
+                    titleTrailing: Icon(Icons.info_outline),
+                    title: Text(
+                      'Updates',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        if (state.updates.isEmpty) Text('No updates available'),
+                        if (state.updates.isNotEmpty)
+                          Text(
+                              '${state.updates.length} packages are ready to update'),
+                        Divider(),
+                      ],
+                    ),
+                    children: state.updates
+                        .map(
+                          (s) => ListTile(
+                            dense: true,
+                            title: Text('${s.title}'),
+                            subtitle: Text(
+                                '${s.package}: ${s.oldVersion ?? ''} -> ${s.version}'),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.info,
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  if (state.updates.isEmpty)
-                                    Text('No updates available'),
-                                  if (state.updates.isNotEmpty)
+                              onPressed: () => showDialog(
+                                context: context,
+                                builder: (context) => SimpleDialog(
+                                  title: Text('Description'),
+                                  contentPadding: EdgeInsets.all(24),
+                                  children: <Widget>[
                                     Text(
-                                        '${state.updates.length} packages are ready to update'),
-                                  Divider(),
-                                ],
+                                      s.description,
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  ],
+                                ),
                               ),
-                              children: state.updates
-                                  .map(
-                                    (s) => ListTile(
-                                      dense: true,
-                                      title: Text('${s.title}'),
-                                      subtitle: Text(
-                                          '${s.package}: ${s.oldVersion ?? ''} -> ${s.version}'),
-                                      trailing: IconButton(
-                                        icon: Icon(
-                                          Icons.info,
-                                        ),
-                                        onPressed: () => showDialog(
-                                          context: context,
-                                          builder: (context) => SimpleDialog(
-                                            title: Text('Description'),
-                                            contentPadding: EdgeInsets.all(24),
-                                            children: <Widget>[
-                                              Text(
-                                                s.description,
-                                                style: TextStyle(fontSize: 12),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                  .toList()
-                                    ..sort((a, b) => (a.title as Text)
-                                        .data
-                                        .compareTo((b.title as Text).data)),
                             ),
-                          ],
-                        )),
+                          ),
+                        )
+                        .toList()
+                          ..sort((a, b) => (a.title as Text)
+                              .data
+                              .compareTo((b.title as Text).data)),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                        color: Colors.white,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            ListTile(
-                              title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(
-                                    'Disks',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                  if (!state.allDisksHealthy)
-                                    Icon(Icons.warning)
-                                ],
+                  PveResourceDataCardWidget(
+                    expandable: false,
+                    title: Text(
+                      'Disks',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    showTitleTrailing: !state.allDisksHealthy,
+                    titleTrailing: Icon(Icons.warning),
+                    subtitle: state.allDisksHealthy
+                        ? Text('No health issues')
+                        : Text('Check disks, health error indicated!'),
+                    children: state.disks
+                        .map(
+                          (d) => ListTile(
+                            dense: true,
+                            leading: Icon(FontAwesomeIcons.solidHdd,
+                                color: state.isDiskHealthy(d)
+                                    ? Colors.grey
+                                    : Colors.red),
+                            title:
+                                Text('${d.type.toUpperCase()}: ${d.devPath}'),
+                            subtitle: Text(
+                                'Usage: ${d.used} ${Renderers.formatSize(d.size ?? 0)}'),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.info,
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  if (state.allDisksHealthy)
-                                    Text('No health issues'),
-                                  if (!state.allDisksHealthy)
-                                    Text(
-                                        'Check disks, health error indicated!'),
-                                  Divider(),
-                                ],
+                              onPressed: () => showDialog(
+                                context: context,
+                                builder: (context) => SimpleDialog(
+                                  title: Text('Details'),
+                                  contentPadding: EdgeInsets.all(24),
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text("Device"),
+                                      subtitle: Text(d.devPath),
+                                    ),
+                                    ListTile(
+                                      title: Text("Type"),
+                                      subtitle: Text(d.type),
+                                    ),
+                                    ListTile(
+                                      title: Text("Usage"),
+                                      subtitle: Text(d.used),
+                                    ),
+                                    ListTile(
+                                      title: Text("GPT"),
+                                      subtitle: Text(d.gpt.toString()),
+                                    ),
+                                    ListTile(
+                                      title: Text("Model"),
+                                      subtitle: Text(d.model),
+                                    ),
+                                    ListTile(
+                                      title: Text("Serial"),
+                                      subtitle: Text(d.serial),
+                                    ),
+                                    ListTile(
+                                      title: Text("S.M.A.R.T"),
+                                      subtitle: Text(d.health),
+                                    ),
+                                    ListTile(
+                                      title: Text("Wearout"),
+                                      subtitle: Text(d.wearout.toString()),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                            ...state.disks
-                                .map(
-                                  (d) => ListTile(
-                                    dense: true,
-                                    leading: Icon(FontAwesomeIcons.solidHdd,
-                                        color: state.isDiskHealthy(d)
-                                            ? Colors.grey
-                                            : Colors.red),
-                                    title: Text(
-                                        '${d.type.toUpperCase()}: ${d.devPath}'),
-                                    subtitle: Text(
-                                        'Usage: ${d.used} ${Renderers.formatSize(d.size ?? 0)}'),
-                                    trailing: IconButton(
-                                      icon: Icon(
-                                        Icons.info,
-                                      ),
-                                      onPressed: () => showDialog(
-                                        context: context,
-                                        builder: (context) => SimpleDialog(
-                                          title: Text('Details'),
-                                          contentPadding: EdgeInsets.all(24),
-                                          children: <Widget>[
-                                            ListTile(
-                                              title: Text("Device"),
-                                              subtitle: Text(d.devPath),
-                                            ),
-                                            ListTile(
-                                              title: Text("Type"),
-                                              subtitle: Text(d.type),
-                                            ),
-                                            ListTile(
-                                              title: Text("Usage"),
-                                              subtitle: Text(d.used),
-                                            ),
-                                            ListTile(
-                                              title: Text("GPT"),
-                                              subtitle: Text(d.gpt.toString()),
-                                            ),
-                                            ListTile(
-                                              title: Text("Model"),
-                                              subtitle: Text(d.model),
-                                            ),
-                                            ListTile(
-                                              title: Text("Serial"),
-                                              subtitle: Text(d.serial),
-                                            ),
-                                            ListTile(
-                                              title: Text("S.M.A.R.T"),
-                                              subtitle: Text(d.health),
-                                            ),
-                                            ListTile(
-                                              title: Text("Wearout"),
-                                              subtitle:
-                                                  Text(d.wearout.toString()),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList()
-                                  ..sort((a, b) => (a.title as Text)
-                                      .data
-                                      .compareTo((b.title as Text).data)),
-                          ],
-                        )),
-                  )
+                          ),
+                        )
+                        .toList()
+                          ..sort((a, b) => (a.title as Text)
+                              .data
+                              .compareTo((b.title as Text).data)),
+                  ),
                 ],
               ),
             ),
