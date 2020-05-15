@@ -368,13 +368,16 @@ class PveNodeOverview extends StatelessWidget {
 
 class PveRRDChart extends StatelessWidget {
   final String title;
+  final double titleWidth;
   final String subtitle;
+  final EdgeInsetsGeometry titlePadding;
   final Iterable<Point<num>> data;
   final Widget icon;
   final Color lineColor;
   final double staticMaximum;
   final Color shadeColorTop;
   final Color shadeColorBottom;
+  final CrossAxisAlignment titleAlginment;
   const PveRRDChart({
     Key key,
     this.title,
@@ -385,25 +388,35 @@ class PveRRDChart extends StatelessWidget {
     this.staticMaximum,
     this.shadeColorTop = Colors.white,
     this.shadeColorBottom = const Color(0x00FFFFFF),
+    this.titleAlginment = CrossAxisAlignment.start,
+    this.titleWidth,
+    this.titlePadding,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: titleAlginment,
       children: <Widget>[
-        ListTile(
-          leading: icon,
-          title: Text(
-            title,
-            style: TextStyle(
-                fontSize: 12,
-                color: Colors.white60,
-                fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text(
-            subtitle,
-            style: TextStyle(
-                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        Container(
+          width: titleWidth ?? null,
+          padding: titlePadding ?? null,
+          child: ListTile(
+            leading: icon,
+            title: Text(
+              title,
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white60,
+                  fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              subtitle,
+              style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+            ),
           ),
         ),
         Expanded(
