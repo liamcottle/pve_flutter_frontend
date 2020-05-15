@@ -21,6 +21,7 @@ import 'package:pve_flutter_frontend/widgets/pve_guest_migrate_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_guest_overview_header.dart';
 import 'package:pve_flutter_frontend/widgets/pve_lxc_options_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_lxc_power_settings_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_resource_data_card_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
 
@@ -50,153 +51,176 @@ class PveLxcOverview extends StatelessWidget {
           builder: (context, state) {
             final status = state.currentStatus;
             final config = state.config;
-            return Scaffold(
-              body: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    PveGuestOverviewHeader(
-                      width: width,
-                      guestID: guestID,
-                      guestStatus: status?.getLxcStatus(),
-                      guestName: config?.hostname ?? 'CT $guestID',
-                      guestNodeID: state.nodeID,
-                      guestType: 'lxc',
-                    ),
-                    ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
-                      bloc: taskBloc,
-                      builder: (context, taskState) {
-                        if (taskState.tasks != null &&
-                            taskState.tasks.isNotEmpty) {
-                          return PveTaskExpansionTile(
-                            task: taskState.tasks.first,
-                            showMorePage: Provider<PveTaskLogBloc>(
-                              create: (context) => PveTaskLogBloc(
-                                apiClient: taskBloc.apiClient,
-                                init: PveTaskLogState.init(state.nodeID),
-                              )
-                                ..events.add(
-                                  FilterTasksByGuestID(
-                                    guestID: guestID,
-                                  ),
+            return SafeArea(
+              child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  title: Text(config?.hostname ?? 'CT $guestID'),
+                ),
+                backgroundColor: Theme.of(context).primaryColor,
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      PveGuestOverviewHeader(
+                        background: PveGuestHeaderRRDPageView(
+                          rrdData: state.rrdData,
+                        ),
+                        width: width,
+                        guestID: guestID,
+                        guestStatus: status?.getLxcStatus(),
+                        guestName: config?.hostname ?? 'CT $guestID',
+                        guestNodeID: state.nodeID,
+                        guestType: 'lxc',
+                      ),
+                      ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
+                        bloc: taskBloc,
+                        builder: (context, taskState) {
+                          if (taskState.tasks != null &&
+                              taskState.tasks.isNotEmpty) {
+                            return PveTaskExpansionTile(
+                              task: taskState.tasks.first,
+                              showMorePage: Provider<PveTaskLogBloc>(
+                                create: (context) => PveTaskLogBloc(
+                                  apiClient: taskBloc.apiClient,
+                                  init: PveTaskLogState.init(state.nodeID),
                                 )
-                                ..events.add(LoadTasks()),
-                              dispose: (context, bloc) => bloc.dispose(),
-                              child: PveTaskLog(),
-                            ),
-                          );
-                        }
-                        return Container();
-                      },
-                    ),
-                    Container(
-                      height: 130,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            ActionCard(
-                              icon: Icon(
-                                Icons.power_settings_new,
-                                size: 55,
-                                color: Colors.white24,
+                                  ..events.add(
+                                    FilterTasksByGuestID(
+                                      guestID: guestID,
+                                    ),
+                                  )
+                                  ..events.add(LoadTasks()),
+                                dispose: (context, bloc) => bloc.dispose(),
+                                child: PveTaskLog(),
                               ),
-                              title: 'Power Settings',
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) => PveLxcPowerSettings(
-                                          lxcBloc: lxcBloc,
-                                        ),
-                                    fullscreenDialog: true),
-                              ),
-                            ),
-                            ActionCard(
-                              icon: Icon(
-                                Icons.settings,
-                                size: 55,
-                                color: Colors.white24,
-                              ),
-                              title: 'Options',
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) => PveLxcOptions(
-                                          lxcBloc: lxcBloc,
-                                        ),
-                                    fullscreenDialog: true),
-                              ),
-                            ),
-                            if (!resourceBloc.latestState.isStandalone)
+                            );
+                          }
+                          return Container();
+                        },
+                      ),
+                      Container(
+                        height: 130,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
                               ActionCard(
-                                  icon: Icon(
-                                    FontAwesomeIcons.paperPlane,
-                                    size: 55,
-                                    color: Colors.white24,
-                                  ),
-                                  title: 'Migrate',
-                                  onTap: () => Navigator.of(context).push(
-                                      _createMigrationRoute(
-                                          guestID,
-                                          state.nodeID,
-                                          resourceBloc.apiClient))),
-                            ActionCard(
-                              icon: Icon(
-                                FontAwesomeIcons.save,
-                                size: 55,
-                                color: Colors.white24,
+                                icon: Icon(
+                                  Icons.power_settings_new,
+                                  size: 55,
+                                  color: Colors.white24,
+                                ),
+                                title: 'Power Settings',
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => PveLxcPowerSettings(
+                                            lxcBloc: lxcBloc,
+                                          ),
+                                      fullscreenDialog: true),
+                                ),
                               ),
-                              title: 'Backup',
-                              onTap: null,
+                              ActionCard(
+                                icon: Icon(
+                                  Icons.settings,
+                                  size: 55,
+                                  color: Colors.white24,
+                                ),
+                                title: 'Options',
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => PveLxcOptions(
+                                            lxcBloc: lxcBloc,
+                                          ),
+                                      fullscreenDialog: true),
+                                ),
+                              ),
+                              if (!resourceBloc.latestState.isStandalone)
+                                ActionCard(
+                                    icon: Icon(
+                                      FontAwesomeIcons.paperPlane,
+                                      size: 55,
+                                      color: Colors.white24,
+                                    ),
+                                    title: 'Migrate',
+                                    onTap: () => Navigator.of(context).push(
+                                        _createMigrationRoute(
+                                            guestID,
+                                            state.nodeID,
+                                            resourceBloc.apiClient))),
+                              ActionCard(
+                                icon: Icon(
+                                  FontAwesomeIcons.save,
+                                  size: 55,
+                                  color: Colors.white24,
+                                ),
+                                title: 'Backup',
+                                onTap: null,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (config != null) ...[
+                        PveResourceDataCardWidget(
+                          title: Text(
+                            'Resources',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          children: <Widget>[
+                            ListTile(
+                              leading: Icon(FontAwesomeIcons.memory),
+                              title: Text('${config.memory}'),
+                              subtitle: Text('Memory'),
+                              dense: true,
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.cached),
+                              title: Text('${config.swap}'),
+                              subtitle: Text('Swap'),
+                              dense: true,
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.memory),
+                              title: Text('${config.cores}'),
+                              subtitle: Text('Cores'),
+                              dense: true,
+                            ),
+                            ListTile(
+                              leading: Icon(FontAwesomeIcons.hdd),
+                              dense: true,
+                              title: Text('${config.rootfs}'),
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                    if (config != null)
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        PveResourceDataCardWidget(
+                            title: Text(
+                              'Network',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
                             children: <Widget>[
-                              Text(
-                                "Resources",
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
-                              ListTile(
-                                leading: Icon(FontAwesomeIcons.memory),
-                                title: Text('${config.memory}'),
-                                dense: true,
-                              ),
-                              ListTile(
-                                leading: Icon(Icons.cached),
-                                title: Text('${config.swap}'),
-                                dense: true,
-                              ),
-                              ListTile(
-                                leading: Icon(Icons.memory),
-                                title: Text('${config.cores} Cores'),
-                                dense: true,
-                              ),
-                              ListTile(
-                                leading: Icon(FontAwesomeIcons.hdd),
-                                dense: true,
-                                title: Text('${config.rootfs}'),
-                              ),
-                              Divider(),
-                              Text(
-                                "Network",
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.ethernet),
                                 dense: true,
                                 title: Text('${config.net0}'),
                               ),
-                              Divider(),
-                              Text(
-                                "DNS",
-                                style: Theme.of(context).textTheme.headline6,
+                            ]),
+                        PveResourceDataCardWidget(
+                            title: Text(
+                              'DNS',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
                               ),
+                            ),
+                            children: <Widget>[
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.globe),
                                 dense: true,
@@ -211,11 +235,10 @@ class PveLxcOverview extends StatelessWidget {
                                     config?.nameserver ?? 'Use host settings'),
                                 subtitle: Text('DNS Server'),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
+                            ]),
+                      ]
+                    ],
+                  ),
                 ),
               ),
             );
