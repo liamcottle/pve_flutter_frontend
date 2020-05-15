@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Renderers {
-  static String formatSize(int size) {
+  static String formatSize(num size) {
     var converted = size.toDouble();
     var units = ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'];
     var num = 0;
