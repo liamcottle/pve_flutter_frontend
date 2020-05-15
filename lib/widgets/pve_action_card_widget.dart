@@ -11,7 +11,7 @@ class ActionCard extends StatelessWidget {
     this.onTap,
     this.title,
     this.icon,
-    this.color = const Color(0xFF00617F),
+    this.color = const Color(0xFF003752),
   }) : super(key: key);
 
   @override
