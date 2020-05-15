@@ -70,7 +70,9 @@ class PveQemuOverview extends StatelessWidget {
                       child: Column(
                     children: <Widget>[
                       PveGuestOverviewHeader(
-                        background: _buildRRDDiagrams(rrdData),
+                        background: PveGuestHeaderRRDPageView(
+                          rrdData: rrdData,
+                        ),
                         width: width,
                         guestID: guestID,
                         guestStatus: status?.getQemuStatus(),
@@ -308,46 +310,6 @@ class PveQemuOverview extends StatelessWidget {
           child: child,
         );
       },
-    );
-  }
-
-  Widget _buildRRDDiagrams(BuiltList<PveGuestRRDdataModel> rrdData) {
-    if (rrdData != null && rrdData.isNotEmpty) {
-      return PageView.builder(
-          itemCount: 2,
-          itemBuilder: (context, item) {
-            if (item == 0) {
-              return PveRRDChart(
-                titlePadding: EdgeInsets.only(bottom: 80),
-                titleWidth: 150,
-                titleAlginment: CrossAxisAlignment.end,
-                title: 'CPU (${rrdData.last.maxcpu ?? '-'})',
-                subtitle:
-                    (rrdData.last?.cpu ?? 0 * 100).toStringAsFixed(2) + "%",
-                data: rrdData
-                    .map((e) => Point(e.time.millisecondsSinceEpoch, e.cpu)),
-                icon: Icon(Icons.memory),
-              );
-            }
-            if (item == 1) {
-              return PveRRDChart(
-                titlePadding: EdgeInsets.only(bottom: 80),
-                titleWidth: 200,
-                titleAlginment: CrossAxisAlignment.end,
-                title: 'Memory',
-                subtitle: Renderers.formatSize(rrdData.last.mem ?? 0.0),
-                data: rrdData
-                    .map((e) => Point(e.time.millisecondsSinceEpoch, e.mem)),
-                icon: Icon(Icons.timer),
-              );
-            }
-          });
-    }
-    return Container(
-      height: 200,
-      child: Center(
-        child: Text('no rrd data'),
-      ),
     );
   }
 }

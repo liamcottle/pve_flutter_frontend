@@ -1,7 +1,11 @@
+import 'dart:math';
+
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
+import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 import 'dart:math' as math;
 
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
@@ -126,5 +130,97 @@ class PveGuestOverviewHeader extends StatelessWidget {
             )
           ]),
     );
+  }
+}
+
+class PveGuestHeaderRRDPageView extends StatefulWidget {
+  final BuiltList<PveGuestRRDdataModel> rrdData;
+
+  PveGuestHeaderRRDPageView({Key key, this.rrdData}) : super(key: key);
+
+  @override
+  _PveGuestHeaderRRDPageViewState createState() =>
+      _PveGuestHeaderRRDPageViewState();
+}
+
+class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
+  PageController controller = PageController();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _indicateScroll());
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.rrdData != null && widget.rrdData.isNotEmpty) {
+      return PageView.builder(
+          controller: controller,
+          itemCount: 2,
+          itemBuilder: (context, item) {
+            final page = item + 1;
+            return Column(
+              children: [
+                if (item == 0)
+                  Expanded(
+                    child: PveRRDChart(
+                      titlePadding: EdgeInsets.only(bottom: 80),
+                      titleWidth: 150,
+                      titleAlginment: CrossAxisAlignment.end,
+                      title: 'CPU (${widget.rrdData.last.maxcpu ?? '-'})',
+                      subtitle: (widget.rrdData.last?.cpu ?? 0 * 100)
+                              .toStringAsFixed(2) +
+                          "%",
+                      data: widget.rrdData.map(
+                          (e) => Point(e.time.millisecondsSinceEpoch, e.cpu)),
+                      icon: Icon(Icons.memory),
+                    ),
+                  ),
+                if (item == 1)
+                  Expanded(
+                    child: PveRRDChart(
+                      titlePadding: EdgeInsets.only(bottom: 80),
+                      titleWidth: 200,
+                      titleAlginment: CrossAxisAlignment.end,
+                      title: 'Memory',
+                      subtitle:
+                          Renderers.formatSize(widget.rrdData.last.mem ?? 0.0),
+                      data: widget.rrdData.map(
+                          (e) => Point(e.time.millisecondsSinceEpoch, e.mem)),
+                      icon: Icon(Icons.timer),
+                    ),
+                  ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    '$page of 2',
+                    style: TextStyle(
+                      color: Colors.white54,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              ],
+            );
+          });
+    }
+    return Container(
+      height: 200,
+      child: Center(
+        child: Text('no rrd data'),
+      ),
+    );
+  }
+
+  void _indicateScroll() async {
+    await Future.delayed(
+        Duration(milliseconds: 300),
+        () => controller.animateTo(50,
+            duration: Duration(milliseconds: 200), curve: Curves.easeIn));
+    await Future.delayed(
+        Duration(milliseconds: 300),
+        () => controller.animateTo(-50,
+            duration: Duration(milliseconds: 200), curve: Curves.easeIn));
   }
 }
