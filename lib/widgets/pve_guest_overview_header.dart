@@ -15,6 +15,7 @@ class PveGuestOverviewHeader extends StatelessWidget {
     @required this.guestName,
     @required this.guestNodeID,
     @required this.guestType,
+    this.background,
   })  : assert(guestName != null),
         super(key: key);
 
@@ -24,6 +25,7 @@ class PveGuestOverviewHeader extends StatelessWidget {
   final PveResourceStatusType guestStatus;
   final String guestName;
   final String guestNodeID;
+  final Widget background;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,62 +38,23 @@ class PveGuestOverviewHeader extends StatelessWidget {
           fit: StackFit.expand,
           alignment: Alignment.center,
           children: <Widget>[
-            Positioned(
-              top: -100,
-              child: Transform.rotate(
-                angle: -math.pi / 4.0,
-                child: Container(
-                  height: 400,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    color: Colors.white10,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: -40,
-              left: 90,
-              child: Transform.rotate(
-                angle: math.pi / 4.0,
-                child: Container(
-                  height: 400,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    color: Colors.white10,
-                  ),
-                ),
-              ),
-            ),
+            if (background != null) background,
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                        width: width * 0.6,
-                        child: Text(
-                          guestName,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 25),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: StatusChip(
+                          status: guestStatus,
+                          fontzsize: 15.0,
+                          fontWeight: FontWeight.w500,
+                          offlineColor: Colors.black38,
                         ),
-                      ),
-                      StatusChip(
-                        status: guestStatus,
-                        fontzsize: 15.0,
-                        fontWeight: FontWeight.w500,
-                        offlineColor: Colors.black38,
                       ),
                     ],
                   ),
