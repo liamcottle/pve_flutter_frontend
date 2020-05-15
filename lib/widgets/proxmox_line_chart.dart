@@ -31,12 +31,7 @@ class ProxmoxLineChart extends CustomPainter {
     final points = convertDataToPoints(data, size, staticMax ?? globalMaxima);
     points.asMap().forEach((i, el) {
       if (i == 0) {
-        path.moveTo(el.x, el.y);
-        return;
-      }
-
-      if (el.y == null) {
-        path.moveTo(el.x, size.height);
+        path.moveTo(el.x, el.y ?? size.height);
         return;
       }
 
@@ -44,7 +39,7 @@ class ProxmoxLineChart extends CustomPainter {
           (points[i].x + points[i - 1].x) / 2, points[i - 1].y ?? size.height);
       final cp2 = Offset(
           (points[i].x + points[i - 1].x) / 2, points[i].y ?? size.height);
-      path.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, el.x, el.y);
+      path.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, el.x, el.y ?? size.height);
     });
     //TODO gaps between datapoints
     paint.style = PaintingStyle.stroke;
@@ -63,8 +58,8 @@ class ProxmoxLineChart extends CustomPainter {
         [0.25, 1.0],
         TileMode.clamp,
         GradientRotation(pi / 2)
-            .transform(
-                Rect.fromPoints(Offset(size.width, shaderHeight), Offset(0, 0)))
+            .transform(Rect.fromPoints(
+                Offset(size.width, shaderHeight.toDouble()), Offset(0, 0)))
             .storage);
     paint.style = PaintingStyle.fill;
     canvas.drawPath(path, paint);
@@ -75,7 +70,7 @@ class ProxmoxLineChart extends CustomPainter {
     return true;
   }
 
-  List<Point> convertDataToPoints(List<Point> data, Size size, double maxima) {
+  List<Point> convertDataToPoints(List<Point> data, Size size, num maxima) {
     if (data.isEmpty) return [];
 
     final bottomY = size.height;
