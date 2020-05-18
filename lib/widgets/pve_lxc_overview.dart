@@ -206,11 +206,12 @@ class PveLxcOverview extends StatelessWidget {
                               ),
                             ),
                             children: <Widget>[
-                              ListTile(
-                                leading: Icon(FontAwesomeIcons.ethernet),
-                                dense: true,
-                                title: Text('${config.net0}'),
-                              ),
+                              for (var net in config.net)
+                                ListTile(
+                                  leading: Icon(FontAwesomeIcons.ethernet),
+                                  dense: true,
+                                  title: Text('$net'),
+                                ),
                             ]),
                         PveResourceDataCardWidget(
                             title: Text(

@@ -198,16 +198,18 @@ class PveQemuOverview extends StatelessWidget {
                                     config.scsihw?.name ?? 'Default (i440fx)'),
                                 dense: true,
                               ),
-                              ListTile(
-                                leading: Icon(FontAwesomeIcons.hdd),
-                                title: Text(config.scsi0),
-                                dense: true,
-                              ),
-                              ListTile(
-                                leading: Icon(FontAwesomeIcons.ethernet),
-                                dense: true,
-                                title: Text(config.net0),
-                              )
+                              for (var scsi in config.scsi)
+                                ListTile(
+                                  leading: Icon(FontAwesomeIcons.hdd),
+                                  title: Text(scsi),
+                                  dense: true,
+                                ),
+                              for (var net in config.net)
+                                ListTile(
+                                  leading: Icon(FontAwesomeIcons.ethernet),
+                                  dense: true,
+                                  title: Text(net),
+                                )
                             ]),
                     ],
                   ))),
