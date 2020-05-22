@@ -61,6 +61,34 @@ class PveLxcOverviewBloc
         yield latestState.rebuild((b) => b..nodeID = event.newNodeID);
       }
     }
+    if (event is UpdateLxcConfigBool) {
+      final node = latestState.nodeID;
+      final digest = latestState.config.digest;
+
+      try {
+        (await apiClient.putRequest('/nodes/$node/lxc/$guestID/config',
+                {event.cField: event.paraValue, 'digest': digest}))
+            .validate(false);
+        events.add(UpdateLxcStatus());
+      } on ProxmoxApiException catch (e) {
+        yield latestState.rebuild((b) => b..errorMessage = e.message);
+        yield latestState.rebuild((b) => b..errorMessage = '');
+      }
+    }
+
+    if (event is RevertPendingLxcConfig) {
+      final node = latestState.nodeID;
+      final digest = latestState.config.digest;
+      try {
+        (await apiClient.putRequest('/nodes/$node/lxc/$guestID/config',
+                {'revert': event.cField, 'digest': digest}))
+            .validate(false);
+        events.add(UpdateLxcStatus());
+      } on ProxmoxApiException catch (e) {
+        yield latestState.rebuild((b) => b..errorMessage = e.message);
+        yield latestState.rebuild((b) => b..errorMessage = '');
+      }
+    }
   }
 }
 
@@ -79,4 +107,17 @@ class Migration extends PveLxcOverviewEvent {
   final String newNodeID;
 
   Migration(this.inProgress, this.newNodeID);
+}
+
+class UpdateLxcConfigBool extends PveLxcOverviewEvent {
+  final String cField;
+  final bool value;
+  String get paraValue => value ? '1' : '0';
+  UpdateLxcConfigBool(this.cField, this.value);
+}
+
+class RevertPendingLxcConfig extends PveLxcOverviewEvent {
+  final cField;
+
+  RevertPendingLxcConfig(this.cField);
 }
