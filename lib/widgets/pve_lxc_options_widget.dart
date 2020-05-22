@@ -58,10 +58,9 @@ class PveLxcOptions extends StatelessWidget {
                       value: config.protection ?? false,
                       onChanged: (v) => null,
                     ),
-                    SwitchListTile(
+                    ListTile(
                       title: Text("Unprivileged"),
-                      value: config.unprivileged ?? true,
-                      onChanged: (v) => null,
+                      subtitle: Text(config.unprivileged ? 'Yes' : 'No'),
                     ),
                     ListTile(
                       title: Text("Features"),
