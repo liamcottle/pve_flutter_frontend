@@ -43,52 +43,94 @@ class PveGuestMigrate extends StatelessWidget {
               ],
             ),
             body: PveMigrateStreamConnector(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      color: Theme.of(context).primaryColor,
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ListTile(
-                              leading: Icon(FontAwesomeIcons.globe),
-                              title: Text('Mode'),
-                              subtitle: Text(migrateState.mode.name),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    color: Theme.of(context).primaryColor,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListTile(
+                            leading: Icon(FontAwesomeIcons.globe),
+                            title: Text(
+                              'Mode',
+                              style: TextStyle(color: Colors.white),
                             ),
-                            ListTile(
-                              leading: Icon(FontAwesomeIcons.mapPin),
-                              title: Text('Source'),
-                              subtitle: Text(migrateState.nodeID ?? "unkown"),
+                            subtitle: Text(
+                              migrateState.mode.name,
+                              style: TextStyle(color: Colors.white54),
                             ),
-                            _MigrateTargetSelector(
+                          ),
+                          ListTile(
+                            leading: Icon(FontAwesomeIcons.mapPin),
+                            title: Text(
+                              'Source',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            subtitle: Text(
+                              migrateState.nodeID ?? "unkown",
+                              style: TextStyle(color: Colors.white54),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: _MigrateTargetSelector(
+                              titleColor: Colors.white,
+                              iconEnabledColor: Colors.white,
                               nodeSelectorbloc: nodeSelectorbloc,
                               migrateBloc: migrateBloc,
                               disabled: migrateState.inProgress,
+                            ),
+                          )
+                        ]),
+                  ),
+                  if (migrateState.inProgress) LinearProgressIndicator(),
+                  if (migrateState.preconditions != null)
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          for (var con in migrateState.preconditions)
+                            ListTile(
+                              leading: con.severity == PveMigrateSeverity.error
+                                  ? Icon(
+                                      Icons.error,
+                                      color: Colors.red,
+                                    )
+                                  : Icon(
+                                      Icons.warning,
+                                      color: Colors.orange,
+                                    ),
+                              title: Text(con.message),
                             )
-                          ]),
-                    ),
-                    if (migrateState.inProgress) LinearProgressIndicator()
-                  ],
-                ),
+                        ],
+                      ),
+                    )
+                ],
               ),
             ),
-            floatingActionButton: FloatingActionButton.extended(
-                onPressed: migrateState.inProgress
-                    ? null
-                    : () {
-                        migrateBloc.events.add(StartMigration());
-                        nodeSelectorbloc.events.add(ResetNodeSelector());
-                      },
-                label: migrateState.inProgress ? Text('') : Text('Start'),
-                icon: migrateState.inProgress
-                    ? Icon(Icons.more_horiz)
-                    : Icon(Icons.send)),
+            floatingActionButton: _disableStartButton(migrateState)
+                ? null
+                : FloatingActionButton.extended(
+                    onPressed: () {
+                      migrateBloc.events.add(StartMigration());
+                      nodeSelectorbloc.events.add(ResetNodeSelector());
+                    },
+                    label: migrateState.inProgress ? Text('') : Text('Start'),
+                    icon: migrateState.inProgress
+                        ? Icon(Icons.more_horiz)
+                        : Icon(Icons.send)),
           ),
         );
       },
     );
+  }
+
+  bool _disableStartButton(PveMigrateState state) {
+    return (state.preconditions
+                ?.any((p) => p.severity == PveMigrateSeverity.error) ??
+            false) ||
+        state.inProgress;
   }
 }
 
@@ -97,12 +139,16 @@ class _MigrateTargetSelector extends StatelessWidget {
       {Key key,
       @required this.nodeSelectorbloc,
       @required this.migrateBloc,
-      @required this.disabled})
+      @required this.disabled,
+      this.titleColor = Colors.black,
+      this.iconEnabledColor = Colors.black})
       : super(key: key);
 
   final PveNodeSelectorBloc nodeSelectorbloc;
   final PveMigrateBloc migrateBloc;
   final bool disabled;
+  final Color titleColor;
+  final Color iconEnabledColor;
 
   @override
   Widget build(BuildContext context) {
@@ -111,8 +157,12 @@ class _MigrateTargetSelector extends StatelessWidget {
       builder: (context, state) {
         return ListTile(
           leading: Icon(Icons.fiber_new),
-          title: Text('Target'),
+          title: Text(
+            'Target',
+            style: TextStyle(color: titleColor),
+          ),
           subtitle: DropdownButtonFormField(
+            iconEnabledColor: iconEnabledColor,
             items: state.availableNodes
                 .map((item) => DropdownMenuItem(
                       child: ListTile(

@@ -26,7 +26,9 @@ abstract class PveMigrateState
             : PveMigrationMode.offline;
         break;
       case 'lxc':
-        return PveMigrationMode.offline;
+        return lxcPreconditions?.running ?? false
+            ? PveMigrationMode.restart
+            : PveMigrationMode.offline;
         break;
       default:
         return PveMigrationMode.offline;
@@ -41,6 +43,12 @@ abstract class PveMigrateState
 
   @nullable
   PveNodesQemuMigrate get qemuPreconditions;
+
+  @nullable
+  PveNodesLxcMigrateModel get lxcPreconditions;
+
+  @nullable
+  BuiltList<PveMigrateCondition> get preconditions;
 
   PveMigrateState._();
 
@@ -72,4 +80,25 @@ class PveMigrationMode extends EnumClass {
 
   static BuiltSet<PveMigrationMode> get values => _$values;
   static PveMigrationMode valueOf(String name) => _$valueOf(name);
+}
+
+abstract class PveMigrateCondition
+    implements Built<PveMigrateCondition, PveMigrateConditionBuilder> {
+  PveMigrateSeverity get severity;
+  String get message;
+
+  PveMigrateCondition._();
+  factory PveMigrateCondition(
+          [void Function(PveMigrateConditionBuilder) updates]) =
+      _$PveMigrateCondition;
+}
+
+class PveMigrateSeverity extends EnumClass {
+  static const PveMigrateSeverity warning = _$warning;
+  static const PveMigrateSeverity error = _$error;
+
+  const PveMigrateSeverity._(String name) : super(name);
+
+  static BuiltSet<PveMigrateSeverity> get values => _$sValues;
+  static PveMigrateSeverity valueOf(String name) => _$sValueOf(name);
 }
