@@ -172,18 +172,21 @@ class PveQemuOverview extends StatelessWidget {
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.memory),
                                 title: Text('${config.memory}'),
+                                subtitle: Text('Memory'),
                                 dense: true,
                               ),
                               ListTile(
                                 leading: Icon(Icons.memory),
                                 title: Text(
                                     '${config.cores} Cores ${config.sockets} Socket'),
+                                subtitle: Text('Processor'),
                                 dense: true,
                               ),
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.microchip),
                                 title: Text(
                                     config.bios?.name ?? 'Default (SeaBIOS)'),
+                                subtitle: Text('BIOS'),
                                 dense: true,
                               ),
                               ListTile(
@@ -191,23 +194,34 @@ class PveQemuOverview extends StatelessWidget {
                                 dense: true,
                                 title:
                                     Text(config.machine ?? 'Default (i440fx)'),
+                                subtitle: Text('Machine Type'),
                               ),
                               ListTile(
-                                leading: Icon(FontAwesomeIcons.cogs),
+                                leading: Icon(FontAwesomeIcons.database),
                                 title: Text(
                                     config.scsihw?.name ?? 'Default (i440fx)'),
+                                subtitle: Text('SCSI Controller'),
                                 dense: true,
                               ),
+                              for (var ide in config.ide)
+                                ListTile(
+                                  leading: Icon(FontAwesomeIcons.compactDisc),
+                                  title: Text(ide),
+                                  subtitle: Text('CD/DVD Drive'),
+                                  dense: true,
+                                ),
                               for (var scsi in config.scsi)
                                 ListTile(
                                   leading: Icon(FontAwesomeIcons.hdd),
                                   title: Text(scsi),
+                                  subtitle: Text('Hard Disk'),
                                   dense: true,
                                 ),
                               for (var net in config.net)
                                 ListTile(
                                   leading: Icon(FontAwesomeIcons.ethernet),
                                   dense: true,
+                                  subtitle: Text('Network Device'),
                                   title: Text(net),
                                 )
                             ]),
