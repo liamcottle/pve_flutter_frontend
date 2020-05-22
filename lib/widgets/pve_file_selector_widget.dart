@@ -15,8 +15,14 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 class PveFileSelector extends StatefulWidget {
   final PveFileSelectorBloc fBloc;
   final PveStorageSelectorBloc sBloc;
+  final bool isSelector;
 
-  const PveFileSelector({Key key, this.fBloc, this.sBloc}) : super(key: key);
+  const PveFileSelector({
+    Key key,
+    this.fBloc,
+    this.sBloc,
+    this.isSelector = false,
+  }) : super(key: key);
   @override
   _PveFileSelectorState createState() => _PveFileSelectorState();
 }
@@ -33,6 +39,7 @@ class _PveFileSelectorState extends State<PveFileSelector> {
                 child: Card(
                   color: Color.fromARGB(255, 243, 246, 255),
                   child: PveFileSelectorWidget(
+                    isSelector: widget.isSelector,
                     fBloc: widget.fBloc,
                     sBloc: widget.sBloc,
                   ),
@@ -53,7 +60,10 @@ class _PveFileSelectorState extends State<PveFileSelector> {
                 ),
               ),
               body: PveFileSelectorWidget(
-                  fBloc: widget.fBloc, sBloc: widget.sBloc),
+                isSelector: widget.isSelector,
+                fBloc: widget.fBloc,
+                sBloc: widget.sBloc,
+              ),
             ),
     );
   }
@@ -69,11 +79,13 @@ class _PveFileSelectorState extends State<PveFileSelector> {
 class PveFileSelectorWidget extends StatelessWidget {
   final PveFileSelectorBloc fBloc;
   final PveStorageSelectorBloc sBloc;
+  final bool isSelector;
 
   const PveFileSelectorWidget({
     Key key,
     @required this.fBloc,
     @required this.sBloc,
+    this.isSelector,
   }) : super(key: key);
 
   @override
@@ -183,6 +195,7 @@ class PveFileSelectorWidget extends StatelessWidget {
                             ),
                           Expanded(
                               child: FileSelectorContentView(
+                            isSelector: isSelector,
                             gridView: state.gridView,
                             content: state.content.toList(),
                           ))
@@ -295,9 +308,14 @@ class PveStorageCard extends StatelessWidget {
 class FileSelectorContentView extends StatelessWidget {
   final bool gridView;
   final List<PveNodesStorageContentModel> content;
+  final bool isSelector;
 
-  const FileSelectorContentView({Key key, this.gridView, this.content})
-      : super(key: key);
+  const FileSelectorContentView({
+    Key key,
+    this.gridView,
+    this.content,
+    this.isSelector,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     if (content == null) {
@@ -320,7 +338,9 @@ class FileSelectorContentView extends StatelessWidget {
           itemBuilder: (context, index) => GridTile(
             child: Card(
               child: InkWell(
-                onTap: () => Navigator.pop(context, content[index]),
+                onTap: isSelector
+                    ? () => Navigator.pop(context, content[index])
+                    : null,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -362,7 +382,8 @@ class FileSelectorContentView extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           trailing: Text(Renderers.formatSize(content[index].size)),
-          onTap: () => Navigator.pop(context, content[index]),
+          onTap:
+              isSelector ? () => Navigator.pop(context, content[index]) : null,
         ),
       ),
     );
