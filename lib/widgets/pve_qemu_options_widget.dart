@@ -1,3 +1,4 @@
+import 'package:built_value/json_object.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_qemu_overview_bloc.dart';
@@ -33,10 +34,15 @@ class PveQemuOptions extends StatelessWidget {
                         title: Text("Name"),
                         subtitle: Text(config.name),
                       ),
-                      SwitchListTile(
+                      PveConfigSwitchListTile(
                         title: Text("Start on boot"),
-                        value: config.onboot ?? false,
-                        onChanged: (v) => null,
+                        value: config.onboot,
+                        defaultValue: false,
+                        pending: config.getPending('onboot'),
+                        onChanged: (v) =>
+                            bloc.events.add(UpdateQemuConfigBool('onboot', v)),
+                        onDeleted: () =>
+                            bloc.events.add(RevertPendingQemuConfig('onboot')),
                       ),
                       ListTile(
                         title: Text("Start/Shutdown order"),
@@ -52,34 +58,59 @@ class PveQemuOptions extends StatelessWidget {
                         title: Text("Boot Device"),
                         subtitle: Text(config.boot ?? 'Disk, Network, USB'),
                       ),
-                      SwitchListTile(
+                      PveConfigSwitchListTile(
                         title: Text("Use tablet for pointer"),
-                        value: config.tablet ?? true,
-                        onChanged: (v) => null,
+                        value: config.tablet,
+                        defaultValue: true,
+                        pending: config.getPending('tablet'),
+                        onChanged: (v) =>
+                            bloc.events.add(UpdateQemuConfigBool('tablet', v)),
+                        onDeleted: () =>
+                            bloc.events.add(RevertPendingQemuConfig('tablet')),
                       ),
                       ListTile(
                         title: Text("Hotplug"),
                         subtitle: Text(config.hotplug ?? 'disk,network,usb'),
                       ),
-                      SwitchListTile(
+                      PveConfigSwitchListTile(
                         title: Text("ACPI support"),
-                        value: config.acpi ?? true,
-                        onChanged: (v) => null,
+                        value: config.acpi,
+                        defaultValue: true,
+                        pending: config.getPending('acpi'),
+                        onChanged: (v) =>
+                            bloc.events.add(UpdateQemuConfigBool('acpi', v)),
+                        onDeleted: () =>
+                            bloc.events.add(RevertPendingQemuConfig('acpi')),
                       ),
-                      SwitchListTile(
+                      PveConfigSwitchListTile(
                         title: Text("KVM hardware virtualization"),
-                        value: config.kvm ?? true,
-                        onChanged: (v) => null,
+                        value: config.kvm,
+                        defaultValue: true,
+                        pending: config.getPending('kvm'),
+                        onChanged: (v) =>
+                            bloc.events.add(UpdateQemuConfigBool('kvm', v)),
+                        onDeleted: () =>
+                            bloc.events.add(RevertPendingQemuConfig('kvm')),
                       ),
-                      SwitchListTile(
+                      PveConfigSwitchListTile(
                         title: Text("Freeze CPU on startup"),
-                        value: config.freeze ?? false,
-                        onChanged: (v) => null,
+                        value: config.freeze,
+                        defaultValue: false,
+                        pending: config.getPending('freeze'),
+                        onChanged: (v) =>
+                            bloc.events.add(UpdateQemuConfigBool('freeze', v)),
+                        onDeleted: () =>
+                            bloc.events.add(RevertPendingQemuConfig('freeze')),
                       ),
-                      SwitchListTile(
+                      PveConfigSwitchListTile(
                         title: Text("Use local time for RTC"),
-                        value: config.localtime ?? false,
-                        onChanged: (v) => null,
+                        value: config.localtime,
+                        defaultValue: false,
+                        pending: config.getPending('localtime'),
+                        onChanged: (v) => bloc.events
+                            .add(UpdateQemuConfigBool('localtime', v)),
+                        onDeleted: () => bloc.events
+                            .add(RevertPendingQemuConfig('localtime')),
                       ),
                       ListTile(
                         title: Text("RTC start date"),
@@ -89,14 +120,20 @@ class PveQemuOptions extends StatelessWidget {
                         title: Text("SMBIOS settings (type1)"),
                         subtitle: Text(config.smbios1 ?? ''),
                       ),
+                      //Todo enhance UI
                       ListTile(
                         title: Text("QEMU Guest Agent"),
                         subtitle: Text(config.agent ?? 'Default (disabled)'),
                       ),
-                      SwitchListTile(
+                      PveConfigSwitchListTile(
                         title: Text("Protection"),
-                        value: config.protection ?? false,
-                        onChanged: (v) => null,
+                        value: config.protection,
+                        defaultValue: false,
+                        pending: config.getPending('protection'),
+                        onChanged: (v) => bloc.events
+                            .add(UpdateQemuConfigBool('protection', v)),
+                        onDeleted: () => bloc.events
+                            .add(RevertPendingQemuConfig('protection')),
                       ),
                       ListTile(
                         title: Text("Spice Enhancements"),
@@ -117,5 +154,54 @@ class PveQemuOptions extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
         });
+  }
+}
+
+class PveConfigSwitchListTile extends StatelessWidget {
+  final bool value;
+  final int pending;
+  final bool defaultValue;
+  final Widget title;
+  final ValueChanged<bool> onChanged;
+  final VoidCallback onDeleted;
+
+  const PveConfigSwitchListTile({
+    Key key,
+    this.value,
+    this.pending,
+    this.defaultValue,
+    this.title,
+    this.onChanged,
+    this.onDeleted,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    var pBool;
+    if (pending != null) {
+      pBool = pending == 0 ? false : true;
+    }
+    return SwitchListTile(
+      title: _getTitle(),
+      value: pBool ?? value ?? defaultValue,
+      onChanged: pending != null ? null : onChanged,
+    );
+  }
+
+  Widget _getTitle() {
+    if (pending != null) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          title,
+          Chip(
+            label: Text('pending'),
+            backgroundColor: Colors.red,
+            onDeleted: onDeleted,
+          )
+        ],
+      );
+    } else {
+      return title;
+    }
   }
 }

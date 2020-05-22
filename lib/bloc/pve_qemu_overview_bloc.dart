@@ -64,6 +64,35 @@ class PveQemuOverviewBloc
         yield latestState.rebuild((b) => b..nodeID = event.newNodeID);
       }
     }
+
+    if (event is UpdateQemuConfigBool) {
+      final node = latestState.nodeID;
+      final digest = latestState.config.digest;
+
+      try {
+        (await apiClient.putRequest('/nodes/$node/qemu/$guestID/config',
+                {event.cField: event.paraValue, 'digest': digest}))
+            .validate(false);
+        events.add(UpdateQemuStatus());
+      } on ProxmoxApiException catch (e) {
+        yield latestState.rebuild((b) => b..errorMessage = e.message);
+        yield latestState.rebuild((b) => b..errorMessage = '');
+      }
+    }
+
+    if (event is RevertPendingQemuConfig) {
+      final node = latestState.nodeID;
+      final digest = latestState.config.digest;
+      try {
+        (await apiClient.putRequest('/nodes/$node/qemu/$guestID/config',
+                {'revert': event.cField, 'digest': digest}))
+            .validate(false);
+        events.add(UpdateQemuStatus());
+      } on ProxmoxApiException catch (e) {
+        yield latestState.rebuild((b) => b..errorMessage = e.message);
+        yield latestState.rebuild((b) => b..errorMessage = '');
+      }
+    }
   }
 
   Future<List<PveGuestRRDdataModel>> _preProcessRRDdata() async {
@@ -92,4 +121,17 @@ class Migration extends PveQemuOverviewEvent {
   final String newNodeID;
 
   Migration(this.inProgress, this.newNodeID);
+}
+
+class UpdateQemuConfigBool extends PveQemuOverviewEvent {
+  final String cField;
+  final bool value;
+  String get paraValue => value ? '1' : '0';
+  UpdateQemuConfigBool(this.cField, this.value);
+}
+
+class RevertPendingQemuConfig extends PveQemuOverviewEvent {
+  final cField;
+
+  RevertPendingQemuConfig(this.cField);
 }
