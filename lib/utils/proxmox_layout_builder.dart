@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 
 enum ProxmoxLayout { slim, wide, ultrawide }
 
-
 typedef ProxmoxLayoutLayoutWidgetBuilder = Widget Function(
     BuildContext context, ProxmoxLayout layout);
 
 /// layout.
 const double ultraWideLayoutThreshold = 1920;
 
-const double wideLayoutThreshold = 800;
+const double wideLayoutThreshold = 1200;
 
 /// Builds a widget tree that can depend on the parent widget's width
 class ProxmoxLayoutBuilder extends StatelessWidget {
@@ -26,7 +25,9 @@ class ProxmoxLayoutBuilder extends StatelessWidget {
     var mediaWidth = MediaQuery.of(context).size.width;
     final ProxmoxLayout layout = mediaWidth >= ultraWideLayoutThreshold
         ? ProxmoxLayout.ultrawide
-        : mediaWidth > wideLayoutThreshold ? ProxmoxLayout.wide : ProxmoxLayout.slim;
+        : mediaWidth > wideLayoutThreshold
+            ? ProxmoxLayout.wide
+            : ProxmoxLayout.slim;
     return builder(context, layout);
   }
 
