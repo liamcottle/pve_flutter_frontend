@@ -1,9 +1,9 @@
-import 'package:built_value/json_object.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_qemu_overview_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_qemu_overview_state.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_config_switch_list_tile.dart';
 
 class PveQemuOptions extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -154,54 +154,5 @@ class PveQemuOptions extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
         });
-  }
-}
-
-class PveConfigSwitchListTile extends StatelessWidget {
-  final bool value;
-  final int pending;
-  final bool defaultValue;
-  final Widget title;
-  final ValueChanged<bool> onChanged;
-  final VoidCallback onDeleted;
-
-  const PveConfigSwitchListTile({
-    Key key,
-    this.value,
-    this.pending,
-    this.defaultValue,
-    this.title,
-    this.onChanged,
-    this.onDeleted,
-  }) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    var pBool;
-    if (pending != null) {
-      pBool = pending == 0 ? false : true;
-    }
-    return SwitchListTile(
-      title: _getTitle(),
-      value: pBool ?? value ?? defaultValue,
-      onChanged: pending != null ? null : onChanged,
-    );
-  }
-
-  Widget _getTitle() {
-    if (pending != null) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          title,
-          Chip(
-            label: Text('pending'),
-            backgroundColor: Colors.red,
-            onDeleted: onDeleted,
-          )
-        ],
-      );
-    } else {
-      return title;
-    }
   }
 }
