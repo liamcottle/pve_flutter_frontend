@@ -36,31 +36,20 @@ class PveNodeOverview extends StatelessWidget {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              title: Text(
+                nodeID,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             backgroundColor: Color(0xFF00617F),
             body: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Container(
-                          width: width * 0.6,
-                          child: Text(
-                            nodeID,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                   if (state.rrdData.isNotEmpty)
                     Container(
                       height: 200,
