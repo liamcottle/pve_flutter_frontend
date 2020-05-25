@@ -24,6 +24,7 @@ class _PveLoginFormState extends State<PveLoginForm> {
   final _originController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscure = true;
   PveLoginBloc lBloc;
   @override
   void initState() {
@@ -84,21 +85,40 @@ class _PveLoginFormState extends State<PveLoginForm> {
                           ? null
                           : state.userNameFieldError,
                     ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.lock),
-                        labelText: 'Password',
-                      ),
-                      controller: _passwordController,
-                      obscureText: true,
-                      autovalidate: true,
-                      autocorrect: false,
-                      validator: (v) => state.isPasswordValid
-                          ? null
-                          : state.passwordFieldError,
-                      onFieldSubmitted: (text) => isLoginButtonEnabled(state)
-                          ? _onLoginButtonPressed()
-                          : null,
+                    Stack(
+                      children: [
+                        TextFormField(
+                          decoration: InputDecoration(
+                            icon: Icon(Icons.lock),
+                            labelText: 'Password',
+                          ),
+                          controller: _passwordController,
+                          obscureText: _obscure,
+                          autovalidate: true,
+                          autocorrect: false,
+                          validator: (v) => state.isPasswordValid
+                              ? null
+                              : state.passwordFieldError,
+                          onFieldSubmitted: (text) =>
+                              isLoginButtonEnabled(state)
+                                  ? _onLoginButtonPressed()
+                                  : null,
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: IconButton(
+                            constraints: BoxConstraints.tight(Size(58, 58)),
+                            //padding: EdgeInsets.zero,
+                            iconSize: 24,
+                            icon: Icon(_obscure
+                                ? Icons.visibility
+                                : Icons.visibility_off),
+                            onPressed: () => setState(() {
+                              _obscure = !_obscure;
+                            }),
+                          ),
+                        )
+                      ],
                     ),
                     SizedBox(height: 20),
                     RaisedButton(
