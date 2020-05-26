@@ -25,6 +25,7 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart'
 import 'package:pve_flutter_frontend/widgets/pve_file_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_help_icon_button_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
+import 'package:pve_flutter_frontend/widgets/pve_resource_data_card_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -237,113 +238,66 @@ class MobileDashboard extends StatelessWidget {
                         ),
                       ),
                     ],
-                    Card(
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  'Nodes',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                if (cState.missingSubscription)
-                                  Icon(Icons.report, color: Colors.red),
-                              ],
-                            ),
-                            subtitle: cState.missingSubscription
-                                ? Text('At least one node without subscription')
-                                : null,
-                          ),
-                          Divider(
-                            indent: 10,
-                            endIndent: 10,
-                          ),
-                          ...cState.nodes.map((node) {
-                            return PveNodeListTile(
-                              name: node.name,
-                              online: node.online,
-                              type: node.type,
-                              level: node.level,
-                              ip: node.ip,
-                            );
-                          }),
-                        ],
+                    PveResourceDataCardWidget(
+                      title: Text(
+                        'Nodes',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
                       ),
+                      showTitleTrailing: cState.missingSubscription,
+                      titleTrailing: Icon(Icons.report, color: Colors.red),
+                      children: [
+                        ...cState.nodes.map((node) {
+                          return PveNodeListTile(
+                            name: node.name,
+                            online: node.online,
+                            type: node.type,
+                            level: node.level,
+                            ip: node.ip,
+                          );
+                        }),
+                      ],
                     ),
-                    Card(
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  'Guests',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                //Text("PLACEHOLDER"),
-                              ],
+                    ProxmoxStreamBuilder<PveResourceBloc, PveResourceState>(
+                        bloc: rBloc,
+                        builder: (context, rState) {
+                          final onlineVMs = rState.vms.where((e) =>
+                              e.getStatus() == PveResourceStatusType.running);
+                          final onlineContainer = rState.container.where((e) =>
+                              e.getStatus() == PveResourceStatusType.running);
+                          return PveResourceDataCardWidget(
+                            title: Text(
+                              'Guests',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
                             ),
-                            subtitle: Text('unkown'),
-                          ),
-                          Divider(
-                            indent: 10,
-                            endIndent: 10,
-                          ),
-                          ProxmoxStreamBuilder<PveResourceBloc,
-                              PveResourceState>(
-                            bloc: rBloc,
-                            builder: (context, rState) {
-                              final onlineVMs = rState.vms.where((e) =>
-                                  e.getStatus() ==
-                                  PveResourceStatusType.running);
-                              final onlineContainer = rState.container.where(
-                                  (e) =>
-                                      e.getStatus() ==
-                                      PveResourceStatusType.running);
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  ListTile(
-                                    title: Text("Virtual Machines"),
-                                    leading: Icon(
-                                        Renderers.getDefaultResourceIcon(
-                                            'qemu')),
-                                  ),
-                                  ListTile(
-                                    title: Text("Online"),
-                                    trailing: Text(onlineVMs.length.toString()),
-                                  ),
-                                  ListTile(
-                                    title: Text("LXC Container"),
-                                    leading: Icon(
-                                        Renderers.getDefaultResourceIcon(
-                                            'lxc')),
-                                  ),
-                                  ListTile(
-                                    title: Text("Online"),
-                                    trailing:
-                                        Text(onlineContainer.length.toString()),
-                                  )
-                                ],
-                              );
-                            },
-                          )
-                        ],
-                      ),
-                    ),
+                            children: <Widget>[
+                              ListTile(
+                                title: Text("Virtual Machines"),
+                                leading: Icon(
+                                    Renderers.getDefaultResourceIcon('qemu')),
+                              ),
+                              ListTile(
+                                title: Text("Online"),
+                                trailing: Text(onlineVMs.length.toString()),
+                              ),
+                              ListTile(
+                                title: Text("LXC Container"),
+                                leading: Icon(
+                                    Renderers.getDefaultResourceIcon('lxc')),
+                              ),
+                              ListTile(
+                                title: Text("Online"),
+                                trailing:
+                                    Text(onlineContainer.length.toString()),
+                              )
+                            ],
+                          );
+                        }),
                   ])),
                 );
               }),
