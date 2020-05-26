@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
             headline6:
                 TextStyle(fontFamily: "Open Sans", fontWeight: FontWeight.w700),
           ),
-          scaffoldBackgroundColor: Colors.white,
+          scaffoldBackgroundColor: Color(0xFFf6f7f9),
         ),
         builder: (context, child) {
           return StreamListener(
