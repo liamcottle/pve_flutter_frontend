@@ -72,5 +72,8 @@ flutter:
     - family: Open Sans
       fonts:
         - asset: assets/fonts/OpenSans-Regular.ttf
+    - family: Proxmox
+      fonts:
+        - asset: assets/fonts/Proxmox.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
