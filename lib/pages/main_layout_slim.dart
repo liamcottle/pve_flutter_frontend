@@ -19,14 +19,15 @@ import 'package:pve_flutter_frontend/states/pve_file_selector_state.dart';
 import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 import 'package:pve_flutter_frontend/states/pve_storage_selector_state.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
-import 'package:pve_flutter_frontend/widgets/cluster_status_widget.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_gauge_chart.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_heartbeat_indicator.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_file_selector_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_help_icon_button_widget.dart';
-import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_data_card_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_subscription_alert_dialog.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MainLayoutSlim extends StatefulWidget {
@@ -39,6 +40,12 @@ class _MainLayoutSlimState extends State<MainLayoutSlim> {
   @override
   Widget build(BuildContext context) {
     final apiClient = Provider.of<ProxmoxApiClient>(context);
+    final resourceViewState = PveResourceBloc(
+      apiClient: apiClient,
+      init: PveResourceState.init().rebuild(
+        (b) => b..typeFilter.replace({'qemu', 'lxc', 'storage'}),
+      ),
+    )..events.add(PollResources());
     return Provider.value(
       value: pageSelector,
       child: StreamBuilder<int>(
@@ -51,15 +58,10 @@ class _MainLayoutSlimState extends State<MainLayoutSlim> {
                 return MobileDashboard();
                 break;
               case 1:
-                return Provider(
-                    create: (context) => PveResourceBloc(
-                          apiClient: apiClient,
-                          init: PveResourceState.init().rebuild(
-                            (b) => b
-                              ..typeFilter.replace({'qemu', 'lxc', 'storage'}),
-                          ),
-                        )..events.add(PollResources()),
-                    child: MobileResourceOverview());
+                return Provider.value(
+                  value: resourceViewState,
+                  child: MobileResourceOverview(),
+                );
                 break;
               case 2:
                 return Provider(
@@ -124,185 +126,280 @@ class MobileDashboard extends StatelessWidget {
     final cBloc = Provider.of<PveClusterStatusBloc>(context);
     final rBloc = Provider.of<PveResourceBloc>(context);
     return Scaffold(
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            automaticallyImplyLeading: false,
-            stretch: true,
-            onStretchTrigger: () {
-              // Function callback for stretch
-              return;
-            },
-            expandedHeight: 300.0,
-            flexibleSpace: FlexibleSpaceBar(
-              stretchModes: <StretchMode>[
-                StretchMode.zoomBackground,
-                StretchMode.blurBackground,
-                StretchMode.fadeTitle,
-              ],
-              centerTitle: false,
-              title: Text("Proxmox"),
-              background: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-                child: ProxmoxStreamBuilder<PveResourceBloc, PveResourceState>(
-                    bloc: rBloc,
-                    builder: (context, rState) {
-                      var aggrMem = 0;
-                      var aggrMaxMem = 0;
-                      var memUsage = 0.0;
-                      rState.nodes.forEach((node) {
-                        aggrMem += node.mem ?? 0;
-                        aggrMaxMem += node.maxmem ?? 0;
-                      });
-
-                      var memString = Renderers.formatSize(aggrMem);
-                      if (aggrMaxMem != 0) {
-                        memUsage = aggrMem / aggrMaxMem;
-                      }
-                      var memAsPercent = (memUsage * 100).toStringAsFixed(2);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              rState.isStandalone ? 'Host' : 'Datacenter',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25),
-                            ),
-                          ),
-                          Expanded(
-                              child: PveRRDChart(
-                            title: 'Memory',
-                            subtitle: '$memString ($memAsPercent%)',
-                            data: [
-                              Point(0.0, aggrMem.toDouble()),
-                              Point(1.0, aggrMem.toDouble())
-                            ],
-                            icon: Icon(Icons.memory),
-                            staticMaximum: aggrMaxMem.toDouble(),
-                            lineColor:
-                                memUsage > 0.7 ? Colors.red : Colors.white,
-                            shadeColorBottom: memUsage > 0.7
-                                ? Color.fromARGB(0, 229, 112, 0)
-                                : Color.fromARGB(0, 255, 255, 255),
-                            shadeColorTop: memUsage > 0.7
-                                ? Color.fromARGB(255, 229, 112, 0)
-                                : Colors.white,
-                          )),
-                        ],
-                      );
-                    }),
-              ),
-            ),
-            actions: <Widget>[
-              PveHelpIconButton(docPath: 'index.html'),
-              IconButton(
-                  icon: Icon(Icons.input),
-                  tooltip: "Logout",
-                  onPressed: () {
-                    Provider.of<PveAuthenticationBloc>(context)
-                        .events
-                        .add(LoggedOut());
-                    Navigator.of(context).pushReplacementNamed('/login');
-                  })
-            ],
+      appBar: AppBar(
+        title: Text(
+          'PROXMOX',
+          style: TextStyle(
+            fontFamily: 'Proxmox',
+            fontSize: 28,
           ),
-          ProxmoxStreamBuilder<PveClusterStatusBloc, PveClusterStatusState>(
-              bloc: cBloc,
-              builder: (context, cState) {
-                return SliverPadding(
-                  padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0),
-                  sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                    if (cState.cluster != null) ...[
-                      Text(
-                        "Status",
-                        style: Theme.of(context).textTheme.subtitle1,
+        ),
+        elevation: 0.0,
+        leading: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Image.asset(
+            'assets/images/proxmox_logo_icon_white.png',
+          ),
+        ),
+        automaticallyImplyLeading: false,
+        actions: <Widget>[
+          PveHelpIconButton(docPath: 'index.html'),
+        ],
+      ),
+      body: Stack(children: [
+        Container(
+          height: 350,
+          color: Theme.of(context).primaryColor,
+        ),
+        ProxmoxStreamBuilder<PveClusterStatusBloc, PveClusterStatusState>(
+            bloc: cBloc,
+            builder: (context, cState) {
+              return ListView(children: <Widget>[
+                if (cState.cluster != null) ...[
+                  ListTile(
+                    title: Text(
+                      "Status",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      Text(cState.cluster?.name ?? "unkown"),
+                    ),
+                    subtitle: Text(
+                      cState.cluster?.name ?? "Datacenter",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    trailing: Container(
+                      width: 96,
+                      height: 48,
+                      child: ProxmoxHeartbeatIndicator(
+                        isHealthy: cState.healthy,
+                        healthyColor: Colors.greenAccent,
+                        warningColor: Colors.orangeAccent,
+                      ),
+                    ),
+                  ),
+                ],
+                Container(
+                  height: 80,
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      if (cState.missingSubscription)
+                        ActionChip(
+                          backgroundColor: Color(0xE6003752),
+                          avatar: Icon(Icons.report, color: Colors.red),
+                          label: Text(
+                            'Subscription',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          onPressed: () => showDialog(
+                            context: context,
+                            builder: (c) => PveSubscriptionAlertDialog(),
+                          ),
+                        ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 20.0, 0, 20),
-                        child: ClusterStatus(
-                          isHealthy: cState.healthy,
-                          healthyColor: Colors.greenAccent,
-                          warningColor: Colors.orangeAccent,
-                          backgroundColor:
-                              Theme.of(context).scaffoldBackgroundColor,
-                          version: cState.cluster?.version?.toString(),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: ActionChip(
+                          backgroundColor: Color(0xE6003752),
+                          avatar: Icon(
+                            Renderers.getDefaultResourceIcon('qemu'),
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          label: Text(
+                            'Virtual Machines',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          onPressed: () =>
+                              Provider.of<BehaviorSubject<int>>(context).add(1),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: ActionChip(
+                          //padding: EdgeInsets.all(8),
+                          labelPadding: EdgeInsets.symmetric(horizontal: 8),
+                          backgroundColor: Color(0xE6003752),
+                          avatar: Icon(
+                            Renderers.getDefaultResourceIcon('lxc'),
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          label: Text(
+                            'Linux Containers',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          onPressed: () =>
+                              Provider.of<BehaviorSubject<int>>(context).add(1),
                         ),
                       ),
                     ],
-                    PveResourceDataCardWidget(
-                      title: Text(
-                        'Nodes',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                  ),
+                ),
+                ProxmoxStreamBuilder<PveResourceBloc, PveResourceState>(
+                    bloc: rBloc,
+                    builder: (context, rState) {
+                      final nodes = rState.nodes;
+                      var aggrCpus = 0.0;
+                      var aggrCpuUsage = 0.0;
+                      var aggrMemUsage = 0.0;
+                      var aggrMem = 0.0;
+                      nodes.forEach((element) {
+                        aggrCpuUsage +=
+                            (element.cpu ?? 0) * (element.maxcpu ?? 0);
+                        aggrCpus += element.maxcpu ?? 0;
+                        aggrMemUsage += element.mem ?? 0;
+                        aggrMem += element.maxmem ?? 0;
+                      });
+                      final cpuUsagePercent =
+                          ((aggrCpuUsage / aggrCpus) * 100).toStringAsFixed(2);
+                      final memUsagePercent =
+                          ((aggrMemUsage / aggrMem) * 100).toStringAsFixed(2);
+                      return PveResourceDataCardWidget(
+                        title: Text(
+                          'Analytics',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
                         ),
-                      ),
-                      showTitleTrailing: cState.missingSubscription,
-                      titleTrailing: Icon(Icons.report, color: Colors.red),
-                      children: [
-                        ...cState.nodes.map((node) {
-                          return PveNodeListTile(
-                            name: node.name,
-                            online: node.online,
-                            type: node.type,
-                            level: node.level,
-                            ip: node.ip,
-                          );
-                        }),
-                      ],
-                    ),
-                    ProxmoxStreamBuilder<PveResourceBloc, PveResourceState>(
-                        bloc: rBloc,
-                        builder: (context, rState) {
-                          final onlineVMs = rState.vms.where((e) =>
-                              e.getStatus() == PveResourceStatusType.running);
-                          final onlineContainer = rState.container.where((e) =>
-                              e.getStatus() == PveResourceStatusType.running);
-                          return PveResourceDataCardWidget(
-                            title: Text(
-                              'Guests',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
+                        subtitle: Text('Usage across all online nodes'),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: ProxmoxGaugeChartListTile(
+                              title: Text('CPU'),
+                              subtitle:
+                                  Text('$aggrCpus Cores ${nodes.length} Nodes'),
+                              legend: Text('$cpuUsagePercent %'),
+                              value: aggrCpuUsage,
+                              maxValue: aggrCpus,
                             ),
-                            children: <Widget>[
-                              ListTile(
-                                title: Text("Virtual Machines"),
-                                leading: Icon(
-                                    Renderers.getDefaultResourceIcon('qemu')),
-                              ),
-                              ListTile(
-                                title: Text("Online"),
-                                trailing: Text(onlineVMs.length.toString()),
-                              ),
-                              ListTile(
-                                title: Text("LXC Container"),
-                                leading: Icon(
-                                    Renderers.getDefaultResourceIcon('lxc')),
-                              ),
-                              ListTile(
-                                title: Text("Online"),
-                                trailing:
-                                    Text(onlineContainer.length.toString()),
-                              )
-                            ],
-                          );
-                        }),
-                  ])),
-                );
-              }),
-        ],
-      ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: ProxmoxGaugeChartListTile(
+                              title: Text('Memory'),
+                              subtitle: Text(
+                                  '${Renderers.formatSize(aggrMemUsage)} of ${Renderers.formatSize(aggrMem)}'),
+                              legend: Text('$memUsagePercent %'),
+                              value: aggrMemUsage,
+                              maxValue: aggrMem,
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                PveResourceDataCardWidget(
+                  title: Text(
+                    'Nodes',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  children: [
+                    ...cState.nodes.map((node) {
+                      return PveNodeListTile(
+                        name: node.name,
+                        online: node.online,
+                        type: node.type,
+                        level: node.level,
+                        ip: node.ip,
+                      );
+                    }),
+                  ],
+                ),
+                ProxmoxStreamBuilder<PveResourceBloc, PveResourceState>(
+                    bloc: rBloc,
+                    builder: (context, rState) {
+                      final onlineVMs = rState.vms.where((e) =>
+                          e.getStatus() == PveResourceStatusType.running);
+                      final onlineCTs = rState.container.where((e) =>
+                          e.getStatus() == PveResourceStatusType.running);
+                      final totalVMs = rState.vms.length;
+                      final offVMs = totalVMs - onlineVMs.length;
+                      final offCTs = totalVMs - onlineCTs.length;
+                      final totalCTs = rState.container.length;
+                      return PveResourceDataCardWidget(
+                        title: Text(
+                          'Guests',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        children: <Widget>[
+                          ListTile(
+                            title: Text("Virtual Machines"),
+                            trailing: Text(totalVMs.toString() ?? '?'),
+                            leading:
+                                Icon(Renderers.getDefaultResourceIcon('qemu')),
+                          ),
+                          ListTile(
+                            dense: true,
+                            title: Text(
+                              "Online",
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            leading: Icon(Icons.play_circle_outline,
+                                color: Colors.green),
+                            trailing: Text(onlineVMs.length.toString()),
+                          ),
+                          ListTile(
+                            dense: true,
+                            title: Text(
+                              "Offline",
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            leading: Icon(Icons.stop),
+                            trailing: Text(offVMs.toString()),
+                          ),
+                          ListTile(
+                            title: Text("LXC Container"),
+                            trailing: Text(totalCTs.toString() ?? '?'),
+                            leading:
+                                Icon(Renderers.getDefaultResourceIcon('lxc')),
+                          ),
+                          Divider(
+                            indent: 10,
+                          ),
+                          ListTile(
+                            dense: true,
+                            title: Text(
+                              "Online",
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            leading: Icon(Icons.play_circle_outline,
+                                color: Colors.green),
+                            trailing: Text(onlineCTs.length.toString()),
+                          ),
+                          ListTile(
+                            dense: true,
+                            title: Text(
+                              "Offline",
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.black38),
+                            ),
+                            leading: Icon(Icons.stop),
+                            trailing: Text(offCTs.toString()),
+                          ),
+                        ],
+                      );
+                    }),
+              ]);
+            }),
+      ]),
       bottomNavigationBar: PveMobileBottomNavigationbar(),
     );
   }
@@ -592,6 +689,17 @@ class MobileAccessManagement extends StatelessWidget {
           //backgroundColor: Colors.transparent,
           elevation: 0.0,
           automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+                icon: Icon(Icons.input),
+                tooltip: "Logout",
+                onPressed: () {
+                  Provider.of<PveAuthenticationBloc>(context)
+                      .events
+                      .add(LoggedOut());
+                  Navigator.of(context).pushReplacementNamed('/login');
+                })
+          ],
           bottom: TabBar(isScrollable: true, tabs: [
             Tab(
               text: 'Users',
