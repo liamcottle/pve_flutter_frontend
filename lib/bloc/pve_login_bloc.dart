@@ -72,7 +72,6 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
     if (origin.isNotEmpty) {
       try {
         var uri = Uri.parse(origin);
-        print(uri.pathSegments.length);
         if (uri.pathSegments.length < 3 &&
             (Validators.isValidDnsName(origin) ||
                 Validators.isValidIPV4(origin))) {
@@ -84,7 +83,6 @@ class PveLoginBloc extends ProxmoxBaseBloc<PveLoginEvent, PveLoginState> {
         if (!uri.hasScheme) {
           uri = uri.replace(scheme: 'https');
         }
-        print(uri.origin);
         yield latestState.rebuild((b) => b
           ..originFieldError = ''
           ..origin = uri.origin);

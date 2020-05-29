@@ -35,7 +35,6 @@ class PveNodeSelectorBloc
     }
 
     if (event is UpdateAllowedNodes) {
-      print(event.nodes);
       yield latestState.rebuild((b) => b..allowedNodes.replace(event.nodes));
     }
 

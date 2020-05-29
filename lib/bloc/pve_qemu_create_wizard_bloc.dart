@@ -49,7 +49,6 @@ class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
         await createVirtualMachine(latestState);
         yield event.updatedState;
       } else {
-        print("goto:${event.updatedState}");
         yield event.updatedState;
       }
     }

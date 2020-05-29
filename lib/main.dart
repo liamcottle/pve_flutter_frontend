@@ -246,7 +246,6 @@ class MyApp extends StatelessWidget {
             if (PveNodeOverview.routeName.hasMatch(context.name)) {
               final match = PveNodeOverview.routeName.firstMatch(context.name);
               final nodeID = match?.group(1);
-              print(nodeID);
               return MaterialPageRoute(
                 fullscreenDialog: false,
                 settings: context,

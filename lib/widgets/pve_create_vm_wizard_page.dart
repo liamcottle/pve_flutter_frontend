@@ -82,7 +82,6 @@ class PveCreateVmWizard extends StatelessWidget {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         final state = snapshot.data;
-                        print(state);
                         final steps = getSteps(state);
                         return Stepper(
                           type: layout != ProxmoxLayout.slim
