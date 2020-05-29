@@ -50,8 +50,9 @@ class PveMigrateStreamConnector extends StatelessWidget {
               tBloc.events.add(SetTaskUPID(state.taskUPID));
             }
 
-            if (state.qemuPreconditions?.allowedNodes !=
-                mBloc.penultimate?.qemuPreconditions?.allowedNodes) {
+            if (state.qemuPreconditions != null &&
+                state.qemuPreconditions?.allowedNodes !=
+                    mBloc.penultimate?.qemuPreconditions?.allowedNodes) {
               nbloc.events.add(UpdateAllowedNodes(
                   Set.from(state.qemuPreconditions.allowedNodes)));
             }
