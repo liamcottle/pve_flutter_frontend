@@ -118,24 +118,30 @@ class PveFileSelectorWidget extends StatelessWidget {
                             var storage = state.storages[index];
                             var isSelected = storage.id == state.selected?.id;
                             var storageIcon =
-                                getStorageIcon(storage.type, isSelected);
+                                Renderers.getStorageIcon(storage.type);
                             return PveStorageCard(
-                                isSelected: isSelected,
-                                sBloc: sBloc,
-                                storage: storage,
-                                storageIcon: storageIcon);
+                              isSelected: isSelected,
+                              sBloc: sBloc,
+                              storage: storage,
+                              storageIcon: PveStorageCardIcon(
+                                icon: storageIcon,
+                                selected: isSelected,
+                              ),
+                            );
                           });
                     }
                     if (state.storages.length == 1) {
                       var storage = state.storages[0];
                       var isSelected = storage.id == state.selected?.id;
-                      var storageIcon =
-                          getStorageIcon(storage.type, isSelected);
+                      var storageIcon = Renderers.getStorageIcon(storage.type);
                       return PveStorageCard(
                         isSelected: isSelected,
                         sBloc: sBloc,
                         storage: storage,
-                        storageIcon: storageIcon,
+                        storageIcon: PveStorageCardIcon(
+                          icon: storageIcon,
+                          selected: isSelected,
+                        ),
                         width: MediaQuery.of(context).size.width * 0.9,
                       );
                     }
@@ -213,16 +219,17 @@ class PveFileSelectorWidget extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget getStorageIcon(String storageType, bool selected) {
-    var icon = Icons.cloud;
-    if (storageType == "dir") {
-      icon = Icons.folder;
-    }
+class PveStorageCardIcon extends StatelessWidget {
+  final bool selected;
+  final IconData icon;
 
-    if (storageType == "nfs") {
-      icon = Icons.folder_shared;
-    }
+  const PveStorageCardIcon({Key key, this.selected, this.icon})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: 50,
       width: 50,
@@ -232,6 +239,7 @@ class PveFileSelectorWidget extends StatelessWidget {
         child: Icon(icon),
       ),
     );
+    ;
   }
 }
 
