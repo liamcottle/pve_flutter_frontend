@@ -502,52 +502,58 @@ class MobileResourceOverview extends StatelessWidget {
                   level: resource.level,
                 );
               }
-              return ListTile(
-                title: Text(resource.displayName),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(resource.node),
-                        StatusChip(
-                          status: resource.getStatus(),
-                          fontzsize: 12,
-                        ),
-                      ],
-                    ),
-                    if (resource.getStatus() == PveResourceStatusType.running)
-                      ProxmoxCapacityIndicator(
-                        usedValue: Renderers.formatSize(resource.disk ?? 0),
-                        totalValue: Renderers.formatSize(resource.maxdisk ?? 0),
-                        usedPercent: (resource.disk ?? 0.0) /
-                            (resource.maxdisk ?? 100.0),
-                        icon: Icon(
-                          Renderers.getDefaultResourceIcon(resource.type,
-                              shared: resource.shared),
-                        ),
+              if (resource.type == 'storage') {
+                return ListTile(
+                  title: Text(resource.displayName),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(resource.node),
+                          StatusChip(
+                            status: resource.getStatus(),
+                            fontzsize: 12,
+                          ),
+                        ],
                       ),
-                  ],
-                ),
-                onTap: resource.getStatus() == PveResourceStatusType.running
-                    ? () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => PveFileSelector(
-                              fBloc: PveFileSelectorBloc(
+                      if (resource.getStatus() == PveResourceStatusType.running)
+                        ProxmoxCapacityIndicator(
+                          usedValue: Renderers.formatSize(resource.disk ?? 0),
+                          totalValue:
+                              Renderers.formatSize(resource.maxdisk ?? 0),
+                          usedPercent: (resource.disk ?? 0.0) /
+                              (resource.maxdisk ?? 100.0),
+                          icon: Icon(
+                            Renderers.getDefaultResourceIcon(resource.type,
+                                shared: resource.shared),
+                          ),
+                        ),
+                    ],
+                  ),
+                  onTap: resource.getStatus() == PveResourceStatusType.running
+                      ? () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => PveFileSelector(
+                                fBloc: PveFileSelectorBloc(
+                                    apiClient: client,
+                                    init: PveFileSelectorState.init(
+                                            nodeID: resource.node)
+                                        .rebuild((b) =>
+                                            b..storageID = resource.storage)),
+                                sBloc: PveStorageSelectorBloc(
                                   apiClient: client,
-                                  init: PveFileSelectorState.init(
+                                  init: PveStorageSelectorState.init(
                                           nodeID: resource.node)
-                                      .rebuild((b) =>
-                                          b..storageID = resource.storage)),
-                              sBloc: PveStorageSelectorBloc(
-                                apiClient: client,
-                                init: PveStorageSelectorState.init(
-                                        nodeID: resource.node)
-                                    .rebuild(
-                                        (b) => b..storage = resource.storage),
-                              )..events.add(LoadStoragesEvent()),
-                            )))
-                    : null,
+                                      .rebuild(
+                                          (b) => b..storage = resource.storage),
+                                )..events.add(LoadStoragesEvent()),
+                              )))
+                      : null,
+                );
+              }
+              return ListTile(
+                title: Text('Unkown resource type'),
               );
             },
           ),
