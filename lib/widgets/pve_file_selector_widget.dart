@@ -198,6 +198,7 @@ class PveFileSelectorWidget extends StatelessWidget {
                             isSelector: isSelector,
                             gridView: state.gridView,
                             content: state.content.toList(),
+                            storageSelected: state.storageID != null,
                           ))
                         ],
                       );
@@ -309,13 +310,15 @@ class FileSelectorContentView extends StatelessWidget {
   final bool gridView;
   final List<PveNodesStorageContentModel> content;
   final bool isSelector;
+  final bool storageSelected;
 
-  const FileSelectorContentView({
-    Key key,
-    this.gridView,
-    this.content,
-    this.isSelector,
-  }) : super(key: key);
+  const FileSelectorContentView(
+      {Key key,
+      this.gridView,
+      this.content,
+      this.isSelector,
+      this.storageSelected})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     if (content == null) {
@@ -324,9 +327,15 @@ class FileSelectorContentView extends StatelessWidget {
       );
     }
 
-    if (content.isEmpty) {
+    if (content.isEmpty && storageSelected) {
       return Center(
         child: Text("Nothing found"),
+      );
+    }
+
+    if (content.isEmpty && !storageSelected) {
+      return Center(
+        child: Text("Please select storage"),
       );
     }
 
