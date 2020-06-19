@@ -41,6 +41,17 @@ class PveFileSelectorBloc
       yield latestState.rebuild((b) => b..volidFilter = event.searchTerm);
       events.add(LoadStorageContent());
     }
+
+    if (event is DeleteFile) {
+      try {
+        await apiClient.deleteNodeStorageContent(
+            latestState.nodeID, latestState.storageID, event.volume,
+            delay: 5);
+      } on ProxmoxApiException catch (e) {
+        print(e);
+      }
+      events.add(LoadStorageContent());
+    }
   }
 
   Future<List<PveNodesStorageContentModel>> loadStorageContent(
@@ -62,9 +73,7 @@ class PveFileSelectorBloc
 abstract class PveFileSelectorEvent {}
 
 class LoadStorageContent extends PveFileSelectorEvent {
-  final PveStorageContentType type;
-
-  LoadStorageContent({this.type});
+  LoadStorageContent();
 }
 
 class ToggleGridListView extends PveFileSelectorEvent {}
@@ -83,4 +92,10 @@ class FilterContent extends PveFileSelectorEvent {
   final String searchTerm;
 
   FilterContent({this.searchTerm});
+}
+
+class DeleteFile extends PveFileSelectorEvent {
+  final String volume;
+
+  DeleteFile(this.volume);
 }
