@@ -1,33 +1,32 @@
-import 'dart:math';
-
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:pve_flutter_frontend/bloc/pve_file_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_migrate_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_node_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_qemu_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_storage_selector_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_viewer_bloc.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
+import 'package:pve_flutter_frontend/states/pve_file_selector_state.dart';
 import 'package:pve_flutter_frontend/states/pve_migrate_state.dart';
 import 'package:pve_flutter_frontend/states/pve_node_selector_state.dart';
 import 'package:pve_flutter_frontend/states/pve_qemu_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
+import 'package:pve_flutter_frontend/states/pve_storage_selector_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_viewer_state.dart';
-import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_action_card_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_guest_backup_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_guest_overview_header.dart';
 import 'package:pve_flutter_frontend/widgets/pve_guest_migrate_widget.dart';
-import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_qemu_options_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_qemu_power_settings_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_data_card_widget.dart';
-import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
 
@@ -152,7 +151,9 @@ class PveQemuOverview extends StatelessWidget {
                                   color: Colors.white24,
                                 ),
                                 title: 'Backup',
-                                onTap: null,
+                                onTap: () => Navigator.of(context).push(
+                                    _createBackupRoute(
+                                        guestID, state.nodeID, bloc.apiClient)),
                               ),
                             ],
                           ),
@@ -326,6 +327,40 @@ class PveQemuOverview extends StatelessWidget {
           child: child,
         );
       },
+    );
+  }
+
+  Route _createBackupRoute(
+    String guestID,
+    String nodeID,
+    ProxmoxApiClient client,
+  ) {
+    return MaterialPageRoute(
+      builder: (context) => MultiProvider(
+          providers: [
+            Provider(
+              create: (context) => PveStorageSelectorBloc(
+                apiClient: client,
+                init: PveStorageSelectorState.init(nodeID: nodeID)
+                    .rebuild((b) => b
+                      ..content = PveStorageContentType.backup
+                      ..filterActive = true),
+              )..events.add(LoadStoragesEvent()),
+              dispose: (context, PveStorageSelectorBloc bloc) => bloc.dispose(),
+            ),
+            Provider(
+              create: (context) => PveFileSelectorBloc(
+                apiClient: client,
+                init: PveFileSelectorState.init(nodeID: nodeID).rebuild((b) => b
+                  ..volidFilter = 'qemu-$guestID-'
+                  ..fileType = PveStorageContentType.backup),
+              )..events.add(LoadStorageContent()),
+              dispose: (context, PveFileSelectorBloc bloc) => bloc.dispose(),
+            )
+          ],
+          child: PveGuestBackupWidget(
+            guestID: guestID,
+          )),
     );
   }
 }
