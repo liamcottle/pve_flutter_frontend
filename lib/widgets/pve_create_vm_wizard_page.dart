@@ -525,10 +525,10 @@ class _HardDiskState extends State<_HardDisk> {
     //wizard.addToValidation(storageSelectorBloc.state);
     requestStepChangeSubscription =
         wizard.outRequestStepChange.listen((stepIndex) {
-      final nextStep = wizard.latestState.rebuild((b) => b
-        ..currentStep = stepIndex);
-        // ..scsi0 =
-        //     '${storageSelectorBloc.latestState.value.id}:${diskSizeController.text}');
+      final nextStep =
+          wizard.latestState.rebuild((b) => b..currentStep = stepIndex);
+      // ..scsi0 =
+      //     '${storageSelectorBloc.latestState.value.id}:${diskSizeController.text}');
 
       wizard.clearValidation();
       wizard.events.add(GoToStep(nextStep));
@@ -569,7 +569,7 @@ class _HardDiskState extends State<_HardDisk> {
             ]),
             Provider.value(
               value: storageSelectorBloc,
-              child: PveStorageSelector(),
+              child: PveStorageSelectorDropdown(),
             ),
             TextFormField(
               decoration: InputDecoration(
