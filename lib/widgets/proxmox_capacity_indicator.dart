@@ -70,6 +70,9 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
   }
 
   AlwaysStoppedAnimation<Color> getUsageAwareColor(double usedPercent) {
+    if (usedPercent == null) {
+      return null;
+    }
     if (usedPercent <= 0.5) {
       return AlwaysStoppedAnimation<Color>(Colors.greenAccent);
     }
