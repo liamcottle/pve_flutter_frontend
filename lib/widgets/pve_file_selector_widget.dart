@@ -269,9 +269,11 @@ class PveStorageCard extends StatelessWidget {
           color: isSelected ? Theme.of(context).primaryColor : Colors.white,
           elevation: isSelected ? 4 : 1,
           child: InkWell(
-              onTap: () {
-                sBloc.events.add(StorageSelectedEvent(storage: storage));
-              },
+              onTap: storage.active
+                  ? () {
+                      sBloc.events.add(StorageSelectedEvent(storage: storage));
+                    }
+                  : null,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -294,18 +296,35 @@ class PveStorageCard extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Expanded(
-                        child: Align(
-                          alignment: FractionalOffset.bottomCenter,
-                          child: ProxmoxCapacityIndicator(
-                            usedValue: Renderers.formatSize(storage.usedSpace),
-                            usedPercent: storage.usedPercent,
-                            totalValue:
-                                Renderers.formatSize(storage.totalSpace),
-                            selected: isSelected,
+                      if (storage.active)
+                        Expanded(
+                          child: Align(
+                            alignment: FractionalOffset.bottomCenter,
+                            child: ProxmoxCapacityIndicator(
+                              usedValue:
+                                  Renderers.formatSize(storage.usedSpace),
+                              usedPercent: storage.usedPercent,
+                              totalValue:
+                                  Renderers.formatSize(storage.totalSpace),
+                              selected: isSelected,
+                            ),
                           ),
                         ),
-                      ),
+                      if (!storage.active)
+                        Expanded(
+                          child: Align(
+                            alignment: FractionalOffset.bottomCenter,
+                            child: Text(
+                              "Storage offline",
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.white54
+                                    : Colors.black54,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
                     ]),
               )),
         ),
