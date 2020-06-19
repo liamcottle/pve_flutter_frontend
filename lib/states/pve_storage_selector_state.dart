@@ -11,6 +11,7 @@ abstract class PveStorageSelectorState
   // Fields
   BuiltList<PveNodesStorageModel> get storages;
   bool get enabledOnly;
+  bool get filterActive;
   String get nodeID;
 
   @nullable
@@ -37,5 +38,6 @@ abstract class PveStorageSelectorState
         ..isSuccess = false
         //class
         ..nodeID = nodeID
-        ..enabledOnly = true);
+        ..enabledOnly = true
+        ..filterActive = false);
 }

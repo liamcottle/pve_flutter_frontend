@@ -73,6 +73,9 @@ class PveStorageSelectorBloc
         enabled: state.enabledOnly,
         storageId: state.storage);
     storages.sort((a, b) => a.id.compareTo(b.id));
+    if (state.filterActive) {
+      storages = storages.where((element) => element.active == true).toList();
+    }
     return storages;
   }
 
