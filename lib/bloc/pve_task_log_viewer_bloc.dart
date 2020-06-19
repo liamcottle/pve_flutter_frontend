@@ -32,7 +32,7 @@ class PveTaskLogViewerBloc
       if (latestState.upid != null) {
         events.add(UpdateLog());
         if (latestState.status?.status == PveTaskLogStatusType.stopped) {
-          updateStatus.cancel();
+          updateLog.cancel();
         }
       }
     });
