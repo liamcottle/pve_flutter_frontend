@@ -3,9 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
-import 'package:pve_flutter_frontend/bloc/pve_task_log_viewer_bloc.dart';
-import 'package:pve_flutter_frontend/states/pve_task_log_viewer_state.dart';
-import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
+import 'package:pve_flutter_frontend/utils/utils.dart';
 
 class PveTaskExpansionTile extends StatelessWidget {
   final Color errorColor;
@@ -62,86 +60,8 @@ class PveTaskExpansionTile extends StatelessWidget {
                 child: Text('More Tasks'),
               ),
             FlatButton(
-              onPressed: () => showModalBottomSheet(
-                  shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(10))),
-                  context: context,
-                  builder: (context) => Provider(
-                        create: (context) => PveTaskLogViewerBloc(
-                          apiClient: taskLogBloc.apiClient,
-                          init: PveTaskLogViewerState.init(
-                            task.node,
-                            upid: task.upid,
-                          ),
-                        ),
-                        child: Builder(
-                          builder: (context) => ProxmoxStreamBuilder<
-                                  PveTaskLogViewerBloc, PveTaskLogViewerState>(
-                              bloc: Provider.of<PveTaskLogViewerBloc>(context),
-                              builder: (context, state) {
-                                if (state.isBlank) {
-                                  return Center(
-                                      child: Text("Waiting for data.."));
-                                }
-
-                                return Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                        child: Align(
-                                          alignment: Alignment.topCenter,
-                                          child: Container(
-                                            width: 40,
-                                            height: 3,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      if (state.status != null)
-                                        ListTile(
-                                          title: Text('Status'),
-                                          subtitle:
-                                              Text(state.status.status.name),
-                                        ),
-                                      Divider(),
-                                      if (state.log != null)
-                                        Expanded(
-                                          child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(14.0),
-                                              child: ListView.separated(
-                                                  itemCount:
-                                                      state.log.lines.length,
-                                                  separatorBuilder: (context,
-                                                          index) =>
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                vertical: 1.0),
-                                                        child: CustomPaint(
-                                                          painter:
-                                                              LineDashedPainter(),
-                                                        ),
-                                                      ),
-                                                  itemBuilder:
-                                                      (context, index) => Text(
-                                                          state.log.lines[index]
-                                                              .lineText))),
-                                        )
-                                    ],
-                                  ),
-                                );
-                              }),
-                        ),
-                      )),
+              onPressed: () => showTaskLogBottomSheet(
+                  context, taskLogBloc.apiClient, task.node, task.upid),
               child: Text('Full Log'),
             )
           ],

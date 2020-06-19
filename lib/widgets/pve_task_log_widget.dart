@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_task_log_viewer_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
+import 'package:pve_flutter_frontend/states/pve_task_log_viewer_state.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 
 class PveTaskLog extends StatelessWidget {
@@ -141,5 +144,139 @@ class PveTaskLog extends StatelessWidget {
 
           return Container();
         });
+  }
+}
+
+class PveTaskLogScrollView extends StatefulWidget {
+  final Widget icon;
+  final Widget jobTitle;
+
+  const PveTaskLogScrollView({
+    Key key,
+    this.icon,
+    this.jobTitle,
+  }) : super(key: key);
+  @override
+  _PveTaskLogScrollViewState createState() => _PveTaskLogScrollViewState();
+}
+
+class _PveTaskLogScrollViewState extends State<PveTaskLogScrollView> {
+  ScrollController _scrollController = new ScrollController();
+  @override
+  void initState() {
+    super.initState();
+    if (mounted) {
+      _scrollToBottom();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamListener<PveTaskLogViewerState>(
+      stream: Provider.of<PveTaskLogViewerBloc>(context).state.distinct(),
+      onStateChange: (newState) {
+        if (_scrollController.hasClients) {
+          _scrollToBottom();
+        }
+      },
+      child: ProxmoxStreamBuilder<PveTaskLogViewerBloc, PveTaskLogViewerState>(
+          bloc: Provider.of<PveTaskLogViewerBloc>(context),
+          builder: (context, state) {
+            var indicatorColor = Colors.teal.shade500;
+            var statusChipColor = Colors.teal.shade100;
+            if (state.status?.failed ?? false) {
+              indicatorColor = Colors.red;
+              statusChipColor = Colors.red.shade100;
+            }
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  if (state.isBlank)
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text("Loading log data.."),
+                      ),
+                    ),
+                  if (!state.isBlank) ...[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          width: 40,
+                          height: 3,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    if (state.status != null)
+                      ListTile(
+                        leading: widget.icon,
+                        title: AnimatedDefaultTextStyle(
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle1
+                              .copyWith(fontWeight: FontWeight.bold),
+                          duration: kThemeChangeDuration,
+                          child: widget.jobTitle ?? const SizedBox(),
+                        ),
+                        trailing: Chip(
+                          label: Text(
+                            state.status.status.name,
+                            style: TextStyle(color: indicatorColor),
+                          ),
+                          backgroundColor: statusChipColor,
+                        ),
+                      ),
+                    Divider(),
+                    if (state.log != null)
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount: state.log.lines.length,
+                            itemBuilder: (context, index) {
+                              final isLast =
+                                  index == state.log.lines.length - 1;
+                              final errorLine = state.log.lines[index].lineText
+                                  .contains('ERROR');
+                              return Card(
+                                color: isLast || errorLine
+                                    ? indicatorColor
+                                    : Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    state.log.lines[index].lineText,
+                                    style: TextStyle(
+                                      color: isLast || errorLine
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                  ]
+                ],
+              ),
+            );
+          }),
+    );
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 50), curve: Curves.ease);
+    }
   }
 }
