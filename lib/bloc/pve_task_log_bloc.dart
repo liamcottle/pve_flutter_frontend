@@ -19,7 +19,7 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
   @override
   void doOnListen() {
     updateTasks = Timer.periodic(Duration(seconds: 4), (timer) {
-      events.add(LoadTasks());
+      events.add(UpdateTasks());
     });
   }
 
@@ -39,17 +39,20 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
       var nodeTaskResponse;
       yield latestState.rebuild((b) => b..isLoading = true);
 
-      if (latestState.tasks.length > 0) {
-        nodeTaskResponse =
-            await getNodeTasks(latestState, limit: latestState.tasks.length);
-      } else {
-        nodeTaskResponse = await getNodeTasks(latestState);
-      }
+      nodeTaskResponse = await getNodeTasks(latestState);
 
       yield latestState.rebuild((b) => b
         ..tasks.replace(nodeTaskResponse.tasks)
         ..total = nodeTaskResponse.total
         ..isLoading = false);
+    }
+
+    if (event is UpdateTasks) {
+      if (latestState.limit >= latestState.tasks.length &&
+          !latestState.isLoading) {
+        final taskResponse = await getNodeTasks(latestState);
+        yield latestState.rebuild((b) => b..tasks.replace(taskResponse.tasks));
+      }
     }
 
     if (event is LoadMoreTasks) {
@@ -113,6 +116,8 @@ class LoadMoreTasks extends PVETaskLogEvent {
     this.limit = 50,
   });
 }
+
+class UpdateTasks extends PVETaskLogEvent {}
 
 class FilterTasksByGuestID extends PVETaskLogEvent {
   final String guestID;
