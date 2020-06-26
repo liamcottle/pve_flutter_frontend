@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
+import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/utils/utils.dart';
 
 class PveTaskExpansionTile extends StatelessWidget {
@@ -24,6 +25,10 @@ class PveTaskExpansionTile extends StatelessWidget {
     final hasError = task.status != 'RUNNING' && task.status != "OK";
     final isFinished = task.endTime != null;
     final taskLogBloc = Provider.of<PveTaskLogBloc>(context);
+    var duration;
+    if (isFinished) {
+      duration = task.endTime.difference(task.startTime);
+    }
     return ExpansionTile(
       backgroundColor: Colors.white,
       key: PageStorageKey<PveClusterTasksModel>(task),
@@ -39,17 +44,28 @@ class PveTaskExpansionTile extends StatelessWidget {
         ListTile(
           leading: Icon(Icons.person),
           title: Text(task.user),
+          subtitle: Text('User'),
         ),
         ListTile(
           leading: Icon(Icons.timer),
           title: Text(
             DateFormat.Md().add_Hms().format(task.startTime),
           ),
+          subtitle: Text('Start time'),
         ),
+        if (duration != null)
+          ListTile(
+            leading: Icon(Icons.timelapse),
+            title: Text(
+              Renderers.renderDuration(duration),
+            ),
+            subtitle: Text('Duration'),
+          ),
         ListTile(
           leading: Icon(Icons.description),
           title: Text("${task.status}"),
           dense: true,
+          subtitle: Text('Shortlog'),
         ),
         ButtonBar(
           children: <Widget>[
