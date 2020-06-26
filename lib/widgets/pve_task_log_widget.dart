@@ -8,9 +8,28 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart'
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 
-class PveTaskLog extends StatelessWidget {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class PveTaskLog extends StatefulWidget {
   PveTaskLog({Key key}) : super(key: key);
+
+  @override
+  _PveTaskLogState createState() => _PveTaskLogState();
+}
+
+class _PveTaskLogState extends State<PveTaskLog> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController _userFilterController;
+  TextEditingController _typeFilterController;
+  @override
+  void initState() {
+    super.initState();
+    final bloc = Provider.of<PveTaskLogBloc>(context, listen: false);
+    final state = bloc.latestState;
+    _userFilterController = TextEditingController.fromValue(
+        TextEditingValue(text: state.userFilter ?? ''));
+    _typeFilterController = TextEditingController.fromValue(
+        TextEditingValue(text: state.typeFilter ?? ''));
+  }
+
   @override
   Widget build(BuildContext context) {
     final bloc = Provider.of<PveTaskLogBloc>(context);
@@ -52,10 +71,11 @@ class PveTaskLog extends StatelessWidget {
                               labelText: 'by user',
                               filled: true,
                               prefixIcon: Icon(Icons.person)),
-                          onFieldSubmitted: (newValue) {
+                          onChanged: (newValue) {
                             bloc.events.add(FilterTasksByUser(newValue));
                             bloc.events.add(LoadTasks());
                           },
+                          controller: _userFilterController,
                         ),
                         SizedBox(
                           height: 20,
@@ -65,17 +85,18 @@ class PveTaskLog extends StatelessWidget {
                               labelText: 'by type',
                               filled: true,
                               prefixIcon: Icon(Icons.description)),
-                          onFieldSubmitted: (newValue) {
+                          onChanged: (newValue) {
                             bloc.events.add(FilterTasksByType(newValue));
                             bloc.events.add(LoadTasks());
                           },
+                          controller: _typeFilterController,
                         ),
                         SizedBox(
                           height: 20,
                         ),
                         DropdownButtonFormField<String>(
                           decoration: InputDecoration(labelText: 'Source'),
-                          value: 'all',
+                          value: state.source,
                           icon: Icon(Icons.arrow_downward),
                           iconSize: 24,
                           elevation: 16,
@@ -120,7 +141,7 @@ class PveTaskLog extends StatelessWidget {
                 body: NotificationListener<ScrollNotification>(
                   onNotification: (ScrollNotification scrollInfo) {
                     if (scrollInfo.metrics.pixels >=
-                        (0.9 * scrollInfo.metrics.maxScrollExtent)) {
+                        (0.8 * scrollInfo.metrics.maxScrollExtent)) {
                       if (!state.isLoading) {
                         bloc.events.add(LoadMoreTasks());
                       }
