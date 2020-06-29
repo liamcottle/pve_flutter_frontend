@@ -17,65 +17,58 @@ class PveLxcPowerSettings extends StatelessWidget {
         final status = state.currentStatus;
         final disableShutdown =
             status?.getLxcStatus() != PveResourceStatusType.running;
-        return Scaffold(
-          backgroundColor: Color(0xFF00617F),
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-          body: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Power Settings",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline4
-                        .copyWith(color: Colors.white),
+        return SingleChildScrollView(
+          child: Container(
+            constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height / 3),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                if (disableShutdown)
+                  ListTile(
+                    leading: Icon(Icons.play_arrow),
+                    title: Text(
+                      "Start",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text("Turn on LXC container"),
+                    onTap: () => action(
+                        context, PveClusterResourceAction.start, lxcBloc),
                   ),
-                ],
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    if (disableShutdown)
-                      OutlineButton.icon(
-                        onPressed: () => action(
-                            context, PveClusterResourceAction.start, lxcBloc),
-                        icon: Icon(Icons.play_arrow),
-                        label: Text("Start"),
-                      ),
-                    OutlineButton.icon(
-                      onPressed: disableShutdown
-                          ? null
-                          : () => action(context,
-                              PveClusterResourceAction.shutdown, lxcBloc),
-                      icon: Icon(Icons.power_settings_new),
-                      label: Text("Shutdown"),
+                if (!disableShutdown) ...[
+                  ListTile(
+                    leading: Icon(Icons.power_settings_new),
+                    title: Text(
+                      "Shutdown",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    OutlineButton.icon(
-                      onPressed: disableShutdown
-                          ? null
-                          : () => action(context,
-                              PveClusterResourceAction.reboot, lxcBloc),
-                      icon: Icon(Icons.autorenew),
-                      label: Text("Reboot"),
+                    subtitle: Text("Turn off LXC container"),
+                    onTap: () => action(
+                        context, PveClusterResourceAction.shutdown, lxcBloc),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.loop),
+                    title: Text(
+                      "Reboot",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    OutlineButton.icon(
-                      onPressed: disableShutdown
-                          ? null
-                          : () => action(
-                              context, PveClusterResourceAction.stop, lxcBloc),
-                      icon: Icon(Icons.stop),
-                      label: Text("Stop"),
+                    subtitle: Text("Reboot LXC container"),
+                    onTap: () => action(
+                        context, PveClusterResourceAction.reboot, lxcBloc),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.stop),
+                    title: Text(
+                      "Stop",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
-              ),
-            ],
+                    subtitle: Text("Stop LXC container"),
+                    onTap: () =>
+                        action(context, PveClusterResourceAction.stop, lxcBloc),
+                  ),
+                ]
+              ],
+            ),
           ),
         );
       },

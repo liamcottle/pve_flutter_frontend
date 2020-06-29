@@ -119,8 +119,8 @@ class PveQemuOverview extends StatelessWidget {
                                   color: Colors.white24,
                                 ),
                                 title: 'Power Settings',
-                                onTap: () => Navigator.of(context)
-                                    .push(_createShutdownRoute(bloc)),
+                                onTap: () =>
+                                    showPowerMenuBottomSheet(context, bloc),
                               ),
                               ActionCard(
                                 icon: Icon(
@@ -233,29 +233,6 @@ class PveQemuOverview extends StatelessWidget {
     );
   }
 
-  Route _createShutdownRoute(PveQemuOverviewBloc bloc) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => Provider.value(
-        value: bloc,
-        child: PveQemuPowerSettings(),
-      ),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return ScaleTransition(
-          scale: Tween<double>(
-            begin: 0.0,
-            end: 1.0,
-          ).animate(
-            CurvedAnimation(
-              parent: animation,
-              curve: Curves.fastOutSlowIn,
-            ),
-          ),
-          child: child,
-        );
-      },
-    );
-  }
-
   Route _createOptionsRoute(PveQemuOverviewBloc bloc) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => Provider.value(
@@ -361,6 +338,19 @@ class PveQemuOverview extends StatelessWidget {
           child: PveGuestBackupWidget(
             guestID: guestID,
           )),
+    );
+  }
+
+  Future<T> showPowerMenuBottomSheet<T>(
+      BuildContext context, PveQemuOverviewBloc qemuBloc) async {
+    return showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
+      context: context,
+      builder: (context) => Provider.value(
+        value: qemuBloc,
+        child: PveQemuPowerSettings(),
+      ),
     );
   }
 }

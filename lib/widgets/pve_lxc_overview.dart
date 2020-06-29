@@ -118,13 +118,8 @@ class PveLxcOverview extends StatelessWidget {
                                   color: Colors.white24,
                                 ),
                                 title: 'Power Settings',
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) => PveLxcPowerSettings(
-                                            lxcBloc: lxcBloc,
-                                          ),
-                                      fullscreenDialog: true),
-                                ),
+                                onTap: () =>
+                                    showPowerMenuBottomSheet(context, lxcBloc),
                               ),
                               ActionCard(
                                 icon: Icon(
@@ -320,6 +315,18 @@ class PveLxcOverview extends StatelessWidget {
           child: PveGuestBackupWidget(
             guestID: guestID,
           )),
+    );
+  }
+
+  Future<T> showPowerMenuBottomSheet<T>(
+      BuildContext context, PveLxcOverviewBloc lxcBloc) async {
+    return showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
+      context: context,
+      builder: (context) => PveLxcPowerSettings(
+        lxcBloc: lxcBloc,
+      ),
     );
   }
 }
