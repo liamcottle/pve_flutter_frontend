@@ -204,8 +204,8 @@ class PveNodeOverview extends StatelessWidget {
                             title: Text('${s.name}'),
                             subtitle: Text('${s.desc}'),
                             trailing: s.state != 'running'
-                                ? Icon(Icons.stop)
-                                : Icon(Icons.play_arrow),
+                                ? Icon(Icons.play_arrow)
+                                : Icon(Icons.stop),
                           ),
                         )
                         .toList()
