@@ -7,11 +7,14 @@ import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 
+/// PveResourceBloc will per default fetch all cluster resources (periodically),
+/// if no ProxmoxApiClient is provided it won't do anything until one is added
+/// and a view subscribes to it.
 class PveResourceBloc
     extends ProxmoxBaseBloc<PveResourceEvents, PveResourceState> {
   ProxmoxApiClient apiClient;
 
-  PveResourceBloc({@required this.apiClient, @required this.init});
+  PveResourceBloc({this.apiClient, @required this.init});
 
   PveResourceState init;
 
