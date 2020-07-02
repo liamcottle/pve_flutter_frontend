@@ -23,7 +23,6 @@ class PveNodeOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nBloc = Provider.of<PveNodeOverviewBloc>(context);
-    final width = MediaQuery.of(context).size.width;
     final tBloc = Provider.of<PveTaskLogBloc>(context);
 
     return ProxmoxStreamBuilder<PveNodeOverviewBloc, PveNodeOverviewState>(
