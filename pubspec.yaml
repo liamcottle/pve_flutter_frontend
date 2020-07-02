@@ -33,6 +33,7 @@ dependencies:
   url_launcher: ^5.4.1
   intl: ^0.16.1
   package_info: ^0.4.0+17
+  path_provider: ^1.6.11
   proxmox_dart_api_client:
     path: ../proxmox_dart_api_client
 
