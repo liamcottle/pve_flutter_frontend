@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
-
 
 class PveBridgeSelectorBloc
     extends ProxmoxBaseBloc<PveBridgeSelectorEvent, PveBridgeSelectorState> {
@@ -31,7 +29,8 @@ class PveBridgeSelectorBloc
   Stream<PveBridgeSelectorState> processEvents(
       PveBridgeSelectorEvent event) async* {
     if (event is LoadBridgesEvent) {
-      final bridges = await apiClient.getNodeNetwork(targetNode, type: bridgeType);
+      final bridges =
+          await apiClient.getNodeNetwork(targetNode, type: bridgeType);
       yield PveBridgeSelectorState(
           bridges: bridges,
           selectedBridge: bridges?.first,
@@ -39,7 +38,8 @@ class PveBridgeSelectorBloc
     }
 
     if (event is BridgeSelectedEvent) {
-      final bridges = await apiClient.getNodeNetwork(targetNode, type: bridgeType);
+      final bridges =
+          await apiClient.getNodeNetwork(targetNode, type: bridgeType);
 
       // to make sure it's the same object
       var selection =
@@ -49,7 +49,8 @@ class PveBridgeSelectorBloc
 
     if (event is ChangeTargetNode) {
       targetNode = event.targetNode;
-      final bridges = await apiClient.getNodeNetwork(targetNode, type: bridgeType);
+      final bridges =
+          await apiClient.getNodeNetwork(targetNode, type: bridgeType);
       try {
         var selection = bridges
             .where((item) => item.iface == latestState.value.iface)
@@ -67,8 +68,6 @@ class PveBridgeSelectorBloc
       }
     }
   }
-
-
 
   @override
   void dispose() {
@@ -95,8 +94,7 @@ class ChangeTargetNode extends PveBridgeSelectorEvent {
 
 //STATES
 
-class PveBridgeSelectorState
-    extends PveFormFieldState<PveNodeNetworkModel> {
+class PveBridgeSelectorState extends PveFormFieldState<PveNodeNetworkModel> {
   final List<PveNodeNetworkModel> bridges;
 
   PveBridgeSelectorState(
