@@ -31,7 +31,7 @@ class PveGuestIdSelectorBloc
       try {
         final id = await apiClient.getNextFreeID();
         yield GuestIdSelectorState(value: id);
-      } on ProxmoxApiException catch (e) {
+      } on ProxmoxApiException {
         yield GuestIdSelectorState(value: null, errorText: "Could not load ID");
       }
     }
@@ -53,7 +53,6 @@ class PveGuestIdSelectorBloc
       }
     }
   }
-
 }
 
 abstract class PveGuestIdSelectorEvent {}
