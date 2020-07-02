@@ -337,6 +337,12 @@ class MyApp extends StatelessWidget {
                 );
             }
           }
+          return MaterialPageRoute(
+            settings: context,
+            builder: (context) {
+              return NotFoundPage();
+            },
+          );
         },
         initialRoute: '/',
       ),
