@@ -21,7 +21,7 @@ Future<T> showTaskLogBottomSheet<T>(BuildContext context,
     ProxmoxApiClient apiClient, String targetNode, String upid,
     {Widget icon = const Icon(Icons.work),
     Widget jobTitle = const Text('Job')}) async {
-  showModalBottomSheet(
+  return showModalBottomSheet(
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
     context: context,
