@@ -239,7 +239,6 @@ class PveStorageCardIcon extends StatelessWidget {
         child: Icon(icon),
       ),
     );
-    ;
   }
 }
 
