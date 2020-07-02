@@ -38,8 +38,6 @@ class _MainLayoutWideState extends State<MainLayoutWide> {
 
   @override
   Widget build(BuildContext context) {
-    final client = Provider.of<ProxmoxApiClient>(context);
-
     return Scaffold(
         key: _scaffoldKey,
         drawer: PveMainNavigationDrawer(),
