@@ -358,7 +358,9 @@ class MobileDashboard extends StatelessWidget {
                             dense: true,
                             title: Text(
                               "Offline",
-                              style: TextStyle(fontSize: 14),
+                              style: TextStyle(
+                                fontSize: 14,
+                              ),
                             ),
                             leading: Icon(Icons.stop),
                             trailing: Text(offVMs.toString()),
@@ -387,7 +389,8 @@ class MobileDashboard extends StatelessWidget {
                             title: Text(
                               "Offline",
                               style: TextStyle(
-                                  fontSize: 14, color: Colors.black38),
+                                fontSize: 14,
+                              ),
                             ),
                             leading: Icon(Icons.stop),
                             trailing: Text(offCTs.toString()),
