@@ -147,7 +147,6 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _indicateScroll());
     super.initState();
   }
 
@@ -210,16 +209,5 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
         child: Text('no rrd data'),
       ),
     );
-  }
-
-  void _indicateScroll() async {
-    await Future.delayed(
-        Duration(milliseconds: 300),
-        () => controller.animateTo(50,
-            duration: Duration(milliseconds: 200), curve: Curves.easeIn));
-    await Future.delayed(
-        Duration(milliseconds: 300),
-        () => controller.animateTo(-50,
-            duration: Duration(milliseconds: 200), curve: Curves.easeIn));
   }
 }
