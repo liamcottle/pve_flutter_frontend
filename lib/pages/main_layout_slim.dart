@@ -141,7 +141,12 @@ class MobileDashboard extends StatelessWidget {
         ),
         automaticallyImplyLeading: false,
         actions: <Widget>[
-          PveHelpIconButton(docPath: 'index.html'),
+          PveHelpIconButton(
+              baseUrl: Provider.of<PveResourceBloc>(context)
+                  .apiClient
+                  .credentials
+                  .apiBaseUrl,
+              docPath: 'index.html'),
         ],
       ),
       body: Stack(children: [

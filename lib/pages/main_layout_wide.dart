@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/widgets/pve_help_icon_button_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_main_navigation_drawer.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_overview_widget.dart';
-import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 
@@ -45,6 +45,10 @@ class _MainLayoutWideState extends State<MainLayoutWide> {
           title: Text("Proxmox"),
           actions: <Widget>[
             PveHelpIconButton(
+              baseUrl: Provider.of<PveResourceBloc>(context)
+                  .apiClient
+                  .credentials
+                  .apiBaseUrl,
               docPath: 'index.html',
             ),
             LogButton(),

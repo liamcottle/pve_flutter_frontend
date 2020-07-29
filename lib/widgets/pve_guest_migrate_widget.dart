@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_migrate_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_node_selector_bloc.dart';
+import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_migrate_state.dart';
 import 'package:pve_flutter_frontend/states/pve_node_selector_state.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
@@ -35,7 +36,12 @@ class PveGuestMigrate extends StatelessWidget {
               ),
               elevation: 0.0,
               actions: <Widget>[
-                PveHelpIconButton(docPath: 'pve-admin-guide.html#qm_migration')
+                PveHelpIconButton(
+                    baseUrl: Provider.of<PveResourceBloc>(context)
+                        .apiClient
+                        .credentials
+                        .apiBaseUrl,
+                    docPath: 'pve-admin-guide.html#qm_migration')
               ],
             ),
             body: PveMigrateStreamConnector(

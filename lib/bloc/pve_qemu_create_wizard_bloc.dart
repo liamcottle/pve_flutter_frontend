@@ -77,8 +77,8 @@ class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
 
 //TODO merge into api client
   Future<void> createVirtualMachine(PveQemuCreateWizardState qemuConfig) async {
-    var url = Uri.parse(await getPlatformAwareOrigin() +
-        '/api2/json/nodes/${qemuConfig.node}/qemu');
+    // var url = Uri.parse(await getPlatformAwareOrigin() +
+    //     '/api2/json/nodes/${qemuConfig.node}/qemu');
 
     Map<String, String> payload = {
       'name': qemuConfig.name,
@@ -93,11 +93,11 @@ class PveQemuCreateWizardBloc extends ProxmoxBaseBloc<PveQemuCreateWizardEvent,
       'memory': qemuConfig.memory.toString(),
       'net0': qemuConfig.net0,
     };
-    payload.removeWhere((key, value) => value == null || value.isEmpty);
-    var response = await apiClient.post(url,
-        headers: {'content-type': 'application/x-www-form-urlencoded'},
-        body: payload);
-    print(response.body);
+    // payload.removeWhere((key, value) => value == null || value.isEmpty);
+    // var response = await apiClient.post(url,
+    //     headers: {'content-type': 'application/x-www-form-urlencoded'},
+    //     body: payload);
+    // print(response.body);
   }
 }
 

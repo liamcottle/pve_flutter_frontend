@@ -4,7 +4,14 @@ import 'package:pve_flutter_frontend/utils/utils.dart';
 class PveHelpIconButton extends StatelessWidget {
   final String docPath;
 
-  const PveHelpIconButton({Key key, this.docPath}) : super(key: key);
+  final Uri baseUrl;
+
+  const PveHelpIconButton({
+    Key key,
+    @required this.baseUrl,
+    this.docPath,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -12,7 +19,7 @@ class PveHelpIconButton extends StatelessWidget {
       tooltip: "Documentation",
       onPressed: () {
         try {
-          launchDocURL('/pve-docs/$docPath');
+          launchDocURL(baseUrl.replace(path: '/pve-docs/$docPath').toString());
         } catch (e) {
           Scaffold.of(context).showSnackBar(SnackBar(
             content: Text(

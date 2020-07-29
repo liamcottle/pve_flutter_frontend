@@ -8,8 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 void registerConsoleIframe(String nodeid) => throw UnimplementedError();
 
-Future<bool> launchDocURL(String docPath) async {
-  var url = await getPlatformAwareOrigin() + docPath;
+Future<bool> launchDocURL(String url) async {
   if (await canLaunch(url)) {
     return await launch(url);
   } else {
