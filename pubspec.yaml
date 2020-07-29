@@ -36,6 +36,8 @@ dependencies:
   path_provider: ^1.6.11
   proxmox_dart_api_client:
     path: ../proxmox_dart_api_client
+  proxmox_login_manager:
+    path: ../proxmox_login_manager
 
 dev_dependencies:
   flutter_test:

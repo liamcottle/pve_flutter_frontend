@@ -1,21 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:proxmox_login_manager/proxmox_login_manager.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
-import 'package:pve_flutter_frontend/bloc/pve_login_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_lxc_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_node_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_qemu_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
-import 'package:pve_flutter_frontend/events/pve_login_events.dart';
 import 'package:pve_flutter_frontend/pages/404_page.dart';
-import 'package:pve_flutter_frontend/pages/login_page.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
 import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
-import 'package:pve_flutter_frontend/states/pve_login_state.dart';
 import 'package:pve_flutter_frontend/states/pve_lxc_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_node_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_qemu_overview_state.dart';
@@ -39,9 +36,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final authBloc = PveAuthenticationBloc();
   try {
-    var credentials = await proxclient.Credentials.fromPlatformStorage();
-    var apiClient = proxclient.ProxmoxApiClient(credentials);
-    await apiClient.refreshCredentials();
+    final loginStorage = await ProxmoxLoginStorage.fromLocalStorage();
+    final apiClient = await loginStorage.recoverLatestSession();
     authBloc.events.add(LoggedIn(apiClient));
   } catch (e) {
     print(e);
@@ -79,7 +75,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamListener(
+    return StreamListener<PveAuthenticationState>(
       stream: authbloc.state,
       onStateChange: (state) {
         if (state is Authenticated) {
@@ -151,21 +147,21 @@ class MyApp extends StatelessWidget {
 
           if (authbloc.state.value is Unauthenticated ||
               context.name == '/login') {
+            ProxmoxLoginStorage.fromLocalStorage()
+                .then((storage) => storage?.invalidateAllSessions());
+
             return MaterialPageRoute(
               builder: (context) {
-                return MultiProvider(
-                  providers: [
-                    Provider<PveLoginBloc>(
-                      create: (context) =>
-                          PveLoginBloc(init: PveLoginState.init(''))
-                            ..events.add(LoadOrigin()),
-                      dispose: (context, bloc) => bloc.dispose(),
-                    ),
-                    Provider.value(
-                      value: authbloc,
-                    )
-                  ],
-                  child: PveLoginPage(),
+                return StreamListener<PveAuthenticationState>(
+                  stream: authbloc.state,
+                  onStateChange: (state) {
+                    if (state is Authenticated) {
+                      Navigator.of(context).pushReplacementNamed('/');
+                    }
+                  },
+                  child: ProxmoxLoginSelector(
+                    onLogin: (client) => authbloc.events.add(LoggedIn(client)),
+                  ),
                 );
               },
             );

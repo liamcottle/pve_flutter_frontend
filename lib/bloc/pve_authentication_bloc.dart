@@ -20,7 +20,6 @@ class PveAuthenticationBloc
       yield Authenticated(event.apiClient);
     }
     if (event is LoggedOut) {
-      await storeTicket('');
       yield Unauthenticated();
     }
   }
