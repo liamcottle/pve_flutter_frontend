@@ -412,6 +412,12 @@ class _PveBackupFormState extends State<PveBackupForm> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
+  void initState() {
+    super.initState();
+    emailToController = TextEditingController();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
@@ -474,6 +480,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
                               widget.guestID,
                               compression,
                               mode,
+                              mailTo: emailToController.text,
                             );
                           }
                         : null,
@@ -486,16 +493,19 @@ class _PveBackupFormState extends State<PveBackupForm> {
   }
 
   Future<void> startBackup(
-      ProxmoxApiClient apiClient,
-      String node,
-      String storage,
-      String guestId,
-      PveVZDumpCompressionType compression,
-      PveVZDumpModeType mode) async {
+    ProxmoxApiClient apiClient,
+    String node,
+    String storage,
+    String guestId,
+    PveVZDumpCompressionType compression,
+    PveVZDumpModeType mode, {
+    String mailTo,
+  }) async {
     try {
       final jobId = await apiClient.nodesVZDumpCreateBackup(
           node, storage, guestId,
-          compressionType: compression, mode: mode);
+          compressionType: compression, mode: mode, mailTo: mailTo);
+
       await showTaskLogBottomSheet(context, apiClient, node, jobId,
           icon: Icon(Icons.save), jobTitle: Text('Backup $guestId'));
     } on ProxmoxApiException catch (e) {
