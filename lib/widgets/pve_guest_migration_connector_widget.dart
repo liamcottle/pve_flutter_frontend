@@ -8,6 +8,7 @@ import 'package:pve_flutter_frontend/bloc/pve_task_log_viewer_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_migrate_state.dart';
 import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_viewer_state.dart';
+import 'package:pve_flutter_frontend/utils/utils.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 
 class PveMigrateStreamConnector extends StatelessWidget {
@@ -48,6 +49,10 @@ class PveMigrateStreamConnector extends StatelessWidget {
           onStateChange: (state) {
             if (state.taskUPID != tBloc.latestState.upid) {
               tBloc.events.add(SetTaskUPID(state.taskUPID));
+              showTaskLogBottomSheet(
+                  context, mBloc.apiClient, state.nodeID, state.taskUPID,
+                  icon: Icon(Icons.save),
+                  jobTitle: Text('Migration ${mBloc.guestID}'));
             }
 
             if (state.qemuPreconditions != null &&
