@@ -45,7 +45,7 @@ android {
     defaultConfig {
         applicationId "com.proxmox.app.pve_flutter_frontend"
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
