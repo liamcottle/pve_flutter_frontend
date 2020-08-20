@@ -11,7 +11,6 @@ import 'package:pve_flutter_frontend/bloc/pve_resource_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
 import 'package:pve_flutter_frontend/pages/404_page.dart';
 import 'package:pve_flutter_frontend/pages/main_layout_slim.dart';
-import 'package:pve_flutter_frontend/pages/main_layout_wide.dart';
 import 'package:pve_flutter_frontend/states/pve_cluster_status_state.dart';
 import 'package:pve_flutter_frontend/states/pve_lxc_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_node_overview_state.dart';
@@ -291,9 +290,10 @@ class MyApp extends StatelessWidget {
                         dispose: (context, bloc) => bloc.dispose(),
                       )
                     ],
+                    //TODO add a wide layout option here when it's ready
                     child: ProxmoxLayoutBuilder(
                       builder: (context, layout) => layout != ProxmoxLayout.slim
-                          ? MainLayoutWide()
+                          ? MainLayoutSlim()
                           : MainLayoutSlim(),
                     ),
                   ),
