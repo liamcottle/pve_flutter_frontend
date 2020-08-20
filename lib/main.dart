@@ -299,31 +299,6 @@ class MyApp extends StatelessWidget {
                   ),
                 );
                 break;
-              case PveCreateVmWizard.routeName:
-                return MaterialPageRoute(
-                  fullscreenDialog: true,
-                  settings: context,
-                  builder: (_) {
-                    return Provider<proxclient.ProxmoxApiClient>.value(
-                        value: state.apiClient, child: PveCreateVmWizard());
-                  },
-                );
-                break;
-
-              case PveConsoleWidget.routeName:
-                return MaterialPageRoute(
-                  fullscreenDialog: true,
-                  settings: context,
-                  builder: (_) {
-                    return Provider<proxclient.ProxmoxApiClient>.value(
-                        value: state.apiClient,
-                        child: PveConsoleWidget(
-                          nodeid: 'localhost',
-                        ));
-                  },
-                );
-                break;
-
               default:
                 return MaterialPageRoute(
                   settings: context,
