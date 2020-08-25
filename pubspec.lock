@@ -442,7 +442,7 @@ packages:
       path: "../proxmox_dart_api_client"
       relative: true
     source: path
-    version: "0.0.0"
+    version: "1.0.0"
   proxmox_login_manager:
     dependency: "direct main"
     description:
