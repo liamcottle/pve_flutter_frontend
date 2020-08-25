@@ -441,7 +441,7 @@ class PveNodeListTile extends StatelessWidget {
   String getNodeTileSubtitle(bool online, String level, String ip) {
     if (online) {
       if (level != null && level.isNotEmpty) {
-        return '$ip - $level';
+        return '$ip - ' + Renderers.renderSupportLevel(level);
       }
       return '$ip - no support';
     }

@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Renderers {
+  static const supportLevelMap = {
+    'c': 'Community',
+    'b': 'Basic',
+    's': 'Standard',
+    'p': 'Premium',
+  };
+
   static String formatSize(num size) {
     if (size == null) {
       return 'NaN';
@@ -63,5 +70,9 @@ class Renderers {
       icon = Icons.folder_shared;
     }
     return icon;
+  }
+
+  static String renderSupportLevel(String level) {
+    return supportLevelMap[level];
   }
 }
