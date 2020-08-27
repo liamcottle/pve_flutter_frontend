@@ -370,14 +370,14 @@ class MobileDashboard extends StatelessWidget {
                             leading: Icon(Icons.stop),
                             trailing: Text(offVMs.toString()),
                           ),
+                          Divider(
+                            indent: 10,
+                          ),
                           ListTile(
                             title: Text("LXC Container"),
                             trailing: Text(totalCTs.toString() ?? '?'),
                             leading:
                                 Icon(Renderers.getDefaultResourceIcon('lxc')),
-                          ),
-                          Divider(
-                            indent: 10,
                           ),
                           ListTile(
                             dense: true,
