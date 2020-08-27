@@ -54,42 +54,64 @@ class PveNodeOverview extends StatelessWidget {
                       child: PageView.builder(
                           itemCount: 3,
                           itemBuilder: (context, item) {
-                            if (item == 0) {
-                              return PveRRDChart(
-                                title:
-                                    'CPU (${state.status?.cpuinfo?.cpus ?? '-'})',
-                                subtitle: (state.rrdData.last?.cpu ?? 0 * 100)
-                                        .toStringAsFixed(2) +
-                                    "%",
-                                data: state.rrdData.map((e) => Point(
-                                    e.time.millisecondsSinceEpoch, e.cpu)),
-                                icon: Icon(Icons.memory),
-                              );
-                            }
-                            if (item == 1) {
-                              return PveRRDChart(
-                                title: 'I/O wait',
-                                subtitle:
-                                    (state.rrdData.last?.iowait ?? 0 * 100)
-                                            .toStringAsFixed(2) +
-                                        "%",
-                                data: state.rrdData.map((e) => Point(
-                                    e.time.millisecondsSinceEpoch, e.iowait)),
-                                icon: Icon(Icons.timer),
-                              );
-                            }
-                            if (item == 2) {
-                              return PveRRDChart(
-                                title: 'Load',
-                                subtitle:
-                                    (state.rrdData.last?.loadavg ?? 0 * 100)
-                                            .toStringAsFixed(2) +
-                                        "%",
-                                data: state.rrdData.map((e) => Point(
-                                    e.time.millisecondsSinceEpoch, e.loadavg)),
-                                icon: Icon(Icons.show_chart),
-                              );
-                            }
+                            final page = item + 1;
+                            return Column(
+                              children: [
+                                if (item == 0)
+                                  Expanded(
+                                    child: PveRRDChart(
+                                      title:
+                                          'CPU (${state.status?.cpuinfo?.cpus ?? '-'})',
+                                      subtitle:
+                                          (state.rrdData.last?.cpu ?? 0 * 100)
+                                                  .toStringAsFixed(2) +
+                                              "%",
+                                      data: state.rrdData.map((e) => Point(
+                                          e.time.millisecondsSinceEpoch,
+                                          e.cpu)),
+                                      icon: Icon(Icons.memory),
+                                    ),
+                                  ),
+                                if (item == 1)
+                                  Expanded(
+                                    child: PveRRDChart(
+                                      title: 'I/O wait',
+                                      subtitle: (state.rrdData.last?.iowait ??
+                                                  0 * 100)
+                                              .toStringAsFixed(2) +
+                                          "%",
+                                      data: state.rrdData.map((e) => Point(
+                                          e.time.millisecondsSinceEpoch,
+                                          e.iowait)),
+                                      icon: Icon(Icons.timer),
+                                    ),
+                                  ),
+                                if (item == 2)
+                                  Expanded(
+                                    child: PveRRDChart(
+                                      title: 'Load',
+                                      subtitle: (state.rrdData.last?.loadavg ??
+                                                  0 * 100)
+                                              .toStringAsFixed(2) +
+                                          "%",
+                                      data: state.rrdData.map((e) => Point(
+                                          e.time.millisecondsSinceEpoch,
+                                          e.loadavg)),
+                                      icon: Icon(Icons.show_chart),
+                                    ),
+                                  ),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Text(
+                                    '$page of 3',
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            );
                           }),
                     ),
                   ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
