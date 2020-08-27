@@ -84,6 +84,7 @@ class PveLxcOverview extends StatelessWidget {
                           if (taskState.tasks != null &&
                               taskState.tasks.isNotEmpty) {
                             return PveTaskExpansionTile(
+                              headerColor: Colors.white,
                               task: taskState.tasks.first,
                               showMorePage: Provider<PveTaskLogBloc>(
                                 create: (context) => PveTaskLogBloc(

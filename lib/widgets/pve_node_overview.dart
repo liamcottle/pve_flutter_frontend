@@ -122,7 +122,7 @@ class PveNodeOverview extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: PveTaskExpansionTile(
-                            infoColor: Colors.white,
+                            headerColor: Colors.white,
                             task: taskState.tasks.first,
                             showMorePage: Provider<PveTaskLogBloc>(
                               create: (context) => PveTaskLogBloc(
