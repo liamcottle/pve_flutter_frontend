@@ -456,13 +456,12 @@ class MobileResourceOverview extends StatelessWidget {
     return ProxmoxStreamBuilder<PveResourceBloc, PveResourceState>(
       bloc: rBloc,
       builder: (context, rstate) {
-        final client = Provider.of<ProxmoxApiClient>(context);
         final fResources = rstate.filterResources.toList();
         return Scaffold(
           endDrawer: _MobileResourceFilterSheet(),
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            backgroundColor: Colors.transparent,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             title: AppbarSearchTextField(
               onChanged: (filter) => rBloc.events.add(FilterByName(filter)),
@@ -474,34 +473,12 @@ class MobileResourceOverview extends StatelessWidget {
             separatorBuilder: (context, index) => Divider(),
             itemBuilder: (context, index) {
               final resource = fResources[index];
-
+              var listWidget;
               if (const ['lxc', 'qemu'].contains(resource.type)) {
-                return ListTile(
-                  leading: Icon(
-                    Renderers.getDefaultResourceIcon(resource.type,
-                        shared: resource.shared),
-                  ),
-                  title: Text(resource.displayName),
-                  subtitle: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(resource.node),
-                      StatusChip(
-                        status: resource.getStatus(),
-                        fontzsize: 12,
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    if (['qemu', 'lxc'].contains(resource.type)) {
-                      Navigator.pushNamed(
-                          context, '/nodes/${resource.node}/${resource.id}');
-                    }
-                  },
-                );
+                listWidget = PveGuestListTile(resource: resource);
               }
               if (resource.type == 'node') {
-                return PveNodeListTile(
+                listWidget = PveNodeListTile(
                   name: resource.node,
                   online: resource.getStatus() == PveResourceStatusType.running,
                   type: resource.type,
@@ -509,55 +486,33 @@ class MobileResourceOverview extends StatelessWidget {
                 );
               }
               if (resource.type == 'storage') {
-                return ListTile(
-                  title: Text(resource.displayName),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(resource.node),
-                          StatusChip(
-                            status: resource.getStatus(),
-                            fontzsize: 12,
-                          ),
-                        ],
-                      ),
-                      if (resource.getStatus() == PveResourceStatusType.running)
-                        ProxmoxCapacityIndicator(
-                          usedValue: Renderers.formatSize(resource.disk ?? 0),
-                          totalValue:
-                              Renderers.formatSize(resource.maxdisk ?? 0),
-                          usedPercent: (resource.disk ?? 0.0) /
-                              (resource.maxdisk ?? 100.0),
-                          icon: Icon(
-                            Renderers.getDefaultResourceIcon(resource.type,
-                                shared: resource.shared),
-                          ),
-                        ),
-                    ],
-                  ),
-                  onTap: resource.getStatus() == PveResourceStatusType.running
-                      ? () => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => PveFileSelector(
-                                fBloc: PveFileSelectorBloc(
-                                    apiClient: client,
-                                    init: PveFileSelectorState.init(
-                                            nodeID: resource.node)
-                                        .rebuild((b) =>
-                                            b..storageID = resource.storage)),
-                                sBloc: PveStorageSelectorBloc(
-                                  apiClient: client,
-                                  init: PveStorageSelectorState.init(
-                                          nodeID: resource.node)
-                                      .rebuild(
-                                          (b) => b..storage = resource.storage),
-                                )..events.add(LoadStoragesEvent()),
-                              )))
-                      : null,
+                listWidget = PveStorageListeTile(
+                  resource: resource,
                 );
               }
+              if (listWidget != null) {
+                if (otherCategory(fResources, index)) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          resource.type.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      listWidget,
+                    ],
+                  );
+                } else {
+                  return listWidget;
+                }
+              }
+
               return ListTile(
                 title: Text('Unkown resource type'),
               );
@@ -566,6 +521,109 @@ class MobileResourceOverview extends StatelessWidget {
           bottomNavigationBar: PveMobileBottomNavigationbar(),
         );
       },
+    );
+  }
+
+  bool otherCategory(List<PveClusterResourcesModel> fResources, index) {
+    var previous;
+    if (index > 0) {
+      previous = fResources[index - 1];
+    }
+    final current = fResources[index];
+    return previous == null || previous.type != current.type;
+  }
+}
+
+class PveGuestListTile extends StatelessWidget {
+  const PveGuestListTile({
+    Key key,
+    @required this.resource,
+  }) : super(key: key);
+
+  final PveClusterResourcesModel resource;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        Renderers.getDefaultResourceIcon(resource.type,
+            shared: resource.shared),
+      ),
+      title: Text(resource.displayName),
+      subtitle: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(resource.node),
+          StatusChip(
+            status: resource.getStatus(),
+            fontzsize: 12,
+          ),
+        ],
+      ),
+      onTap: () {
+        if (['qemu', 'lxc'].contains(resource.type)) {
+          Navigator.pushNamed(
+              context, '/nodes/${resource.node}/${resource.id}');
+        }
+      },
+    );
+  }
+}
+
+class PveStorageListeTile extends StatelessWidget {
+  const PveStorageListeTile({
+    Key key,
+    @required this.resource,
+  }) : super(key: key);
+
+  final PveClusterResourcesModel resource;
+
+  @override
+  Widget build(BuildContext context) {
+    final apiClient = Provider.of<ProxmoxApiClient>(context);
+
+    return ListTile(
+      title: Text(resource.displayName),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(resource.node),
+              StatusChip(
+                status: resource.getStatus(),
+                fontzsize: 12,
+              ),
+            ],
+          ),
+          if (resource.getStatus() == PveResourceStatusType.running)
+            ProxmoxCapacityIndicator(
+              usedValue: Renderers.formatSize(resource.disk ?? 0),
+              totalValue: Renderers.formatSize(resource.maxdisk ?? 0),
+              usedPercent: (resource.disk ?? 0.0) / (resource.maxdisk ?? 100.0),
+              icon: Icon(
+                Renderers.getDefaultResourceIcon(resource.type,
+                    shared: resource.shared),
+              ),
+            ),
+        ],
+      ),
+      onTap: resource.getStatus() == PveResourceStatusType.running
+          ? () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => PveFileSelector(
+                  fBloc: PveFileSelectorBloc(
+                      apiClient: apiClient,
+                      init: PveFileSelectorState.init(nodeID: resource.node)
+                          .rebuild((b) => b..storageID = resource.storage)),
+                  sBloc: PveStorageSelectorBloc(
+                    apiClient: apiClient,
+                    init: PveStorageSelectorState.init(nodeID: resource.node)
+                        .rebuild((b) => b..storage = resource.storage),
+                  )..events.add(LoadStoragesEvent()),
+                ),
+              ))
+          : null,
     );
   }
 }
