@@ -78,6 +78,7 @@ class PveQemuOverview extends StatelessWidget {
                         guestName: config?.name ?? 'VM $guestID',
                         guestNodeID: state.nodeID,
                         guestType: 'qemu',
+                        ha: status?.ha,
                       ),
                       ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
                         bloc: taskBloc,

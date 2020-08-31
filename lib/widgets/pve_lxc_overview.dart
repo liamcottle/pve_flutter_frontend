@@ -77,6 +77,7 @@ class PveLxcOverview extends StatelessWidget {
                         guestName: config?.hostname ?? 'CT $guestID',
                         guestNodeID: state.nodeID,
                         guestType: 'lxc',
+                        ha: status?.ha,
                       ),
                       ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
                         bloc: taskBloc,

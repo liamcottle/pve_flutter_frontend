@@ -18,6 +18,7 @@ class PveGuestOverviewHeader extends StatelessWidget {
     @required this.guestName,
     @required this.guestNodeID,
     @required this.guestType,
+    @required this.ha,
     this.background,
   })  : assert(guestName != null),
         super(key: key);
@@ -29,8 +30,10 @@ class PveGuestOverviewHeader extends StatelessWidget {
   final String guestName;
   final String guestNodeID;
   final Widget background;
+  final PveHAMangerServiceStatusModel ha;
   @override
   Widget build(BuildContext context) {
+    final haError = ha?.state == 'error';
     return Container(
       height: 250,
       width: width,
@@ -104,27 +107,28 @@ class PveGuestOverviewHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        FontAwesomeIcons.heartbeat,
-                        color: Colors.white54,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          "HA State",
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontWeight: FontWeight.w500,
+                if (ha?.managed ?? false)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          FontAwesomeIcons.heartbeat,
+                          color: haError ? Colors.red : Colors.green,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            "HA State",
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
               ],
             )
           ]),
