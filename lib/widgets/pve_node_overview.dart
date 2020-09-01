@@ -165,12 +165,14 @@ class PveNodeOverview extends StatelessWidget {
                           subtitle: Text(
                               'CPU Information (Socket: ${status.cpuinfo.sockets})'),
                         ),
-                      CheckboxListTile(
-                        dense: true,
-                        value: status?.ksm?.shared ?? false,
-                        title: Text('Kernel same-page merging (KSM)'),
-                        onChanged: (v) {},
-                      ),
+                      if (status?.ksm?.shared ?? false)
+                        CheckboxListTile(
+                          dense: true,
+                          value: status?.ksm?.shared ?? false,
+                          title: Text('Kernel same-page merging (KSM)',
+                              style: TextStyle(color: Colors.black)),
+                          onChanged: null,
+                        ),
                       if (status?.rootfs != null) ...[
                         Divider(
                           indent: 10,
