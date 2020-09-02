@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:pve_flutter_frontend/utils/renderers.dart';
 
 class ProxmoxLineChart extends CustomPainter {
   final List<Point> data;
@@ -9,12 +10,16 @@ class ProxmoxLineChart extends CustomPainter {
   final Color shadeColorTop;
   final Color shadeColorBottom;
   final double staticMax;
+  final Point touchPoint;
+  final String yUnit;
   ProxmoxLineChart({
     this.data,
     this.lineColor,
     this.staticMax,
     this.shadeColorTop = Colors.white,
     this.shadeColorBottom = const Color(0x00FFFFFF),
+    this.touchPoint,
+    this.yUnit = '',
   });
 
   @override
@@ -41,6 +46,38 @@ class ProxmoxLineChart extends CustomPainter {
           (points[i].x + points[i - 1].x) / 2, points[i].y ?? size.height);
       path.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, el.x, el.y ?? size.height);
     });
+
+    if (touchPoint != null) {
+      final index = closestX(touchPoint, points);
+      final selectedLabel = data[index].y?.toStringAsFixed(2) ?? '';
+      TextSpan span = TextSpan(
+        style: TextStyle(
+          color: Colors.white,
+        ),
+        text: '$selectedLabel $yUnit',
+      );
+      TextPainter tp = TextPainter(
+        text: span,
+        textAlign: TextAlign.left,
+        textDirection: TextDirection.ltr,
+      );
+      tp.layout();
+
+      // prevent right/left overflow
+      var tpX;
+      if (tp.width <= points[index].x) {
+        tpX = points[index].x - tp.width;
+      } else {
+        tpX = points[index].x;
+      }
+
+      tp.paint(canvas, Offset(tpX, points[index].y ?? size.height));
+      canvas.drawCircle(
+          Offset(points[index].x, points[index].y ?? size.height), 2, paint);
+    }
+
+    canvas.drawLine(Offset(0, 0), Offset(5, 0), paint);
+
     //TODO gaps between datapoints
     paint.style = PaintingStyle.stroke;
     canvas.drawPath(path, paint);
@@ -82,5 +119,9 @@ class ProxmoxLineChart extends CustomPainter {
       converted.add(Point(xDiff * i, y));
     });
     return converted;
+  }
+
+  int closestX(Point touchPoint, List<Point> convertedPoints) {
+    return convertedPoints.indexWhere((element) => element.x >= touchPoint.x);
   }
 }

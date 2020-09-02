@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
-import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_rrd_chart_widget.dart';
 
 class PveGuestOverviewHeader extends StatelessWidget {
   const PveGuestOverviewHeader({
@@ -162,6 +162,13 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
           itemCount: 2,
           itemBuilder: (context, item) {
             final page = item + 1;
+            final pageIndicator = Text(
+              '$page of 2',
+              style: TextStyle(
+                color: Colors.white54,
+                fontWeight: FontWeight.w500,
+              ),
+            );
             return Column(
               children: [
                 if (item == 0)
@@ -177,6 +184,7 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
                       data: widget.rrdData.map(
                           (e) => Point(e.time.millisecondsSinceEpoch, e.cpu)),
                       icon: Icon(Icons.memory),
+                      bottomRight: pageIndicator,
                     ),
                   ),
                 if (item == 1)
@@ -191,18 +199,9 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
                       data: widget.rrdData.map(
                           (e) => Point(e.time.millisecondsSinceEpoch, e.mem)),
                       icon: Icon(Icons.timer),
+                      bottomRight: pageIndicator,
                     ),
                   ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Text(
-                    '$page of 2',
-                    style: TextStyle(
-                      color: Colors.white54,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                )
               ],
             );
           });

@@ -7,9 +7,9 @@ import 'package:pve_flutter_frontend/states/pve_node_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
-import 'package:pve_flutter_frontend/widgets/proxmox_line_chart.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_data_card_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_rrd_chart_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 import 'dart:math';
 
@@ -55,6 +55,13 @@ class PveNodeOverview extends StatelessWidget {
                           itemCount: 3,
                           itemBuilder: (context, item) {
                             final page = item + 1;
+                            final pageIndicator = Text(
+                              '$page of 3',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            );
                             return Column(
                               children: [
                                 if (item == 0)
@@ -64,12 +71,13 @@ class PveNodeOverview extends StatelessWidget {
                                           'CPU (${state.status?.cpuinfo?.cpus ?? '-'})',
                                       subtitle:
                                           (state.rrdData.last?.cpu ?? 0 * 100)
-                                                  .toStringAsFixed(2) +
-                                              "%",
+                                              .toStringAsFixed(2),
                                       data: state.rrdData.map((e) => Point(
                                           e.time.millisecondsSinceEpoch,
                                           e.cpu)),
                                       icon: Icon(Icons.memory),
+                                      bottomRight: pageIndicator,
+                                      unit: "%",
                                     ),
                                   ),
                                 if (item == 1)
@@ -77,13 +85,14 @@ class PveNodeOverview extends StatelessWidget {
                                     child: PveRRDChart(
                                       title: 'I/O wait',
                                       subtitle: (state.rrdData.last?.iowait ??
-                                                  0 * 100)
-                                              .toStringAsFixed(2) +
-                                          "%",
+                                              0 * 100)
+                                          .toStringAsFixed(2),
                                       data: state.rrdData.map((e) => Point(
                                           e.time.millisecondsSinceEpoch,
                                           e.iowait)),
                                       icon: Icon(Icons.timer),
+                                      bottomRight: pageIndicator,
+                                      unit: "%",
                                     ),
                                   ),
                                 if (item == 2)
@@ -91,25 +100,16 @@ class PveNodeOverview extends StatelessWidget {
                                     child: PveRRDChart(
                                       title: 'Load',
                                       subtitle: (state.rrdData.last?.loadavg ??
-                                                  0 * 100)
-                                              .toStringAsFixed(2) +
-                                          "%",
+                                              0 * 100)
+                                          .toStringAsFixed(2),
                                       data: state.rrdData.map((e) => Point(
                                           e.time.millisecondsSinceEpoch,
                                           e.loadavg)),
                                       icon: Icon(Icons.show_chart),
+                                      bottomRight: pageIndicator,
+                                      unit: "%",
                                     ),
                                   ),
-                                Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Text(
-                                    '$page of 3',
-                                    style: TextStyle(
-                                      color: Colors.white54,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                )
                               ],
                             );
                           }),
@@ -373,77 +373,6 @@ class PveNodeOverview extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class PveRRDChart extends StatelessWidget {
-  final String title;
-  final double titleWidth;
-  final String subtitle;
-  final EdgeInsetsGeometry titlePadding;
-  final Iterable<Point<num>> data;
-  final Widget icon;
-  final Color lineColor;
-  final double staticMaximum;
-  final Color shadeColorTop;
-  final Color shadeColorBottom;
-  final CrossAxisAlignment titleAlginment;
-  const PveRRDChart({
-    Key key,
-    this.title,
-    this.subtitle,
-    this.data,
-    this.icon,
-    this.lineColor = Colors.white,
-    this.staticMaximum,
-    this.shadeColorTop = Colors.white,
-    this.shadeColorBottom = const Color(0x00FFFFFF),
-    this.titleAlginment = CrossAxisAlignment.start,
-    this.titleWidth,
-    this.titlePadding,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: titleAlginment,
-      children: <Widget>[
-        Container(
-          width: titleWidth ?? null,
-          padding: titlePadding ?? null,
-          child: ListTile(
-            leading: icon,
-            title: Text(
-              title,
-              style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white60,
-                  fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              subtitle,
-              style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Expanded(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            child: CustomPaint(
-              painter: ProxmoxLineChart(
-                  data: data?.toList(),
-                  lineColor: lineColor,
-                  staticMax: staticMaximum,
-                  shadeColorBottom: shadeColorBottom,
-                  shadeColorTop: shadeColorTop),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
