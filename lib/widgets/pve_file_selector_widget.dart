@@ -294,6 +294,7 @@ class PveStorageCard extends StatelessWidget {
                           color: isSelected ? Colors.white54 : Colors.black54,
                           fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 1,
                       ),
                       if (storage.active)
                         Expanded(
