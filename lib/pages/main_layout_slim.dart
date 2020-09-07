@@ -712,45 +712,77 @@ class _MobileResourceFilterSheet extends StatelessWidget {
       bloc: rBloc,
       builder: (context, state) => Drawer(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Resources',
-                  style: Theme.of(context).textTheme.headline5,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 20.0, 8.0, 0),
+                child: ListTile(
+                  title: Text(
+                    'Filter Results',
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
                 ),
-                CheckboxListTile(
-                  dense: true,
-                  title: Text('Nodes'),
-                  value: state.typeFilter.contains('node'),
-                  onChanged: (v) => rBloc.events.add(
-                      FilterByType(addOrRemove(v, 'node', state.typeFilter))),
+              ),
+              Divider(
+                indent: 0,
+                endIndent: 0,
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        'Type',
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    CheckboxListTile(
+                      dense: true,
+                      title: Text(
+                        'Nodes',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      value: state.typeFilter.contains('node'),
+                      onChanged: (v) => rBloc.events.add(FilterByType(
+                          addOrRemove(v, 'node', state.typeFilter))),
+                    ),
+                    CheckboxListTile(
+                      dense: true,
+                      title: Text(
+                        'Qemu',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      value: state.typeFilter.contains('qemu'),
+                      onChanged: (v) => rBloc.events.add(FilterByType(
+                          addOrRemove(v, 'qemu', state.typeFilter))),
+                    ),
+                    CheckboxListTile(
+                      dense: true,
+                      title: Text(
+                        'LXC',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      value: state.typeFilter.contains('lxc'),
+                      onChanged: (v) => rBloc.events.add(FilterByType(
+                          addOrRemove(v, 'lxc', state.typeFilter))),
+                    ),
+                    CheckboxListTile(
+                      dense: true,
+                      title: Text(
+                        'Storage',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      value: state.typeFilter.contains('storage'),
+                      onChanged: (v) => rBloc.events.add(FilterByType(
+                          addOrRemove(v, 'storage', state.typeFilter))),
+                    ),
+                  ],
                 ),
-                CheckboxListTile(
-                  dense: true,
-                  title: Text('Qemu'),
-                  value: state.typeFilter.contains('qemu'),
-                  onChanged: (v) => rBloc.events.add(
-                      FilterByType(addOrRemove(v, 'qemu', state.typeFilter))),
-                ),
-                CheckboxListTile(
-                  dense: true,
-                  title: Text('LXC'),
-                  value: state.typeFilter.contains('lxc'),
-                  onChanged: (v) => rBloc.events.add(
-                      FilterByType(addOrRemove(v, 'lxc', state.typeFilter))),
-                ),
-                CheckboxListTile(
-                  dense: true,
-                  title: Text('Storage'),
-                  value: state.typeFilter.contains('storage'),
-                  onChanged: (v) => rBloc.events.add(FilterByType(
-                      addOrRemove(v, 'storage', state.typeFilter))),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
