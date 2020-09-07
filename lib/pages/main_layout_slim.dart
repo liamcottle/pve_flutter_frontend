@@ -98,19 +98,19 @@ class PveMobileBottomNavigationbar extends StatelessWidget {
             icon: Icon(
               Icons.dashboard,
             ),
-            title: Text("Dashboard"),
+            label: "Dashboard",
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.developer_board,
             ),
-            title: Text("Resources"),
+            label: "Resources",
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.supervised_user_circle,
             ),
-            title: Text("Access"),
+            label: "Access",
           ),
         ],
         currentIndex: pageSelector.value,
