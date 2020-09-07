@@ -470,68 +470,74 @@ class MobileResourceOverview extends StatelessWidget {
       bloc: rBloc,
       builder: (context, rstate) {
         final fResources = rstate.filterResources.toList();
-        return Scaffold(
-          endDrawer: _MobileResourceFilterSheet(),
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            elevation: 0,
-            title: AppbarSearchTextField(
-              onChanged: (filter) => rBloc.events.add(FilterByName(filter)),
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Scaffold(
+            endDrawer: _MobileResourceFilterSheet(),
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              elevation: 0,
+              title: AppbarSearchTextField(
+                onChanged: (filter) => rBloc.events.add(FilterByName(filter)),
+              ),
+              actions: <Widget>[AppBarFilterIconButton()],
             ),
-            actions: <Widget>[AppBarFilterIconButton()],
-          ),
-          body: ListView.separated(
-            itemCount: fResources.length,
-            separatorBuilder: (context, index) => Divider(),
-            itemBuilder: (context, index) {
-              final resource = fResources[index];
-              var listWidget;
-              if (const ['lxc', 'qemu'].contains(resource.type)) {
-                listWidget = PveGuestListTile(resource: resource);
-              }
-              if (resource.type == 'node') {
-                listWidget = PveNodeListTile(
-                  name: resource.node,
-                  online: resource.getStatus() == PveResourceStatusType.running,
-                  type: resource.type,
-                  level: resource.level,
-                );
-              }
-              if (resource.type == 'storage') {
-                listWidget = PveStorageListeTile(
-                  resource: resource,
-                );
-              }
-              if (listWidget != null) {
-                if (otherCategory(fResources, index)) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          resource.type.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+            body: ListView.separated(
+              itemCount: fResources.length,
+              separatorBuilder: (context, index) => Divider(),
+              itemBuilder: (context, index) {
+                final resource = fResources[index];
+                var listWidget;
+                if (const ['lxc', 'qemu'].contains(resource.type)) {
+                  listWidget = PveGuestListTile(resource: resource);
+                }
+                if (resource.type == 'node') {
+                  listWidget = PveNodeListTile(
+                    name: resource.node,
+                    online:
+                        resource.getStatus() == PveResourceStatusType.running,
+                    type: resource.type,
+                    level: resource.level,
+                  );
+                }
+                if (resource.type == 'storage') {
+                  listWidget = PveStorageListeTile(
+                    resource: resource,
+                  );
+                }
+                if (listWidget != null) {
+                  if (otherCategory(fResources, index)) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Text(
+                            resource.type.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      listWidget,
-                    ],
-                  );
-                } else {
-                  return listWidget;
+                        listWidget,
+                      ],
+                    );
+                  } else {
+                    return listWidget;
+                  }
                 }
-              }
 
-              return ListTile(
-                title: Text('Unkown resource type'),
-              );
-            },
+                return ListTile(
+                  title: Text('Unkown resource type'),
+                );
+              },
+            ),
+            bottomNavigationBar: PveMobileBottomNavigationbar(),
           ),
-          bottomNavigationBar: PveMobileBottomNavigationbar(),
         );
       },
     );
@@ -670,8 +676,21 @@ class _AppbarSearchTextFieldState extends State<AppbarSearchTextField> {
             Icons.search,
             size: 20,
           ),
+          suffixIcon: _controller.text.isNotEmpty
+              ? IconButton(
+                  padding: EdgeInsets.zero,
+                  iconSize: 20,
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    _controller.clear();
+                    widget.onChanged('');
+                    FocusScope.of(context).unfocus();
+                  },
+                )
+              : null,
           contentPadding: EdgeInsets.fromLTRB(20, 5, 8, 5),
           prefixIconConstraints: BoxConstraints(minHeight: 32, minWidth: 32),
+          suffixIconConstraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
           fillColor: Color(0xFFF1F2F4),
           filled: true,
           isDense: true,
