@@ -38,14 +38,29 @@ class _MainLayoutSlimState extends State<MainLayoutSlim> {
   @override
   Widget build(BuildContext context) {
     final apiClient = Provider.of<ProxmoxApiClient>(context);
-    final resourceViewState = PveResourceBloc(
-      apiClient: apiClient,
-      init: PveResourceState.init().rebuild(
-        (b) => b..typeFilter.replace({'qemu', 'lxc', 'storage'}),
-      ),
-    )..events.add(PollResources());
-    return Provider.value(
-      value: pageSelector,
+    return MultiProvider(
+      providers: [
+        Provider.value(
+          value: pageSelector,
+        ),
+        Provider<PveResourceBloc>(
+          create: (context) => PveResourceBloc(
+            apiClient: apiClient,
+            init: PveResourceState.init().rebuild(
+              (b) => b..typeFilter.replace({'qemu', 'lxc', 'storage'}),
+            ),
+          )..events.add(PollResources()),
+          dispose: (context, bloc) => bloc.dispose(),
+        ),
+        Provider<PveAccessManagementBloc>(
+          create: (context) => PveAccessManagementBloc(
+              apiClient: apiClient,
+              init:
+                  PveAccessManagementState.init(apiClient.credentials.username))
+            ..events.add(LoadUsers()),
+          dispose: (context, bloc) => bloc.dispose(),
+        )
+      ],
       child: WillPopScope(
         onWillPop: () async {
           if (pageSelector.value != 0) {
@@ -64,20 +79,10 @@ class _MainLayoutSlimState extends State<MainLayoutSlim> {
                   return MobileDashboard();
                   break;
                 case 1:
-                  return Provider.value(
-                    value: resourceViewState,
-                    child: MobileResourceOverview(),
-                  );
+                  return MobileResourceOverview();
                   break;
                 case 2:
-                  return Provider(
-                    create: (context) => PveAccessManagementBloc(
-                        apiClient: apiClient,
-                        init: PveAccessManagementState.init(
-                            apiClient.credentials.username))
-                      ..events.add(LoadUsers()),
-                    child: MobileAccessManagement(),
-                  );
+                  return MobileAccessManagement();
                   break;
                 default:
               }
