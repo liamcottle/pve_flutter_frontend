@@ -46,36 +46,45 @@ class _MainLayoutSlimState extends State<MainLayoutSlim> {
     )..events.add(PollResources());
     return Provider.value(
       value: pageSelector,
-      child: StreamBuilder<int>(
-        stream: pageSelector.stream,
-        initialData: pageSelector.value,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            switch (snapshot.data) {
-              case 0:
-                return MobileDashboard();
-                break;
-              case 1:
-                return Provider.value(
-                  value: resourceViewState,
-                  child: MobileResourceOverview(),
-                );
-                break;
-              case 2:
-                return Provider(
-                  create: (context) => PveAccessManagementBloc(
-                      apiClient: apiClient,
-                      init: PveAccessManagementState.init(
-                          apiClient.credentials.username))
-                    ..events.add(LoadUsers()),
-                  child: MobileAccessManagement(),
-                );
-                break;
-              default:
-            }
+      child: WillPopScope(
+        onWillPop: () async {
+          if (pageSelector.value != 0) {
+            pageSelector.add(0);
+            return false;
           }
-          return Container();
+          return true;
         },
+        child: StreamBuilder<int>(
+          stream: pageSelector.stream,
+          initialData: pageSelector.value,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              switch (snapshot.data) {
+                case 0:
+                  return MobileDashboard();
+                  break;
+                case 1:
+                  return Provider.value(
+                    value: resourceViewState,
+                    child: MobileResourceOverview(),
+                  );
+                  break;
+                case 2:
+                  return Provider(
+                    create: (context) => PveAccessManagementBloc(
+                        apiClient: apiClient,
+                        init: PveAccessManagementState.init(
+                            apiClient.credentials.username))
+                      ..events.add(LoadUsers()),
+                    child: MobileAccessManagement(),
+                  );
+                  break;
+                default:
+              }
+            }
+            return Container();
+          },
+        ),
       ),
     );
   }
