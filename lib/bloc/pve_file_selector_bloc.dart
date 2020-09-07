@@ -33,6 +33,10 @@ class PveFileSelectorBloc
 
     if (event is ToggleSearch) {
       yield latestState.rebuild((b) => b..search = !b.search);
+      // reset search
+      if (!latestState.search) {
+        events.add(FilterContent(searchTerm: ''));
+      }
     }
 
     if (event is FilterContent) {
