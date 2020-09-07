@@ -228,7 +228,6 @@ class MobileDashboard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: ActionChip(
-                          //padding: EdgeInsets.all(8),
                           labelPadding: EdgeInsets.symmetric(horizontal: 8),
                           backgroundColor: Color(0xE6003752),
                           avatar: Icon(
