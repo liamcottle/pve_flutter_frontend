@@ -387,7 +387,7 @@ class FileSelectorContentView extends StatelessWidget {
                     FractionallySizedBox(
                       widthFactor: 0.8,
                       child: Text(
-                        Renderers.renderStorageContent(content[index].volid),
+                        Renderers.renderStorageContent(content[index]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -413,7 +413,7 @@ class FileSelectorContentView extends StatelessWidget {
             color: Color.fromARGB(255, 152, 162, 201),
           ),
           title: Text(
-            Renderers.renderStorageContent(content[index].volid),
+            Renderers.renderStorageContent(content[index]),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),

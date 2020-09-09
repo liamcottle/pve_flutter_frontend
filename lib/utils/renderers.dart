@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class Renderers {
   static const supportLevelMap = {
@@ -27,8 +28,8 @@ class Renderers {
         "B";
   }
 
-  static String renderStorageContent(String volid) {
-    return volid.replaceAll(RegExp(r"^.*:(.*\/)?"), '');
+  static String renderStorageContent(PveNodesStorageContentModel content) {
+    return content.volid.replaceAll(RegExp(r"^.*?:(.*?\/)?"), '');
   }
 
   static IconData getDefaultResourceIcon(String type, {bool shared = false}) {

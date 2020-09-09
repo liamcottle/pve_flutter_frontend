@@ -213,7 +213,7 @@ class PveGuestBackupContent extends StatelessWidget {
             color: Color.fromARGB(255, 152, 162, 201),
           ),
           title: Text(
-            Renderers.renderStorageContent(content[index].volid),
+            Renderers.renderStorageContent(content[index]),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -368,7 +368,7 @@ class _PveConfigurationDialogState extends State<PveConfigurationDialog> {
         insetPadding: EdgeInsets.all(4),
         title: Text("Configuration"),
         content: snapshot.hasData
-            ? Text(snapshot.data)
+            ? SingleChildScrollView(child: Text(snapshot.data))
             : Center(
                 child: CircularProgressIndicator(),
               ),
