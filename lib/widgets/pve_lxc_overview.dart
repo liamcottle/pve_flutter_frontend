@@ -308,7 +308,7 @@ class PveLxcOverview extends StatelessWidget {
               create: (context) => PveFileSelectorBloc(
                 apiClient: client,
                 init: PveFileSelectorState.init(nodeID: nodeID).rebuild((b) => b
-                  ..volidFilter = 'lxc-$guestID-'
+                  ..guestID = int.parse(guestID)
                   ..fileType = PveStorageContentType.backup),
               )..events.add(LoadStorageContent()),
               dispose: (context, PveFileSelectorBloc bloc) => bloc.dispose(),
