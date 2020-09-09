@@ -60,7 +60,7 @@ class PveFileSelectorBloc
       PveFileSelectorState state) async {
     final data = await apiClient.getNodeStorageContent(
         state.nodeID, state.storageID,
-        content: state.fileType);
+        content: state.fileType, vmid: state.guestID);
 
     if (state.volidFilter != null && state.volidFilter.isNotEmpty) {
       return data

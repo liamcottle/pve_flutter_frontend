@@ -19,6 +19,8 @@ abstract class PveFileSelectorState
   String get storageID;
   @nullable
   PveStorageContentType get fileType;
+  @nullable
+  int get guestID;
 
   PveFileSelectorState._();
 
