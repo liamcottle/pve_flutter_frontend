@@ -563,10 +563,14 @@ class PveGuestListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final status = resource.getStatus();
     return ListTile(
       leading: Icon(
         Renderers.getDefaultResourceIcon(resource.type,
             shared: resource.shared),
+        color: status == PveResourceStatusType.running
+            ? Color(0xFF03fc6b)
+            : Colors.grey,
       ),
       title: Text(resource.displayName),
       subtitle: Row(
