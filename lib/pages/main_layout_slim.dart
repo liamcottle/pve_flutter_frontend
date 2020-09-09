@@ -47,7 +47,9 @@ class _MainLayoutSlimState extends State<MainLayoutSlim> {
           create: (context) => PveResourceBloc(
             apiClient: apiClient,
             init: PveResourceState.init().rebuild(
-              (b) => b..typeFilter.replace({'qemu', 'lxc', 'storage'}),
+              (b) => b
+                ..typeFilter.replace({'qemu', 'lxc', 'storage'})
+                ..statusFilter.replace(PveResourceStatusType.values),
             ),
           )..events.add(PollResources()),
           dispose: (context, bloc) => bloc.dispose(),
@@ -235,8 +237,14 @@ class MobileDashboard extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white),
                           ),
-                          onPressed: () =>
-                              Provider.of<BehaviorSubject<int>>(context).add(1),
+                          onPressed: () {
+                            Provider.of<BehaviorSubject<int>>(context).add(1);
+                            Provider.of<PveResourceBloc>(context)
+                                .events
+                                .add(FilterResources(
+                                  typeFilter: BuiltSet.from(['qemu']),
+                                ));
+                          },
                         ),
                       ),
                       Padding(
@@ -255,8 +263,14 @@ class MobileDashboard extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white),
                           ),
-                          onPressed: () =>
-                              Provider.of<BehaviorSubject<int>>(context).add(1),
+                          onPressed: () {
+                            Provider.of<BehaviorSubject<int>>(context).add(1);
+                            Provider.of<PveResourceBloc>(context)
+                                .events
+                                .add(FilterResources(
+                                  typeFilter: BuiltSet.from(['lxc']),
+                                ));
+                          },
                         ),
                       ),
                     ],
@@ -361,17 +375,35 @@ class MobileDashboard extends StatelessWidget {
                             trailing: Text(totalVMs.toString() ?? '?'),
                             leading:
                                 Icon(Renderers.getDefaultResourceIcon('qemu')),
+                            onTap: () {
+                              Provider.of<BehaviorSubject<int>>(context).add(1);
+                              Provider.of<PveResourceBloc>(context)
+                                  .events
+                                  .add(FilterResources(
+                                    typeFilter: BuiltSet.from(['qemu']),
+                                  ));
+                            },
                           ),
                           ListTile(
-                            dense: true,
-                            title: Text(
-                              "Online",
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            leading: Icon(Icons.play_circle_outline,
-                                color: Colors.green),
-                            trailing: Text(onlineVMs.length.toString()),
-                          ),
+                              dense: true,
+                              title: Text(
+                                "Online",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              leading: Icon(Icons.play_circle_outline,
+                                  color: Colors.green),
+                              trailing: Text(onlineVMs.length.toString()),
+                              onTap: () {
+                                Provider.of<BehaviorSubject<int>>(context)
+                                    .add(1);
+                                Provider.of<PveResourceBloc>(context)
+                                    .events
+                                    .add(FilterResources(
+                                      typeFilter: BuiltSet.from(['qemu']),
+                                      statusFilter: BuiltSet.from(
+                                          [PveResourceStatusType.running]),
+                                    ));
+                              }),
                           ListTile(
                             dense: true,
                             title: Text(
@@ -382,6 +414,16 @@ class MobileDashboard extends StatelessWidget {
                             ),
                             leading: Icon(Icons.stop),
                             trailing: Text(offVMs.toString()),
+                            onTap: () {
+                              Provider.of<BehaviorSubject<int>>(context).add(1);
+                              Provider.of<PveResourceBloc>(context)
+                                  .events
+                                  .add(FilterResources(
+                                    typeFilter: BuiltSet.from(['qemu']),
+                                    statusFilter: BuiltSet.from(
+                                        [PveResourceStatusType.stopped]),
+                                  ));
+                            },
                           ),
                           Divider(
                             indent: 10,
@@ -391,6 +433,14 @@ class MobileDashboard extends StatelessWidget {
                             trailing: Text(totalCTs.toString() ?? '?'),
                             leading:
                                 Icon(Renderers.getDefaultResourceIcon('lxc')),
+                            onTap: () {
+                              Provider.of<BehaviorSubject<int>>(context).add(1);
+                              Provider.of<PveResourceBloc>(context)
+                                  .events
+                                  .add(FilterResources(
+                                    typeFilter: BuiltSet.from(['lxc']),
+                                  ));
+                            },
                           ),
                           ListTile(
                             dense: true,
@@ -401,6 +451,16 @@ class MobileDashboard extends StatelessWidget {
                             leading: Icon(Icons.play_circle_outline,
                                 color: Colors.green),
                             trailing: Text(onlineCTs.length.toString()),
+                            onTap: () {
+                              Provider.of<BehaviorSubject<int>>(context).add(1);
+                              Provider.of<PveResourceBloc>(context)
+                                  .events
+                                  .add(FilterResources(
+                                    typeFilter: BuiltSet.from(['lxc']),
+                                    statusFilter: BuiltSet.from(
+                                        [PveResourceStatusType.running]),
+                                  ));
+                            },
                           ),
                           ListTile(
                             dense: true,
@@ -412,6 +472,16 @@ class MobileDashboard extends StatelessWidget {
                             ),
                             leading: Icon(Icons.stop),
                             trailing: Text(offCTs.toString()),
+                            onTap: () {
+                              Provider.of<BehaviorSubject<int>>(context).add(1);
+                              Provider.of<PveResourceBloc>(context)
+                                  .events
+                                  .add(FilterResources(
+                                    typeFilter: BuiltSet.from(['lxc']),
+                                    statusFilter: BuiltSet.from(
+                                        [PveResourceStatusType.stopped]),
+                                  ));
+                            },
                           ),
                         ],
                       );
@@ -481,7 +551,8 @@ class MobileResourceOverview extends StatelessWidget {
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               elevation: 0,
               title: AppbarSearchTextField(
-                onChanged: (filter) => rBloc.events.add(FilterByName(filter)),
+                onChanged: (filter) =>
+                    rBloc.events.add(FilterResources(nameFilter: filter)),
               ),
               actions: <Widget>[AppBarFilterIconButton()],
             ),
@@ -726,6 +797,17 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                     'Filter Results',
                     style: TextStyle(color: Colors.grey.shade700),
                   ),
+                  trailing: rBloc.isFiltered
+                      ? FlatButton(
+                          onPressed: () => rBloc.events.add(ResetFilter()),
+                          child: Text(
+                            'Reset',
+                            style: TextStyle(
+                              color: Theme.of(context).accentColor,
+                            ),
+                          ),
+                        )
+                      : null,
                 ),
               ),
               Divider(
@@ -750,8 +832,9 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
                       value: state.typeFilter.contains('node'),
-                      onChanged: (v) => rBloc.events.add(FilterByType(
-                          addOrRemove(v, 'node', state.typeFilter))),
+                      onChanged: (v) => rBloc.events.add(FilterResources(
+                        typeFilter: addOrRemove(v, 'node', state.typeFilter),
+                      )),
                     ),
                     CheckboxListTile(
                       dense: true,
@@ -760,8 +843,9 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
                       value: state.typeFilter.contains('qemu'),
-                      onChanged: (v) => rBloc.events.add(FilterByType(
-                          addOrRemove(v, 'qemu', state.typeFilter))),
+                      onChanged: (v) => rBloc.events.add(FilterResources(
+                        typeFilter: addOrRemove(v, 'qemu', state.typeFilter),
+                      )),
                     ),
                     CheckboxListTile(
                       dense: true,
@@ -770,8 +854,9 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
                       value: state.typeFilter.contains('lxc'),
-                      onChanged: (v) => rBloc.events.add(FilterByType(
-                          addOrRemove(v, 'lxc', state.typeFilter))),
+                      onChanged: (v) => rBloc.events.add(FilterResources(
+                        typeFilter: addOrRemove(v, 'lxc', state.typeFilter),
+                      )),
                     ),
                     CheckboxListTile(
                       dense: true,
@@ -780,12 +865,53 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
                       value: state.typeFilter.contains('storage'),
-                      onChanged: (v) => rBloc.events.add(FilterByType(
-                          addOrRemove(v, 'storage', state.typeFilter))),
+                      onChanged: (v) => rBloc.events.add(FilterResources(
+                        typeFilter: addOrRemove(v, 'storage', state.typeFilter),
+                      )),
                     ),
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        'Status',
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    CheckboxListTile(
+                      dense: true,
+                      title: Text(
+                        'Online',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      value: state.statusFilter
+                          .contains(PveResourceStatusType.running),
+                      onChanged: (v) => rBloc.events.add(FilterResources(
+                        statusFilter: addOrRemove(v,
+                            PveResourceStatusType.running, state.statusFilter),
+                      )),
+                    ),
+                    CheckboxListTile(
+                      dense: true,
+                      title: Text(
+                        'Offline',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      value: state.statusFilter
+                          .contains(PveResourceStatusType.stopped),
+                      onChanged: (v) => rBloc.events.add(FilterResources(
+                        statusFilter: addOrRemove(v,
+                            PveResourceStatusType.stopped, state.statusFilter),
+                      )),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
         ),
@@ -793,8 +919,7 @@ class _MobileResourceFilterSheet extends StatelessWidget {
     );
   }
 
-  BuiltSet<String> addOrRemove(
-      bool value, String element, BuiltSet<String> filter) {
+  BuiltSet<S> addOrRemove<S>(bool value, S element, BuiltSet<S> filter) {
     if (value) {
       return filter.rebuild((b) => b..add(element));
     } else {
@@ -806,12 +931,24 @@ class _MobileResourceFilterSheet extends StatelessWidget {
 class AppBarFilterIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-        icon: Icon(
-          FontAwesomeIcons.filter,
-          color: Colors.black,
-        ),
-        onPressed: () => Scaffold.of(context).openEndDrawer());
+    final rBloc = Provider.of<PveResourceBloc>(context);
+
+    return ProxmoxStreamBuilder<PveResourceBloc, PveResourceState>(
+        bloc: rBloc,
+        builder: (context, state) {
+          return IconButton(
+            icon: rBloc.isFiltered
+                ? Icon(
+                    FontAwesomeIcons.filter,
+                    color: Colors.black,
+                  )
+                : Icon(
+                    FontAwesomeIcons.filter,
+                    color: Colors.grey,
+                  ),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          );
+        });
   }
 }
 

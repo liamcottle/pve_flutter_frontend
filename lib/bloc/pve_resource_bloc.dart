@@ -18,6 +18,14 @@ class PveResourceBloc
 
   PveResourceState init;
 
+  bool get isFiltered =>
+      latestState.typeFilter != init.typeFilter ||
+      latestState.subFilter != init.subFilter ||
+      latestState.nodeFilter != init.nodeFilter ||
+      latestState.poolFilter != init.poolFilter ||
+      latestState.statusFilter != init.statusFilter ||
+      latestState.nameFilter != init.nameFilter;
+
   @override
   PveResourceState get initialState => init;
 
@@ -52,28 +60,24 @@ class PveResourceBloc
           resource.node, resource.id, resource.type, event.action);
     }
 
-    if (event is FilterByType) {
-      yield latestState.rebuild((b) => b..typeFilter.replace(event.filter));
+    if (event is FilterResources) {
+      yield latestState.rebuild((b) => b
+        ..typeFilter.replace(event.typeFilter ?? latestState.typeFilter)
+        ..subFilter.replace(event.subscriptionfilter ?? latestState.subFilter)
+        ..nodeFilter.replace(event.nodeFilter ?? latestState.nodeFilter)
+        ..poolFilter.replace(event.poolFilter ?? latestState.poolFilter)
+        ..statusFilter.replace(event.statusFilter ?? latestState.statusFilter)
+        ..nameFilter = event.nameFilter ?? latestState.nameFilter);
     }
 
-    if (event is FilterBySubscription) {
-      yield latestState.rebuild((b) => b..subFilter.replace(event.filter));
-    }
-
-    if (event is FilterByNode) {
-      yield latestState.rebuild((b) => b..nodeFilter.replace(event.filter));
-    }
-
-    if (event is FilterByPool) {
-      yield latestState.rebuild((b) => b..poolFilter.replace(event.filter));
-    }
-
-    if (event is FilterByStatus) {
-      yield latestState.rebuild((b) => b..statusFilter = !b.statusFilter);
-    }
-
-    if (event is FilterByName) {
-      yield latestState.rebuild((b) => b..nameFilter = event.filter);
+    if (event is ResetFilter) {
+      yield latestState.rebuild((b) => b
+        ..typeFilter.replace(init.typeFilter)
+        ..subFilter.replace(init.subFilter)
+        ..nodeFilter.replace(init.nodeFilter)
+        ..poolFilter.replace(init.poolFilter)
+        ..statusFilter.replace(init.statusFilter)
+        ..nameFilter = init.nameFilter);
     }
   }
 }
@@ -82,37 +86,25 @@ abstract class PveResourceEvents {}
 
 class PollResources extends PveResourceEvents {}
 
-class FilterByType extends PveResourceEvents {
-  final BuiltSet<String> filter;
+class FilterResources extends PveResourceEvents {
+  final BuiltSet<String> typeFilter;
+  final BuiltSet<String> subscriptionfilter;
+  final BuiltSet<String> nodeFilter;
+  final BuiltSet<String> poolFilter;
+  final BuiltSet<PveResourceStatusType> statusFilter;
+  final String nameFilter;
 
-  FilterByType(this.filter);
+  FilterResources({
+    this.typeFilter,
+    this.subscriptionfilter,
+    this.nodeFilter,
+    this.poolFilter,
+    this.statusFilter,
+    this.nameFilter,
+  });
 }
 
-class FilterBySubscription extends PveResourceEvents {
-  final BuiltSet<String> filter;
-
-  FilterBySubscription(this.filter);
-}
-
-class FilterByNode extends PveResourceEvents {
-  final BuiltSet<String> filter;
-
-  FilterByNode(this.filter);
-}
-
-class FilterByPool extends PveResourceEvents {
-  final BuiltSet<String> filter;
-
-  FilterByPool(this.filter);
-}
-
-class FilterByStatus extends PveResourceEvents {}
-
-class FilterByName extends PveResourceEvents {
-  final String filter;
-
-  FilterByName(this.filter);
-}
+class ResetFilter extends PveResourceEvents {}
 
 class PerformActionOnResource extends PveResourceEvents {
   final PveClusterResourceAction action;

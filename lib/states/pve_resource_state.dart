@@ -15,7 +15,7 @@ abstract class PveResourceState
   BuiltSet<String> get subFilter;
   BuiltSet<String> get nodeFilter;
   BuiltSet<String> get poolFilter;
-  bool get statusFilter;
+  BuiltSet<PveResourceStatusType> get statusFilter;
   String get nameFilter;
 
   Iterable<PveClusterResourcesModel> get filterResources =>
@@ -33,8 +33,8 @@ abstract class PveResourceState
         if (poolFilter.isNotEmpty) {
           include &= poolFilter.contains(r.pool);
         }
-        if (statusFilter) {
-          include &= r.getStatus() == PveResourceStatusType.running;
+        if (statusFilter.isNotEmpty) {
+          include &= statusFilter.contains(r.getStatus());
         }
         if (nameFilter.isNotEmpty) {
           include &= r.displayName.contains(nameFilter);
@@ -67,6 +67,5 @@ abstract class PveResourceState
     ..isLoading = false
     ..isSuccess = false
     //class
-    ..statusFilter = false
     ..nameFilter = '');
 }
