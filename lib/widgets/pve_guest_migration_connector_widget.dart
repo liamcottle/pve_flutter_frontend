@@ -49,6 +49,7 @@ class PveMigrateStreamConnector extends StatelessWidget {
           onStateChange: (state) {
             if (state.taskUPID != tBloc.latestState.upid) {
               tBloc.events.add(SetTaskUPID(state.taskUPID));
+              Navigator.of(context).pop();
               showTaskLogBottomSheet(
                   context, mBloc.apiClient, state.nodeID, state.taskUPID,
                   icon: Icon(Icons.save),
