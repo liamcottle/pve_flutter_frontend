@@ -102,8 +102,6 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
       guestID,
       migrationTarget: latestState.targetNodeID,
     );
-    yield latestState
-        .rebuild((b) => b..qemuPreconditions.replace(qPreconditions));
 
     var preconditions = <PveMigrateCondition>[];
 
@@ -134,7 +132,9 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
 
     preconditions.sort((a, b) => a.severity.name.compareTo(b.severity.name));
 
-    yield latestState.rebuild((b) => b..preconditions.replace(preconditions));
+    yield latestState.rebuild((b) => b
+      ..preconditions.replace(preconditions)
+      ..qemuPreconditions.replace(qPreconditions));
   }
 }
 
