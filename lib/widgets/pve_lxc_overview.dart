@@ -72,7 +72,14 @@ class PveLxcOverview extends StatelessWidget {
                             ? PveGuestHeaderRRDPageView(
                                 rrdData: state.rrdData,
                               )
-                            : null,
+                            : Center(
+                                child: Text(
+                                  "TEMPLATE",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                         width: width,
                         guestID: guestID,
                         guestStatus: status?.getLxcStatus(),

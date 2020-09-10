@@ -71,9 +71,16 @@ class PveQemuOverview extends StatelessWidget {
                       PveGuestOverviewHeader(
                         background: !(status?.template ?? false)
                             ? PveGuestHeaderRRDPageView(
-                                rrdData: state.rrdData,
+                                rrdData: rrdData,
                               )
-                            : null,
+                            : Center(
+                                child: Text(
+                                  "TEMPLATE",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                         width: width,
                         guestID: guestID,
                         guestStatus: status?.getQemuStatus(),
