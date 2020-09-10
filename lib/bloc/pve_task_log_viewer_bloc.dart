@@ -65,8 +65,8 @@ class PveTaskLogViewerBloc
     if (event is UpdateLog) {
       yield latestState.rebuild((b) => b..isLoading = true);
 
-      final taskLog =
-          await apiClient.getNodeTaskLog(latestState.nodeID, latestState.upid);
+      final taskLog = await apiClient
+          .getNodeTaskLog(latestState.nodeID, latestState.upid, limit: '1000');
       yield latestState.rebuild((b) => b
         ..log.replace(taskLog)
         ..isLoading = false);
