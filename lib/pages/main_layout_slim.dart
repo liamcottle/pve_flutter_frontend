@@ -22,6 +22,7 @@ import 'package:pve_flutter_frontend/widgets/proxmox_gauge_chart.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_heartbeat_indicator.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_file_selector_widget.dart';
+import 'package:pve_flutter_frontend/widgets/pve_guest_icon_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_help_icon_button_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_data_card_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
@@ -635,13 +636,12 @@ class PveGuestListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final status = resource.getStatus();
+
     return ListTile(
-      leading: Icon(
-        Renderers.getDefaultResourceIcon(resource.type,
-            shared: resource.shared),
-        color: status == PveResourceStatusType.running
-            ? Color(0xFF03fc6b)
-            : Colors.grey,
+      leading: PveGuestIcon(
+        type: resource.type,
+        template: resource.template,
+        status: status,
       ),
       title: Text(resource.displayName),
       subtitle: Row(
@@ -649,7 +649,7 @@ class PveGuestListTile extends StatelessWidget {
         children: [
           Text(resource.node),
           StatusChip(
-            status: resource.getStatus(),
+            status: status,
             fontzsize: 12,
           ),
         ],

@@ -6,8 +6,9 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart'
 import 'package:pve_flutter_frontend/widgets/pve_config_switch_list_tile.dart';
 
 class PveQemuOptions extends StatelessWidget {
+  final String guestID;
   final _formKey = GlobalKey<FormState>();
-  PveQemuOptions({Key key}) : super(key: key);
+  PveQemuOptions({Key key, @required this.guestID}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class PveQemuOptions extends StatelessWidget {
                     children: <Widget>[
                       ListTile(
                         title: Text("Name"),
-                        subtitle: Text(config.name),
+                        subtitle: Text(config.name ?? 'VM$guestID'),
                       ),
                       PveConfigSwitchListTile(
                         title: Text("Start on boot"),

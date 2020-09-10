@@ -68,9 +68,11 @@ class PveLxcOverview extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       PveGuestOverviewHeader(
-                        background: PveGuestHeaderRRDPageView(
-                          rrdData: state.rrdData,
-                        ),
+                        background: !(status?.template ?? false)
+                            ? PveGuestHeaderRRDPageView(
+                                rrdData: state.rrdData,
+                              )
+                            : null,
                         width: width,
                         guestID: guestID,
                         guestStatus: status?.getLxcStatus(),
@@ -78,6 +80,7 @@ class PveLxcOverview extends StatelessWidget {
                         guestNodeID: state.nodeID,
                         guestType: 'lxc',
                         ha: status?.ha,
+                        template: status?.template ?? false,
                       ),
                       ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
                         bloc: taskBloc,
@@ -113,16 +116,17 @@ class PveLxcOverview extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              ActionCard(
-                                icon: Icon(
-                                  Icons.power_settings_new,
-                                  size: 55,
-                                  color: Colors.white24,
+                              if (!(status?.template ?? false))
+                                ActionCard(
+                                  icon: Icon(
+                                    Icons.power_settings_new,
+                                    size: 55,
+                                    color: Colors.white24,
+                                  ),
+                                  title: 'Power Settings',
+                                  onTap: () => showPowerMenuBottomSheet(
+                                      context, lxcBloc),
                                 ),
-                                title: 'Power Settings',
-                                onTap: () =>
-                                    showPowerMenuBottomSheet(context, lxcBloc),
-                              ),
                               ActionCard(
                                 icon: Icon(
                                   Icons.settings,

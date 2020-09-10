@@ -23,7 +23,7 @@ class PveLxcPowerSettings extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                if (disableShutdown)
+                if (disableShutdown && !status.template)
                   ListTile(
                     leading: Icon(Icons.play_arrow),
                     title: Text(

@@ -26,7 +26,7 @@ class PveQemuPowerSettings extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   if (qemuStatus == PveResourceStatusType.stopped &&
-                      state.currentStatus.template.isEmpty)
+                      !state.currentStatus.template)
                     ListTile(
                       leading: Icon(Icons.play_arrow),
                       title: Text(
@@ -41,7 +41,7 @@ class PveQemuPowerSettings extends StatelessWidget {
                         PveResourceStatusType.paused,
                         PveResourceStatusType.suspended
                       ].contains(qemuStatus) &&
-                      state.currentStatus.template.isEmpty)
+                      !state.currentStatus.template)
                     ListTile(
                       leading: Icon(Icons.play_arrow),
                       title: Text(

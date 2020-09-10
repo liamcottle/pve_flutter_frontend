@@ -69,9 +69,11 @@ class PveQemuOverview extends StatelessWidget {
                       child: Column(
                     children: <Widget>[
                       PveGuestOverviewHeader(
-                        background: PveGuestHeaderRRDPageView(
-                          rrdData: rrdData,
-                        ),
+                        background: !(status?.template ?? false)
+                            ? PveGuestHeaderRRDPageView(
+                                rrdData: state.rrdData,
+                              )
+                            : null,
                         width: width,
                         guestID: guestID,
                         guestStatus: status?.getQemuStatus(),
@@ -79,6 +81,7 @@ class PveQemuOverview extends StatelessWidget {
                         guestNodeID: state.nodeID,
                         guestType: 'qemu',
                         ha: status?.ha,
+                        template: status?.template ?? false,
                       ),
                       ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
                         bloc: taskBloc,
@@ -114,16 +117,17 @@ class PveQemuOverview extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              ActionCard(
-                                icon: Icon(
-                                  Icons.power_settings_new,
-                                  size: 55,
-                                  color: Colors.white24,
+                              if (!(status?.template ?? false))
+                                ActionCard(
+                                  icon: Icon(
+                                    Icons.power_settings_new,
+                                    size: 55,
+                                    color: Colors.white24,
+                                  ),
+                                  title: 'Power Settings',
+                                  onTap: () =>
+                                      showPowerMenuBottomSheet(context, bloc),
                                 ),
-                                title: 'Power Settings',
-                                onTap: () =>
-                                    showPowerMenuBottomSheet(context, bloc),
-                              ),
                               ActionCard(
                                 icon: Icon(
                                   Icons.settings,
@@ -239,7 +243,9 @@ class PveQemuOverview extends StatelessWidget {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => Provider.value(
         value: bloc,
-        child: PveQemuOptions(),
+        child: PveQemuOptions(
+          guestID: guestID,
+        ),
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return ScaleTransition(

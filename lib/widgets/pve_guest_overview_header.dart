@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
+import 'package:pve_flutter_frontend/widgets/pve_guest_icon_widget.dart';
 
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_rrd_chart_widget.dart';
@@ -18,6 +19,7 @@ class PveGuestOverviewHeader extends StatelessWidget {
     @required this.guestName,
     @required this.guestNodeID,
     @required this.guestType,
+    @required this.template,
     @required this.ha,
     this.background,
   })  : assert(guestName != null),
@@ -31,6 +33,7 @@ class PveGuestOverviewHeader extends StatelessWidget {
   final String guestNodeID;
   final Widget background;
   final PveHAMangerServiceStatusModel ha;
+  final bool template;
   @override
   Widget build(BuildContext context) {
     final haError = ha?.state == 'error';
@@ -69,9 +72,12 @@ class PveGuestOverviewHeader extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
                     children: <Widget>[
-                      Icon(
-                        Renderers.getDefaultResourceIcon(guestType),
+                      PveGuestIcon(
+                        type: guestType,
+                        template: template,
+                        status: guestStatus,
                         color: Colors.white54,
+                        templateColor: Colors.white54,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
