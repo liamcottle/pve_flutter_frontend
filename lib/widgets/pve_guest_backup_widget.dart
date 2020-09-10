@@ -508,6 +508,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
 
       await showTaskLogBottomSheet(context, apiClient, node, jobId,
           icon: Icon(Icons.save), jobTitle: Text('Backup $guestId'));
+      Navigator.of(context).pop();
     } on ProxmoxApiException catch (e) {
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text(
