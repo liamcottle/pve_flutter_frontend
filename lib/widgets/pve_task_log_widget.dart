@@ -297,7 +297,7 @@ class _PveTaskLogScrollViewState extends State<PveTaskLogScrollView> {
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 50), curve: Curves.ease);
+          duration: Duration(milliseconds: 500), curve: Curves.easeOut);
     }
   }
 }
