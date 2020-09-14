@@ -18,6 +18,7 @@ import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 import 'package:pve_flutter_frontend/states/pve_storage_selector_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_viewer_state.dart';
+import 'package:pve_flutter_frontend/utils/utils.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_action_card_widget.dart';
@@ -133,6 +134,21 @@ class PveLxcOverview extends StatelessWidget {
                                   title: 'Power Settings',
                                   onTap: () => showPowerMenuBottomSheet(
                                       context, lxcBloc),
+                                ),
+                              if (!(status?.template ?? false))
+                                ActionCard(
+                                  icon: Icon(
+                                    Icons.queue_play_next,
+                                    size: 55,
+                                    color: Colors.white24,
+                                  ),
+                                  title: 'Console',
+                                  onTap: () => showConsoleMenuBottomSheet(
+                                      context,
+                                      lxcBloc.apiClient,
+                                      guestID,
+                                      state.nodeID,
+                                      'lxc'),
                                 ),
                               ActionCard(
                                 icon: Icon(

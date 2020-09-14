@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_viewer_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_viewer_state.dart';
+import 'package:pve_flutter_frontend/widgets/pve_console_menu_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,4 +39,22 @@ Future<T> showTaskLogBottomSheet<T>(BuildContext context,
       ),
     ),
   );
+}
+
+Future<T> showConsoleMenuBottomSheet<T>(
+    BuildContext context,
+    ProxmoxApiClient apiClient,
+    String guestID,
+    String node,
+    String type) async {
+  return showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
+      context: context,
+      builder: (context) => PveConsoleMenu(
+            apiClient: apiClient,
+            guestID: guestID,
+            node: node,
+            type: type,
+          ));
 }
