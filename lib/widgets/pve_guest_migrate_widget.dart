@@ -21,108 +21,106 @@ class PveGuestMigrate extends StatelessWidget {
     return ProxmoxStreamBuilder<PveMigrateBloc, PveMigrateState>(
       bloc: migrateBloc,
       builder: (context, migrateState) {
-        return SafeArea(
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text(
-                "Migration",
-                style: TextStyle(color: Colors.white, fontSize: 25),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              leading: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              elevation: 0.0,
-              actions: <Widget>[
-                PveHelpIconButton(
-                    baseUrl: Provider.of<PveResourceBloc>(context)
-                        .apiClient
-                        .credentials
-                        .apiBaseUrl,
-                    docPath: 'pve-admin-guide.html#qm_migration')
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              "Migration",
+              style: TextStyle(color: Colors.white, fontSize: 25),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            elevation: 0.0,
+            actions: <Widget>[
+              PveHelpIconButton(
+                  baseUrl: Provider.of<PveResourceBloc>(context)
+                      .apiClient
+                      .credentials
+                      .apiBaseUrl,
+                  docPath: 'pve-admin-guide.html#qm_migration')
+            ],
+          ),
+          body: PveMigrateStreamConnector(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  color: Theme.of(context).primaryColor,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListTile(
+                          leading: Icon(FontAwesomeIcons.globe),
+                          title: Text(
+                            'Mode',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            migrateState.mode.name,
+                            style: TextStyle(color: Colors.white54),
+                          ),
+                        ),
+                        ListTile(
+                          leading: Icon(FontAwesomeIcons.mapPin),
+                          title: Text(
+                            'Source',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            migrateState.nodeID ?? "unkown",
+                            style: TextStyle(color: Colors.white54),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: _MigrateTargetSelector(
+                            titleColor: Colors.white,
+                            iconEnabledColor: Colors.white,
+                            nodeSelectorbloc: nodeSelectorbloc,
+                            migrateBloc: migrateBloc,
+                            disabled: migrateState.inProgress,
+                          ),
+                        )
+                      ]),
+                ),
+                if (migrateState.inProgress) LinearProgressIndicator(),
+                if (migrateState.preconditions != null)
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        for (var con in migrateState.preconditions)
+                          ListTile(
+                            leading: con.severity == PveMigrateSeverity.error
+                                ? Icon(
+                                    Icons.error,
+                                    color: Colors.red,
+                                  )
+                                : Icon(
+                                    Icons.warning,
+                                    color: Colors.orange,
+                                  ),
+                            title: Text(con.message),
+                          )
+                      ],
+                    ),
+                  )
               ],
             ),
-            body: PveMigrateStreamConnector(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    color: Theme.of(context).primaryColor,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            leading: Icon(FontAwesomeIcons.globe),
-                            title: Text(
-                              'Mode',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            subtitle: Text(
-                              migrateState.mode.name,
-                              style: TextStyle(color: Colors.white54),
-                            ),
-                          ),
-                          ListTile(
-                            leading: Icon(FontAwesomeIcons.mapPin),
-                            title: Text(
-                              'Source',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            subtitle: Text(
-                              migrateState.nodeID ?? "unkown",
-                              style: TextStyle(color: Colors.white54),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: _MigrateTargetSelector(
-                              titleColor: Colors.white,
-                              iconEnabledColor: Colors.white,
-                              nodeSelectorbloc: nodeSelectorbloc,
-                              migrateBloc: migrateBloc,
-                              disabled: migrateState.inProgress,
-                            ),
-                          )
-                        ]),
-                  ),
-                  if (migrateState.inProgress) LinearProgressIndicator(),
-                  if (migrateState.preconditions != null)
-                    Expanded(
-                      child: ListView(
-                        children: [
-                          for (var con in migrateState.preconditions)
-                            ListTile(
-                              leading: con.severity == PveMigrateSeverity.error
-                                  ? Icon(
-                                      Icons.error,
-                                      color: Colors.red,
-                                    )
-                                  : Icon(
-                                      Icons.warning,
-                                      color: Colors.orange,
-                                    ),
-                              title: Text(con.message),
-                            )
-                        ],
-                      ),
-                    )
-                ],
-              ),
-            ),
-            floatingActionButton: _disableStartButton(migrateState)
-                ? null
-                : FloatingActionButton.extended(
-                    onPressed: () {
-                      migrateBloc.events.add(StartMigration());
-                      nodeSelectorbloc.events.add(ResetNodeSelector());
-                    },
-                    label: migrateState.inProgress ? Text('') : Text('Start'),
-                    icon: migrateState.inProgress
-                        ? Icon(Icons.more_horiz)
-                        : Icon(Icons.send)),
           ),
+          floatingActionButton: _disableStartButton(migrateState)
+              ? null
+              : FloatingActionButton.extended(
+                  onPressed: () {
+                    migrateBloc.events.add(StartMigration());
+                    nodeSelectorbloc.events.add(ResetNodeSelector());
+                  },
+                  label: migrateState.inProgress ? Text('') : Text('Start'),
+                  icon: migrateState.inProgress
+                      ? Icon(Icons.more_horiz)
+                      : Icon(Icons.send)),
         );
       },
     );
