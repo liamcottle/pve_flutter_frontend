@@ -49,3 +49,7 @@ If you want to login without typing your password for your
 Test-Cluster, add this to the main function:
 
 var apiClient = await proxclient.authenticate("root@pam", "yourpassword");
+
+
+## Screenshots Android
+adb shell settings put global sysui_demo_allowed 1
