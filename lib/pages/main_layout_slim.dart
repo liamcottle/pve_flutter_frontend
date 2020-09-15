@@ -85,7 +85,11 @@ class _MainLayoutSlimState extends State<MainLayoutSlim> {
                   return MobileResourceOverview();
                   break;
                 case 2:
+                  Provider.of<PveAccessManagementBloc>(context)
+                      .events
+                      .add(LoadUsers());
                   return MobileAccessManagement();
+
                   break;
                 default:
               }
