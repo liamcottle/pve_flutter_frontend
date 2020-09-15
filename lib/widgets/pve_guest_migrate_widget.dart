@@ -164,6 +164,9 @@ class _MigrateTargetSelector extends StatelessWidget {
             style: TextStyle(color: titleColor),
           ),
           subtitle: DropdownButtonFormField(
+            decoration: InputDecoration(
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: titleColor))),
             iconEnabledColor: iconEnabledColor,
             items: state.availableNodes
                 .map((item) => DropdownMenuItem(
@@ -202,7 +205,17 @@ class _MigrateTargetSelector extends StatelessWidget {
   // you ask why? if not, the height of the dropdown isn't constant
   List<Widget> getSelectedItem(List<PveNodesModel> nodes) {
     if (nodes.isNotEmpty)
-      return nodes.map((item) => Row(children: [Text(item.nodeName)])).toList();
+      return nodes
+          .map((item) => Row(children: [
+                Text(
+                  item.nodeName,
+                  style: TextStyle(
+                    color: titleColor,
+                    fontSize: 14,
+                  ),
+                )
+              ]))
+          .toList();
     return [Text('')];
   }
 }
