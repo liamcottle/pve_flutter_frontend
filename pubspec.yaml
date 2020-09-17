@@ -79,5 +79,9 @@ flutter:
     - family: Proxmox
       fonts:
         - asset: assets/fonts/Proxmox.ttf
+    - family: ProxmoxIcons
+      fonts:
+        - asset: assets/fonts/ProxmoxIcons.ttf
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

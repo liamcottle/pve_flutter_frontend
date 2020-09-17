@@ -18,6 +18,7 @@ import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 import 'package:pve_flutter_frontend/states/pve_storage_selector_state.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
+import 'package:pve_flutter_frontend/widgets/proxmox_custom_icon.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_gauge_chart.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_heartbeat_indicator.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
@@ -154,11 +155,9 @@ class MobileDashboard extends StatelessWidget {
           ),
         ),
         elevation: 0.0,
-        leading: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Image.asset(
-            'assets/images/proxmox_logo_icon_white.png',
-          ),
+        leading: Icon(
+          ProxmoxIcons.proxmox,
+          size: 36,
         ),
         automaticallyImplyLeading: false,
         actions: <Widget>[
