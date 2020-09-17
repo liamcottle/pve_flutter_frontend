@@ -184,13 +184,15 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
                       titleWidth: 150,
                       titleAlginment: CrossAxisAlignment.end,
                       title: 'CPU (${widget.rrdData.last.maxcpu ?? '-'})',
-                      subtitle: (widget.rrdData.last?.cpu ?? 0 * 100)
-                              .toStringAsFixed(2) +
-                          "%",
+                      subtitle:
+                          (widget.rrdData.last?.cpu ?? 0).toStringAsFixed(2) +
+                              "%",
                       data: widget.rrdData.map(
                           (e) => Point(e.time.millisecondsSinceEpoch, e.cpu)),
                       icon: Icon(Icons.memory),
                       bottomRight: pageIndicator,
+                      dataRenderer: (data) =>
+                          '${data?.toStringAsFixed(2) ?? 0} %',
                     ),
                   ),
                 if (item == 1)
@@ -201,11 +203,12 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
                       titleAlginment: CrossAxisAlignment.end,
                       title: 'Memory',
                       subtitle:
-                          Renderers.formatSize(widget.rrdData.last.mem ?? 0.0),
+                          Renderers.formatSize(widget.rrdData.last.mem ?? 0),
                       data: widget.rrdData.map(
                           (e) => Point(e.time.millisecondsSinceEpoch, e.mem)),
                       icon: Icon(Icons.timer),
                       bottomRight: pageIndicator,
+                      dataRenderer: (data) => Renderers.formatSize(data ?? 0),
                     ),
                   ),
               ],

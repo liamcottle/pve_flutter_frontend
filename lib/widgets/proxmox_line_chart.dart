@@ -2,7 +2,8 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:pve_flutter_frontend/utils/renderers.dart';
+
+typedef DataRenderer = String Function(num data);
 
 class ProxmoxLineChart extends CustomPainter {
   final List<Point> data;
@@ -11,7 +12,7 @@ class ProxmoxLineChart extends CustomPainter {
   final Color shadeColorBottom;
   final double staticMax;
   final Point touchPoint;
-  final String yUnit;
+  final DataRenderer ordinateRenderer;
   ProxmoxLineChart({
     this.data,
     this.lineColor,
@@ -19,7 +20,7 @@ class ProxmoxLineChart extends CustomPainter {
     this.shadeColorTop = Colors.white,
     this.shadeColorBottom = const Color(0x00FFFFFF),
     this.touchPoint,
-    this.yUnit = '',
+    this.ordinateRenderer,
   });
 
   @override
@@ -49,12 +50,14 @@ class ProxmoxLineChart extends CustomPainter {
 
     if (touchPoint != null) {
       final index = closestX(touchPoint, points);
-      final selectedLabel = data[index].y?.toStringAsFixed(2) ?? '';
+      final selectedLabel = ordinateRenderer != null
+          ? ordinateRenderer(data[index].y)
+          : data[index].y?.toStringAsFixed(2) ?? '';
       TextSpan span = TextSpan(
         style: TextStyle(
           color: Colors.white,
         ),
-        text: '$selectedLabel $yUnit',
+        text: selectedLabel,
       );
       TextPainter tp = TextPainter(
         text: span,
@@ -75,8 +78,6 @@ class ProxmoxLineChart extends CustomPainter {
       canvas.drawCircle(
           Offset(points[index].x, points[index].y ?? size.height), 2, paint);
     }
-
-    canvas.drawLine(Offset(0, 0), Offset(5, 0), paint);
 
     //TODO gaps between datapoints
     paint.style = PaintingStyle.stroke;

@@ -72,44 +72,46 @@ class PveNodeOverview extends StatelessWidget {
                                       title:
                                           'CPU (${state.status?.cpuinfo?.cpus ?? '-'})',
                                       subtitle:
-                                          (state.rrdData.last?.cpu ?? 0 * 100)
-                                              .toStringAsFixed(2),
+                                          '${state.rrdData.last?.cpu?.toStringAsFixed(2) ?? 0} %',
                                       data: state.rrdData.map((e) => Point(
                                           e.time.millisecondsSinceEpoch,
                                           e.cpu)),
                                       icon: Icon(Icons.memory),
                                       bottomRight: pageIndicator,
-                                      unit: "%",
+                                      dataRenderer: (data) =>
+                                          '${data?.toStringAsFixed(2) ?? 0} %',
                                     ),
                                   ),
                                 if (item == 1)
                                   Expanded(
                                     child: PveRRDChart(
                                       title: 'I/O wait',
-                                      subtitle: (state.rrdData.last?.iowait ??
-                                              0 * 100)
-                                          .toStringAsFixed(2),
+                                      subtitle: state.rrdData.last?.iowait
+                                              ?.toStringAsFixed(2) ??
+                                          '0',
                                       data: state.rrdData.map((e) => Point(
                                           e.time.millisecondsSinceEpoch,
                                           e.iowait)),
                                       icon: Icon(Icons.timer),
                                       bottomRight: pageIndicator,
-                                      unit: "%",
+                                      dataRenderer: (data) =>
+                                          data?.toStringAsFixed(3) ?? '0',
                                     ),
                                   ),
                                 if (item == 2)
                                   Expanded(
                                     child: PveRRDChart(
                                       title: 'Load',
-                                      subtitle: (state.rrdData.last?.loadavg ??
-                                              0 * 100)
-                                          .toStringAsFixed(2),
+                                      subtitle: state.rrdData.last?.loadavg
+                                              ?.toStringAsFixed(2) ??
+                                          '0',
                                       data: state.rrdData.map((e) => Point(
                                           e.time.millisecondsSinceEpoch,
                                           e.loadavg)),
                                       icon: Icon(Icons.show_chart),
                                       bottomRight: pageIndicator,
-                                      unit: "%",
+                                      dataRenderer: (data) =>
+                                          data?.toStringAsFixed(2) ?? '0',
                                     ),
                                   ),
                               ],

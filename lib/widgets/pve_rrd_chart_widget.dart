@@ -19,7 +19,7 @@ class PveRRDChart extends StatefulWidget {
   final bool showMaximum;
   final bool showDuration;
   final Widget bottomRight;
-  final String unit;
+  final DataRenderer dataRenderer;
 
   const PveRRDChart({
     Key key,
@@ -37,7 +37,7 @@ class PveRRDChart extends StatefulWidget {
     this.showMaximum = true,
     this.showDuration = true,
     this.bottomRight,
-    this.unit = '',
+    this.dataRenderer,
   }) : super(key: key);
 
   @override
@@ -69,7 +69,7 @@ class _PveRRDChartState extends State<PveRRDChart> {
                   fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
-              '${widget.subtitle} ${widget.unit}',
+              '${widget.subtitle}',
               style: TextStyle(
                   fontSize: 20,
                   color: Colors.white,
@@ -81,7 +81,9 @@ class _PveRRDChartState extends State<PveRRDChart> {
           Row(
             children: [
               Text(
-                'max $globalMaximaLabel ${widget.unit}',
+                widget.dataRenderer != null
+                    ? 'max ' + widget.dataRenderer(globalMaxima)
+                    : 'max $globalMaximaLabel',
                 style: TextStyle(color: Colors.white60, fontSize: 11),
               ),
             ],
@@ -106,7 +108,7 @@ class _PveRRDChartState extends State<PveRRDChart> {
                     shadeColorBottom: widget.shadeColorBottom,
                     shadeColorTop: widget.shadeColorTop,
                     touchPoint: touchpoint,
-                    yUnit: widget.unit),
+                    ordinateRenderer: widget.dataRenderer),
               ),
             ),
           ),
