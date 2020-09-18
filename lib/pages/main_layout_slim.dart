@@ -147,12 +147,22 @@ class MobileDashboard extends StatelessWidget {
     final rBloc = Provider.of<PveResourceBloc>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'PROXMOX',
-          style: TextStyle(
-            fontFamily: 'Proxmox',
-            fontSize: 28,
-          ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Proxmox',
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+            Text(
+              'Virtual Environment',
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            )
+          ],
         ),
         elevation: 0.0,
         leading: Icon(
