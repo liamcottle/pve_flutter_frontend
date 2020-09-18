@@ -144,9 +144,6 @@ class MyApp extends StatelessWidget {
 
           if (authbloc.state.value is Unauthenticated ||
               context.name == '/login') {
-            ProxmoxLoginStorage.fromLocalStorage()
-                .then((storage) => storage?.invalidateAllSessions());
-
             return MaterialPageRoute(
               builder: (context) {
                 return StreamListener<PveAuthenticationState>(

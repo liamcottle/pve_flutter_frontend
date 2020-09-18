@@ -114,14 +114,15 @@ class PveMobileBottomNavigationbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final pageSelector = Provider.of<BehaviorSubject<int>>(context);
     return BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.dashboard,
-            ),
-            label: "Dashboard",
-          ),
+              icon: Icon(
+                Icons.dashboard,
+              ),
+              label: "Dashboard",
+              backgroundColor: Theme.of(context).primaryColor),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.developer_board,
@@ -134,9 +135,22 @@ class PveMobileBottomNavigationbar extends StatelessWidget {
             ),
             label: "Access",
           ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.logout,
+            ),
+            label: "Sites",
+          ),
         ],
         currentIndex: pageSelector.value,
-        onTap: (index) => pageSelector.add(index));
+        onTap: (index) {
+          if (index == 3) {
+            Provider.of<PveAuthenticationBloc>(context).events.add(LoggedOut());
+            Navigator.of(context).pushReplacementNamed('/login');
+          } else {
+            pageSelector.add(index);
+          }
+        });
   }
 }
 
@@ -977,17 +991,6 @@ class MobileAccessManagement extends StatelessWidget {
           //backgroundColor: Colors.transparent,
           elevation: 0.0,
           automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-                icon: Icon(Icons.input),
-                tooltip: "Logout",
-                onPressed: () {
-                  Provider.of<PveAuthenticationBloc>(context)
-                      .events
-                      .add(LoggedOut());
-                  Navigator.of(context).pushReplacementNamed('/login');
-                })
-          ],
           bottom: TabBar(isScrollable: true, tabs: [
             Tab(
               text: 'Users',
