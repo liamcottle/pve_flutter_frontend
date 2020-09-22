@@ -12,7 +12,6 @@ deb:
 	cd $(DEBUILDIR)/proxmox_dart_api_client; pub get
 	cd $(DEBUILDIR)/proxmox_dart_api_client; pub run build_runner build
 	cd $(DEBUILDIR)/proxmox_login_manager; flutter pub get
-	cd $(DEBUILDIR)/proxmox_login_manager; flutter clean
 	cd $(DEBUILDIR)/proxmox_login_manager; flutter packages pub run build_runner build
 	mkdir $(DEBUILDIR)/pve_flutter_frontend
 	cp -a pubspec.yaml pve_flutter_frontend.iml debian/ assets/ linux/ lib/ $(DEBUILDIR)/pve_flutter_frontend/
