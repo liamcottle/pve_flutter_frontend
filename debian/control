@@ -1,0 +1,15 @@
+Source: pve-flutter-frontend
+Section: utils
+Priority: optional
+Maintainer: Proxmox Support Team <support@proxmox.com>
+Build-Depends: debhelper (>=10), clang, cmake, meson, libgtk-3-dev, pkg-config
+Standards-Version: 4.3.0
+Homepage: https://www.proxmox.com
+
+Package: pve-flutter-gui
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Mobile companion for the Proxmox Virtual Environment
+ Log in to your Proxmox Virtual Environment (VE) server and manage virtual
+ machines, containers, hosts, and clusters. Based on the cutting edge Flutter
+ framework you will get a beautiful and blazing fast experience.

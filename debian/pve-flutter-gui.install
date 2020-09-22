@@ -1,0 +1,4 @@
+build/linux/release/bundle/pve_flutter_frontend opt/pve-flutter-gui
+build/linux/release/bundle/lib/ opt/pve-flutter-gui/
+build/linux/release/bundle/data/ opt/pve-flutter-gui/
+debian/pve-flutter-ui usr/bin/
