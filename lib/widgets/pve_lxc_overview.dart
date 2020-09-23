@@ -218,7 +218,7 @@ class PveLxcOverview extends StatelessWidget {
                             ),
                             ListTile(
                               leading: Icon(Icons.memory),
-                              title: Text('${config.cores}'),
+                              title: Text('${config.cores ?? 'unlimited'}'),
                               subtitle: Text('Cores'),
                               dense: true,
                             ),
