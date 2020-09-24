@@ -702,7 +702,7 @@ class PveStorageListeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final apiClient = Provider.of<ProxmoxApiClient>(context);
-
+    final usedPercent = (resource.disk ?? 0.0) / (resource.maxdisk ?? 100.0);
     return ListTile(
       title: Text(resource.displayName),
       subtitle: Column(
@@ -718,11 +718,13 @@ class PveStorageListeTile extends StatelessWidget {
               ),
             ],
           ),
-          if (resource.getStatus() == PveResourceStatusType.running)
+          if (resource.getStatus() == PveResourceStatusType.running &&
+              !(usedPercent.isNaN || usedPercent.isInfinite))
             ProxmoxCapacityIndicator(
               usedValue: Renderers.formatSize(resource.disk ?? 0),
               totalValue: Renderers.formatSize(resource.maxdisk ?? 0),
-              usedPercent: (resource.disk ?? 0.0) / (resource.maxdisk ?? 100.0),
+              usedPercent:
+                  usedPercent.isNaN || usedPercent.isInfinite ? 0 : usedPercent,
               icon: Icon(
                 Renderers.getDefaultResourceIcon(resource.type,
                     shared: resource.shared),

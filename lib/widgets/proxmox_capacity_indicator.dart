@@ -24,6 +24,9 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (usedPercent == null || usedPercent.isNaN || usedPercent.isInfinite) {
+      return Container();
+    }
     return Theme(
       data: Theme.of(context).copyWith(),
       child: Column(
