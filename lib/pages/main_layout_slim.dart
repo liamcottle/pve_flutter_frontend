@@ -387,8 +387,8 @@ class MobileDashboard extends StatelessWidget {
                           e.getStatus() == PveResourceStatusType.running);
                       final totalVMs = rState.vms.length;
                       final offVMs = totalVMs - onlineVMs.length;
-                      final offCTs = totalVMs - onlineCTs.length;
                       final totalCTs = rState.container.length;
+                      final offCTs = totalCTs - onlineCTs.length;
                       return PveResourceDataCardWidget(
                         title: Text(
                           'Guests',
