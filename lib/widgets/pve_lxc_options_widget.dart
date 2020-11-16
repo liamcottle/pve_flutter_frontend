@@ -76,7 +76,8 @@ class PveLxcOptions extends StatelessWidget {
                     ),
                     ListTile(
                       title: Text("Unprivileged"),
-                      subtitle: Text(config.unprivileged ? 'Yes' : 'No'),
+                      subtitle:
+                          Text(config.unprivileged ?? false ? 'Yes' : 'No'),
                     ),
                     ListTile(
                       title: Text("Features"),
