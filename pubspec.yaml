@@ -61,6 +61,7 @@ flutter:
     - assets/images/Proxmox_logo_white_orange_800.png
     - assets/images/Proxmox-logo-symbol-white-orange.png
     - assets/images/proxmox_logo_icon_white.png
+    - assets/images/ssl_validate/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pve_flutter_frontend/widgets/pve_first_welcome_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:proxmox_login_manager/proxmox_login_manager.dart';
 import 'package:pve_flutter_frontend/bloc/pve_authentication_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_cluster_status_bloc.dart';
@@ -47,6 +49,7 @@ void main() async {
     FlutterError.dumpErrorToConsole(details);
     if (kReleaseMode) ProxmoxGlobalErrorBloc().addError(details.exception);
   };
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   Provider.debugCheckInvalidValueType = null;
 
   runApp(
@@ -60,6 +63,7 @@ void main() async {
       ],
       child: MyApp(
         authbloc: authBloc,
+        sharedPreferences: sharedPreferences,
       ),
     ),
   );
@@ -67,9 +71,12 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final PveAuthenticationBloc authbloc;
+  final SharedPreferences sharedPreferences;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  MyApp({Key key, this.authbloc}) : super(key: key);
+  MyApp({Key key, this.authbloc, this.sharedPreferences})
+      : assert(sharedPreferences != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +147,11 @@ class MyApp extends StatelessWidget {
           if (authbloc.state.value is Uninitialized) {
             return MaterialPageRoute(
               builder: (context) => PveSplashScreen(),
+            );
+          }
+          if (sharedPreferences.getBool('showWelcomeScreen') ?? true) {
+            return MaterialPageRoute(
+              builder: (context) => PveWelcome(),
             );
           }
 
