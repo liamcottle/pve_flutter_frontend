@@ -5,6 +5,7 @@ import 'package:pve_flutter_frontend/bloc/pve_node_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_node_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
+import 'package:pve_flutter_frontend/utils/promox_colors.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/utils/utils.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
@@ -46,7 +47,7 @@ class PveNodeOverview extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            backgroundColor: Color(0xFF00617F),
+            backgroundColor: ProxmoxColors.supportBlue,
             body: SingleChildScrollView(
               child: Column(
                 children: <Widget>[

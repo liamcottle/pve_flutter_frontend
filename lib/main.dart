@@ -28,6 +28,7 @@ import 'package:pve_flutter_frontend/widgets/pve_lxc_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_qemu_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_splash_screen.dart';
+import 'utils/promox_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -91,7 +92,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
           fontFamily: "Open Sans",
           primarySwatch: Colors.blue,
-          primaryColor: Color(0xFF00617F),
+          primaryColor: ProxmoxColors.supportBlue,
           primaryTextTheme: TextTheme(
             headline6:
                 TextStyle(fontFamily: "Open Sans", fontWeight: FontWeight.w700),
