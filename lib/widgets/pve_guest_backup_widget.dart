@@ -455,11 +455,12 @@ class _PveBackupFormState extends State<PveBackupForm> {
                     helperText: ' ',
                   ),
                   controller: emailToController,
-                  autovalidate: true,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
                     if (value.isNotEmpty && !Validators.isValidEmail(value)) {
                       return 'Please enter valid email address';
                     }
+                    return null;
                   },
                 ),
                 OutlineButton.icon(
@@ -547,7 +548,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
         mode = selection;
       }),
       value: mode,
-      autovalidate: true,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
 
@@ -568,7 +569,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
         compression = selection;
       }),
       value: compression,
-      autovalidate: true,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
 }

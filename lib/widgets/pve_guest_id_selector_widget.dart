@@ -30,8 +30,8 @@ class PveGuestIdSelector extends StatelessWidget {
             decoration: InputDecoration(labelText: labelText, helperText: ' '),
             initialValue: state?.value,
             keyboardType: TextInputType.number,
-            inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-            autovalidate: true,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             onChanged: (text) {
               _pveGuestIdSelectorBloc.events.add(OnChanged(text));
             },

@@ -67,7 +67,7 @@ class PveStorageSelectorDropdown extends StatelessWidget {
           selectedItemBuilder: (context) =>
               state.storages.map((item) => Text(item.id)).toList(),
           value: state.selected,
-          autovalidate: true,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (value) {
             if (state.errorMessage.isNotEmpty) {
               return state.errorMessage;
@@ -75,6 +75,7 @@ class PveStorageSelectorDropdown extends StatelessWidget {
             if (value == null && !allowBlank) {
               return 'Selection required';
             }
+            return null;
           },
         );
       },

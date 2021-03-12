@@ -32,7 +32,7 @@ class PveGuestOsSelector extends StatelessWidget {
             },
             value: snapshot.data?.value,
             validator: (_) => snapshot.data?.errorText,
-            autovalidate: true,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
           );
         });
   }
