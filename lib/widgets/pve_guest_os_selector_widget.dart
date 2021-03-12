@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rxdart/streams.dart' show ValueStreamExtensions;
 import 'package:provider/provider.dart';
 import 'package:pve_flutter_frontend/bloc/pve_guest_os_selector_bloc.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';

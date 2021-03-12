@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/streams.dart' show ValueStreamExtensions;
 import 'package:pve_flutter_frontend/bloc/pve_guest_id_selector_bloc.dart';
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
 

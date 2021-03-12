@@ -32,6 +32,8 @@ import 'package:pve_flutter_frontend/widgets/pve_qemu_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_splash_screen.dart';
 import 'utils/promox_colors.dart';
 
+import 'package:rxdart/streams.dart' show ValueStreamExtensions;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final authBloc = PveAuthenticationBloc();

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_global_error_bloc.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/streams.dart' show ValueStreamExtensions;
 
 abstract class ProxmoxBaseBloc<E, S> {
   final PublishSubject<E> _eventSubject = PublishSubject<E>();
