@@ -16,7 +16,7 @@ class ProxmoxClusterVisualizer extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    var center = size.width / 2;
+    // var center = size.width / 2;
 
     for (var i = 0; i < seeds; i++) {
       //var theta = i * tau / phi;

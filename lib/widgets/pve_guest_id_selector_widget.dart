@@ -8,10 +8,10 @@ import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
 class PveGuestIdSelector extends StatelessWidget {
   final String labelText;
 
-  PveGuestIdSelector(
-      {Key key,
-      this.labelText,})
-      : super(key: key);
+  PveGuestIdSelector({
+    Key key,
+    this.labelText,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -3,19 +3,19 @@ import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
-
 class PveCdSelectorBloc
     extends ProxmoxBaseBloc<PveCdSelectorEvent, PveCdSelectorState> {
-
   @override
-  PveCdSelectorState get initialState => PveCdSelectorState(CdType.iso, 'Choose file');
+  PveCdSelectorState get initialState =>
+      PveCdSelectorState(CdType.iso, 'Choose file');
 
   PveCdSelectorBloc();
 
   @override
   Stream<PveCdSelectorState> processEvents(PveCdSelectorEvent event) async* {
     if (event is ChangeValue) {
-      if (event.value == CdType.iso && (state.value.file == null || state.value.file.isEmpty)) {
+      if (event.value == CdType.iso &&
+          (state.value.file == null || state.value.file.isEmpty)) {
         yield PveCdSelectorState(event.value, "Choose file");
       } else {
         yield PveCdSelectorState(event.value, null);
@@ -23,12 +23,9 @@ class PveCdSelectorBloc
     }
 
     if (event is FileSelected) {
-      yield PveCdSelectorState(state.value.value, null,
-          file: event.volid);
+      yield PveCdSelectorState(state.value.value, null, file: event.volid);
     }
   }
-
-
 }
 
 abstract class PveCdSelectorEvent {}

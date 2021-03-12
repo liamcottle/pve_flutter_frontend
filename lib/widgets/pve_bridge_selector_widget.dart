@@ -4,11 +4,7 @@ import 'package:rxdart/streams.dart' show ValueStreamExtensions;
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_bridge_selector_bloc.dart';
 
-
-
-
-class PveBridgeSelector extends StatelessWidget{
-
+class PveBridgeSelector extends StatelessWidget {
   final String labelText;
 
   const PveBridgeSelector({Key key, this.labelText}) : super(key: key);
@@ -45,8 +41,7 @@ class PveBridgeSelector extends StatelessWidget{
                 )
             ],
             onChanged: (PveNodeNetworkModel selection) =>
-                _bBloc.events
-                    .add(BridgeSelectedEvent(selection)),
+                _bBloc.events.add(BridgeSelectedEvent(selection)),
             value: state.value,
             autovalidate: true,
             validator: (_) {
@@ -59,5 +54,4 @@ class PveBridgeSelector extends StatelessWidget{
       },
     );
   }
-
 }

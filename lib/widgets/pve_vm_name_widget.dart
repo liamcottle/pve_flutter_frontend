@@ -24,7 +24,7 @@ class PveVmNameWidget extends StatelessWidget {
             ),
             initialValue: state?.value,
             onChanged: (text) => vBloc.events.add(OnChange(text)),
-            autovalidate: true,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (_) {
               return state?.errorText;
             },
