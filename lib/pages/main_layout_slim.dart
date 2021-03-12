@@ -145,7 +145,9 @@ class PveMobileBottomNavigationbar extends StatelessWidget {
         currentIndex: pageSelector.value,
         onTap: (index) {
           if (index == 3) {
-            Provider.of<PveAuthenticationBloc>(context).events.add(LoggedOut());
+            Provider.of<PveAuthenticationBloc>(context, listen: false)
+                .events
+                .add(LoggedOut());
             Navigator.of(context).pushReplacementNamed('/login');
           } else {
             pageSelector.add(index);
@@ -266,8 +268,10 @@ class MobileDashboard extends StatelessWidget {
                                 color: Colors.white),
                           ),
                           onPressed: () {
-                            Provider.of<BehaviorSubject<int>>(context).add(1);
-                            Provider.of<PveResourceBloc>(context)
+                            Provider.of<BehaviorSubject<int>>(context,
+                                    listen: false)
+                                .add(1);
+                            Provider.of<PveResourceBloc>(context, listen: false)
                                 .events
                                 .add(FilterResources(
                                   typeFilter: BuiltSet.from(['qemu']),
@@ -292,8 +296,10 @@ class MobileDashboard extends StatelessWidget {
                                 color: Colors.white),
                           ),
                           onPressed: () {
-                            Provider.of<BehaviorSubject<int>>(context).add(1);
-                            Provider.of<PveResourceBloc>(context)
+                            Provider.of<BehaviorSubject<int>>(context,
+                                    listen: false)
+                                .add(1);
+                            Provider.of<PveResourceBloc>(context, listen: false)
                                 .events
                                 .add(FilterResources(
                                   typeFilter: BuiltSet.from(['lxc']),
