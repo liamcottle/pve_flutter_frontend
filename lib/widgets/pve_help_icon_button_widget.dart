@@ -21,7 +21,7 @@ class PveHelpIconButton extends StatelessWidget {
         try {
           launchDocURL(baseUrl.replace(path: '/pve-docs/$docPath').toString());
         } catch (e) {
-          Scaffold.of(context).showSnackBar(SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
               "Could not open Docs",
               style: ThemeData.dark().textTheme.button,

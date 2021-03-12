@@ -409,7 +409,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
   TextEditingController emailToController;
   bool enableSubmitButton = true;
   final _formKey = GlobalKey<FormState>();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {

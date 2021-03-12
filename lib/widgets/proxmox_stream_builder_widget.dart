@@ -29,7 +29,7 @@ class _ProxmoxBaseStreamBuilderState<B extends ProxmoxBaseBloc<dynamic, S>,
       stream: widget.bloc.state,
       onStateChange: (newState) {
         if (newState.isFailure && widget.errorHandler)
-          Scaffold.of(context)?.showSnackBar(
+          ScaffoldMessenger.of(context)?.showSnackBar(
                 SnackBar(
                   content: Text(
                     newState.errorMessage ?? "Error",
