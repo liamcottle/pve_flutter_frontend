@@ -2,6 +2,64 @@
 
 Frontend for Proxmox Virtual Environment
 
+# Setup How-To
+
+## Get Flutter
+
+See:
+https://flutter.dev/docs/get-started/install/linux#install-flutter-manually
+
+Make `flutter doctor` as happy as possible. Note you may need to tell it where
+chromium is located, e.g., with `export CHROME_EXECUTABLE=/usr/bin/chromium`
+
+## Get Path-Dependencies
+
+Most dependencies can be served from pub.dev, but the frontend also depends on
+to local path dependencies maintained by Proxmox.
+
+So, in the parent folder clone both, the API client library (pure dart package)
+and the login manager, serving as a base for Proxmox api2 projects.
+
+ cd ..
+ git clone git://git.proxmox.com/git/flutter/proxmox_dart_api_client.git
+ cd proxmox_dart_api_client
+ flutter pub get
+ flutter packages pub run build_runner build --delete-conflicting-outputs
+
+
+ cd ..
+ git clone git://git.proxmox.com/git/flutter/proxmox_login_manager.git
+ cd proxmox_login_manager
+ flutter pub get
+ flutter packages pub run build_runner build --delete-conflicting-outputs
+
+Now you have made the local dependencies and their dependencies available, and
+built the generated (data) model code for each.
+
+## Run 
+
+### Linux
+
+With the dependencies setup you should cd back into this directory
+(pve_flutter_frontend repository root) and also generate the model code once:
+
+ flutter packages pub run build_runner build --delete-conflicting-outputs
+
+Note: the `--delete-conflicting-outputs` option is normally not required, but
+can come in handy during development trial/error coding.
+
+To actually run it you can do:
+
+ flutter run -d linux
+
+# Build errors
+
+If there's an error during build use the verbose `-v` flag, to make flutter
+tell you what's actually going on. Quick remedies are then often rebuilding the
+models, build from clean state, upgrade or downgrade flutter to the last known
+working version - as we use latest master we sometimes run actually into bugs.
+Or if you made code changes resulting in an error, well duh, fix those.
+
 ## Web build infos
 
 Launch App in Chrome:
