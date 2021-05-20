@@ -78,7 +78,7 @@ following content:
 
     #!/bin/sh
     mkdir -p /tmp/chrome || true
-    /usr/bin/chromium --disable-web-security --user-data-dir="/tmp/chrome" $*
+    /usr/bin/chromium --disable-features=CrossOriginOpenerPolicy,CrossOriginEmbedderPolicy --disable-web-security --user-data-dir="/tmp/chrome" $*
 
 Then `chmod +x chrome-no-cors.sh` it and adapt the CHROME_EXECUTABLE env
 variable:
