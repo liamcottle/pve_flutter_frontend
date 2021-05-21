@@ -268,8 +268,7 @@ class MobileDashboard extends StatelessWidget {
                                 color: Colors.white),
                           ),
                           onPressed: () {
-                            Provider.of<BehaviorSubject<int>>(context,
-                                    listen: false)
+                            Provider.of<BehaviorSubject<int>>(context, listen: false)
                                 .add(1);
                             Provider.of<PveResourceBloc>(context, listen: false)
                                 .events
@@ -296,8 +295,7 @@ class MobileDashboard extends StatelessWidget {
                                 color: Colors.white),
                           ),
                           onPressed: () {
-                            Provider.of<BehaviorSubject<int>>(context,
-                                    listen: false)
+                            Provider.of<BehaviorSubject<int>>(context, listen: false)
                                 .add(1);
                             Provider.of<PveResourceBloc>(context, listen: false)
                                 .events
@@ -410,8 +408,8 @@ class MobileDashboard extends StatelessWidget {
                             leading:
                                 Icon(Renderers.getDefaultResourceIcon('qemu')),
                             onTap: () {
-                              Provider.of<BehaviorSubject<int>>(context).add(1);
-                              Provider.of<PveResourceBloc>(context)
+                              Provider.of<BehaviorSubject<int>>(context, listen: false).add(1);
+                              Provider.of<PveResourceBloc>(context, listen: false)
                                   .events
                                   .add(FilterResources(
                                     typeFilter: BuiltSet.from(['qemu']),
@@ -428,9 +426,9 @@ class MobileDashboard extends StatelessWidget {
                                   color: Colors.green),
                               trailing: Text(onlineVMs.length.toString()),
                               onTap: () {
-                                Provider.of<BehaviorSubject<int>>(context)
+                                Provider.of<BehaviorSubject<int>>(context, listen: false)
                                     .add(1);
-                                Provider.of<PveResourceBloc>(context)
+                                Provider.of<PveResourceBloc>(context, listen: false)
                                     .events
                                     .add(FilterResources(
                                       typeFilter: BuiltSet.from(['qemu']),
@@ -449,8 +447,8 @@ class MobileDashboard extends StatelessWidget {
                             leading: Icon(Icons.stop),
                             trailing: Text(offVMs.toString()),
                             onTap: () {
-                              Provider.of<BehaviorSubject<int>>(context).add(1);
-                              Provider.of<PveResourceBloc>(context)
+                              Provider.of<BehaviorSubject<int>>(context, listen: false).add(1);
+                              Provider.of<PveResourceBloc>(context, listen: false)
                                   .events
                                   .add(FilterResources(
                                     typeFilter: BuiltSet.from(['qemu']),
@@ -468,8 +466,8 @@ class MobileDashboard extends StatelessWidget {
                             leading:
                                 Icon(Renderers.getDefaultResourceIcon('lxc')),
                             onTap: () {
-                              Provider.of<BehaviorSubject<int>>(context).add(1);
-                              Provider.of<PveResourceBloc>(context)
+                              Provider.of<BehaviorSubject<int>>(context, listen: false).add(1);
+                              Provider.of<PveResourceBloc>(context, listen: false)
                                   .events
                                   .add(FilterResources(
                                     typeFilter: BuiltSet.from(['lxc']),
@@ -486,8 +484,8 @@ class MobileDashboard extends StatelessWidget {
                                 color: Colors.green),
                             trailing: Text(onlineCTs.length.toString()),
                             onTap: () {
-                              Provider.of<BehaviorSubject<int>>(context).add(1);
-                              Provider.of<PveResourceBloc>(context)
+                              Provider.of<BehaviorSubject<int>>(context, listen: false).add(1);
+                              Provider.of<PveResourceBloc>(context, listen: false)
                                   .events
                                   .add(FilterResources(
                                     typeFilter: BuiltSet.from(['lxc']),
@@ -507,8 +505,8 @@ class MobileDashboard extends StatelessWidget {
                             leading: Icon(Icons.stop),
                             trailing: Text(offCTs.toString()),
                             onTap: () {
-                              Provider.of<BehaviorSubject<int>>(context).add(1);
-                              Provider.of<PveResourceBloc>(context)
+                              Provider.of<BehaviorSubject<int>>(context, listen: false).add(1);
+                              Provider.of<PveResourceBloc>(context, listen: false)
                                   .events
                                   .add(FilterResources(
                                     typeFilter: BuiltSet.from(['lxc']),
