@@ -76,17 +76,13 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
     if (usedPercent == null) {
       return null;
     }
-    if (usedPercent <= 0.5) {
-      return AlwaysStoppedAnimation<Color>(Colors.greenAccent);
-    }
 
-    if (0.5 < usedPercent && usedPercent <= 0.75) {
+    if (usedPercent < 0.75) {
+      return AlwaysStoppedAnimation<Color>(Colors.greenAccent);
+    } else if (usedPercent < 0.85) {
+      return AlwaysStoppedAnimation<Color>(Colors.red);
+    } else {
       return AlwaysStoppedAnimation<Color>(Colors.yellow);
     }
-    if (usedPercent > 0.75) {
-      return AlwaysStoppedAnimation<Color>(Colors.red);
-    }
-
-    return null;
   }
 }
