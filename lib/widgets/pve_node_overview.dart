@@ -380,7 +380,7 @@ class PveNodeOverview extends StatelessWidget {
                                     ),
                                     ListTile(
                                       title: Text("Wearout"),
-                                      subtitle: Text(d.wearout.toString()),
+                                      subtitle: Text(d.wearout_percentage),
                                     )
                                   ],
                                 ),
