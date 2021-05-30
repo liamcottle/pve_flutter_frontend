@@ -87,12 +87,12 @@ variable:
 
 Now you can start the web based build normally:
 
-$ flutter run -d chrome
-
-I personally prefer to run with a fixed port, so that I can access and reuse configuration:
-
 $ flutter run -d chrome --web-port=35000
 
+
+NOTE: without setting a fixed port flutter uses a random one, as chrome binds
+ certificate expections and local browser storage to a (protocol, host, port)
+ tuple, this means that we'd lose all saved settings etc. every time else
 
 ### Use reverse proxy to allow connections to PVE and the App over the same port
 
