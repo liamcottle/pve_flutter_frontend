@@ -31,40 +31,25 @@ class _PveFileSelectorState extends State<PveFileSelector> {
   @override
   Widget build(BuildContext context) {
     return ProxmoxLayoutBuilder(
-      builder: (context, layout) => layout != ProxmoxLayout.slim
-          ? Center(
-              child: Container(
-                height: MediaQuery.of(context).size.height * 0.5,
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Card(
-                  color: Color.fromARGB(255, 243, 246, 255),
-                  child: PveFileSelectorWidget(
-                    isSelector: widget.isSelector,
-                    fBloc: widget.fBloc,
-                    sBloc: widget.sBloc,
-                  ),
-                ),
-              ),
-            )
-          : Scaffold(
-              appBar: AppBar(
-                iconTheme: IconThemeData(color: Colors.black),
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                title: Text(
-                  "Storage",
-                  style: TextStyle(
-                      // fontSize: 30,
-                      // fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-              ),
-              body: PveFileSelectorWidget(
-                isSelector: widget.isSelector,
-                fBloc: widget.fBloc,
-                sBloc: widget.sBloc,
-              ),
-            ),
+      builder: (context, layout) => Scaffold(
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.black),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Text(
+            "Storage",
+            style: TextStyle(
+                // fontSize: 30,
+                // fontWeight: FontWeight.bold,
+                color: Colors.black),
+          ),
+        ),
+        body: PveFileSelectorWidget(
+          isSelector: widget.isSelector,
+          fBloc: widget.fBloc,
+          sBloc: widget.sBloc,
+        ),
+      ),
     );
   }
 
