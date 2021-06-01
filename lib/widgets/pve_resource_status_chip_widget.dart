@@ -15,7 +15,7 @@ class StatusChip extends StatelessWidget {
     this.fontzsize = 12,
     this.fontWeight = FontWeight.normal,
     this.offlineColor = Colors.grey,
-    this.onlineColor = const Color(0xFF03fc6b),
+    this.onlineColor = const Color(0xFF21bf4b),
     this.intermediateColor = Colors.orange,
   }) : super(key: key);
 

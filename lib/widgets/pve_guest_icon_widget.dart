@@ -46,7 +46,7 @@ class PveGuestIcon extends StatelessWidget {
     return Icon(
       Renderers.getDefaultResourceIcon(type),
       color:
-          status == PveResourceStatusType.running ? Color(0xFF03fc6b) : color,
+          status == PveResourceStatusType.running ? Color(0xFF21bf4b) : color,
     );
   }
 }
