@@ -56,9 +56,15 @@ class Renderers {
       return "0$n";
     }
 
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+    String hours = twoDigits(duration.inHours.remainder(24));
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+
+    if (duration.inDays > 0) {
+      return "${duration.inDays}d $hours:$minutes:$seconds";
+    } else {
+      return "$hours:$minutes:$seconds";
+    }
   }
 
   static IconData getStorageIcon(String storageType) {
