@@ -55,11 +55,11 @@ class PveNodeOverview extends StatelessWidget {
                     Container(
                       height: 200,
                       child: PageView.builder(
-                          itemCount: 3,
+                          itemCount: 4,
                           itemBuilder: (context, item) {
                             final page = item + 1;
                             final pageIndicator = Text(
-                              '$page of 3',
+                              '$page of 4',
                               style: TextStyle(
                                 color: Colors.white54,
                                 fontWeight: FontWeight.w500,
@@ -88,6 +88,18 @@ class PveNodeOverview extends StatelessWidget {
                                 if (item == 1)
                                   Expanded(
                                     child: PveRRDChart(
+                                      title: 'Memory',
+                                      subtitle: Renderers.formatSize(state.rrdData.last.memused ?? 0),
+                                      data: state.rrdData.map(
+                                        (e) => Point(e.time.millisecondsSinceEpoch, e.memused)),
+                                      icon: Icon(Icons.timer),
+                                      bottomRight: pageIndicator,
+                                      dataRenderer: (data) => Renderers.formatSize(data ?? 0),
+                                    ),
+                                  ),
+                                if (item == 2)
+                                 Expanded(
+                                    child: PveRRDChart(
                                       title: 'I/O wait',
                                       subtitle: state.rrdData.last?.iowait
                                               ?.toStringAsFixed(2) ??
@@ -101,7 +113,7 @@ class PveNodeOverview extends StatelessWidget {
                                           data?.toStringAsFixed(3) ?? '0',
                                     ),
                                   ),
-                                if (item == 2)
+                                if (item == 3)
                                   Expanded(
                                     child: PveRRDChart(
                                       title: 'Load',
