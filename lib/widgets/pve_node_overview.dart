@@ -92,7 +92,7 @@ class PveNodeOverview extends StatelessWidget {
                                       subtitle: Renderers.formatSize(state.rrdData.last.memused ?? 0),
                                       data: state.rrdData.map(
                                         (e) => Point(e.time.millisecondsSinceEpoch, e.memused)),
-                                      icon: Icon(Icons.timer),
+                                      icon: Icon(FontAwesomeIcons.memory),
                                       bottomRight: pageIndicator,
                                       dataRenderer: (data) => Renderers.formatSize(data ?? 0),
                                     ),

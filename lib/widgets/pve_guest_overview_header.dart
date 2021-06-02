@@ -207,7 +207,7 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
                           Renderers.formatSize(widget.rrdData.last.mem ?? 0),
                       data: widget.rrdData.map(
                           (e) => Point(e.time.millisecondsSinceEpoch, e.mem)),
-                      icon: Icon(Icons.timer),
+                      icon: Icon(FontAwesomeIcons.memory),
                       bottomRight: pageIndicator,
                       dataRenderer: (data) => Renderers.formatSize(data ?? 0),
                     ),
