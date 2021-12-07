@@ -9,7 +9,7 @@
 
         <meta-data
             android:name="flutterEmbedding"
-	    android:value="2" />
+            android:value="2" />
 
         <activity
             android:name="com.proxmox.app.pve_flutter_frontend.MainActivity"
@@ -17,9 +17,9 @@
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
-	    android:windowSoftInputMode="adjustResize">
-	    
-	    <!-- Specify that the launch screen should continue being displayed -->
+            android:windowSoftInputMode="adjustResize">
+
+            <!-- Specify that the launch screen should continue being displayed -->
             <!-- until Flutter renders its first frame. -->
             <meta-data
                 android:name="io.flutter.embedding.android.SplashScreenDrawable"
@@ -34,9 +34,8 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
-	</activity>
-	<provider
+        </activity>
+        <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.proxmox.app.pve_flutter_frontend.provider"
             android:exported="false"
