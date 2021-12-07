@@ -24,25 +24,25 @@ class MainActivity: FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
             call, result ->
-            // Note: this method is invoked on the main thread.
-            Log.d("METHODCHANNEL", call.method)
-            if (call.method == "shareFile") {
-                val serializedShortcuts: Map<String, String> = call.arguments()
-                val path: String = serializedShortcuts.get("path")!!;
-                val type: String = serializedShortcuts.get("type")!!;
-                try {
-                    shareFile(path, type);
-                    result.success(null);
-                } catch (e: ActivityNotFoundException) {
-                    result.error("ActivityNotFoundException", "", null);
-                } catch (e: Exception) {
-                    result.error("PlatformException", "", null);
-		}
-            } else {
-                result.notImplemented()
+                // Note: this method is invoked on the main thread.
+                Log.d("METHODCHANNEL", call.method)
+                if (call.method == "shareFile") {
+                    val serializedShortcuts: Map<String, String> = call.arguments()
+                    val path: String = serializedShortcuts.get("path")!!;
+                    val type: String = serializedShortcuts.get("type")!!;
+                    try {
+                        shareFile(path, type);
+                        result.success(null);
+                    } catch (e: ActivityNotFoundException) {
+                        result.error("ActivityNotFoundException", "", null);
+                    } catch (e: Exception) {
+                        result.error("PlatformException", "", null);
+                    }
+                } else {
+                    result.notImplemented()
+                }
             }
         }
-    }
 
     fun shareFile(path:String, type:String){
         var file = File(path);
