@@ -62,19 +62,8 @@ class PveConsoleMenu extends StatelessWidget {
                       });
                     } on PlatformException catch (e) {
                       if (e.code.contains('ActivityNotFoundException')) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text('SPICE client required'),
-                            content: Text(
-                                'A Spice client is required on this device.'),
-                            actions: [
-                              FlatButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child: Text('Close'))
-                            ],
-                          ),
-                        );
+                        showTextDialog(context, 'SPICE client required',
+                            'A Spice client-app is required.');
                       }
                     }
                   } else {
@@ -84,6 +73,21 @@ class PveConsoleMenu extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  void showTextDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          FlatButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'))
+        ],
       ),
     );
   }
