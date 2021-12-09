@@ -42,21 +42,18 @@ class PveConsoleMenu extends StatelessWidget {
                 onTap: () async {
                   if (Platform.isAndroid) {
                     final tempDir = await getExternalCacheDirectories();
-                    var filePath = '';
 
+                    var apiPath;
                     if (['qemu', 'lxc'].contains(type)) {
-                      final response = await apiClient.postRequest(
-                          '/nodes/$node/$type/$guestID/spiceproxy');
-                      final data = json.decode(response.body)['data'];
-                      filePath = await writeSpiceFile(data, tempDir[0].path);
+                      apiPath = '/nodes/$node/$type/$guestID/spiceproxy';
+                    } else if (type == 'node') {
+                      apiPath = '/nodes/$node/spiceshell';
+                    } else {
+                      throw 'Unsupported console type "$type", must be one of "qemu", "lxc", "node"';
                     }
-
-                    if (type == 'node') {
-                      final response = await apiClient
-                          .postRequest('/nodes/$node/spiceshell');
-                      final data = json.decode(response.body)['data'];
-                      filePath = await writeSpiceFile(data, tempDir[0].path);
-                    }
+                    final response = await apiClient.postRequest(apiPath);
+                    final data = json.decode(response.body)['data'];
+                    var filePath = await writeSpiceFile(data, tempDir[0].path);
 
                     try {
                       await platform.invokeMethod('shareFile', {
