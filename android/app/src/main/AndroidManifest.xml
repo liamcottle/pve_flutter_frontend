@@ -41,4 +41,11 @@
             android:resource="@xml/provider_paths"/>
         </provider>
     </application>
+
+    <queries>
+        <intent> <!-- allow us to open https URLs (docs, proxmox.com, ...) -->
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
 </manifest>
