@@ -20,22 +20,17 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
 
-            <!-- Specify that the launch screen should continue being displayed -->
-            <!-- until Flutter renders its first frame. -->
-            <meta-data
-                android:name="io.flutter.embedding.android.SplashScreenDrawable"
-                android:resource="@drawable/launch_background" />
-
-            <!-- Theme to apply as soon as Flutter begins rendering frames -->
-            <meta-data
-                android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/NormalTheme" />
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <!-- This is used by Flutter to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.proxmox.app.pve_flutter_frontend.provider"

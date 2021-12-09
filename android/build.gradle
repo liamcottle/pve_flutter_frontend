@@ -1,5 +1,8 @@
 buildscript {
-    ext.kotlin_version = '1.2.71'
+    ext {
+        kotlin_version = '1.5.32'
+        androidXCore = "1.7.0"
+    }
     repositories {
         google()
         jcenter()
@@ -21,8 +24,6 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
     project.evaluationDependsOn(':app')
 }
 

@@ -32,7 +32,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 31
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -76,4 +76,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-splashscreen:1.0.0-alpha02'
+
+    def appcompat_version = "1.4.0"
+    // mainly required to get us style/Theme.AppCompat.DayNight.NoActionBar for nwp
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
 }
