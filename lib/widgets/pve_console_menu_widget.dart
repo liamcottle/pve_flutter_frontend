@@ -53,6 +53,11 @@ class PveConsoleMenu extends StatelessWidget {
                     }
                     final response = await apiClient.postRequest(apiPath);
                     final data = json.decode(response.body)['data'];
+                    if (data == null) {
+                      showTextDialog(context, 'Empty reply from SPICE API',
+                          'Ensure you have "${type == 'node' ? 'Sys' : 'VM'}.Console" permissions.');
+                      return;
+                    }
                     var filePath = await writeSpiceFile(data, tempDir[0].path);
 
                     try {
