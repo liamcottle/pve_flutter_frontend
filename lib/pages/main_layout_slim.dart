@@ -855,7 +855,7 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                           child: Text(
                             'Reset',
                             style: TextStyle(
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         )
