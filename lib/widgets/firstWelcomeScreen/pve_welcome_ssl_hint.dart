@@ -4,7 +4,7 @@ import 'package:pve_flutter_frontend/widgets/firstWelcomeScreen/pve_welcome_comm
 // disable ssl validation hint
 class PveWelcomePageSSLValidation extends StatelessWidget {
   const PveWelcomePageSSLValidation({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

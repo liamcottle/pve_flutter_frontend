@@ -3,15 +3,15 @@ import 'package:flutter/widgets.dart';
 typedef StreamStateChange<T> = void Function(T newState);
 
 class StreamListener<T> extends StatefulWidget {
-  final Widget child;
+  final Widget? child;
   final StreamStateChange<T> onStateChange;
   final Stream<T> stream;
 
   const StreamListener({
-    Key key,
-    @required this.stream,
-    @required this.child,
-    @required this.onStateChange,
+    Key? key,
+    required this.stream,
+    required this.child,
+    required this.onStateChange,
   });
 
   @override
@@ -20,7 +20,7 @@ class StreamListener<T> extends StatefulWidget {
 
 class _StreamListenerState<T> extends State<StreamListener<T>> {
   Stream<T> get _stream => widget.stream;
-  StreamSubscription<T> _subscription;
+  StreamSubscription<T>? _subscription;
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _StreamListenerState<T> extends State<StreamListener<T>> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) => widget.child!;
 
   @override
   void dispose() {

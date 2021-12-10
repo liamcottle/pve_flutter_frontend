@@ -13,15 +13,15 @@ import 'package:pve_flutter_frontend/widgets/pve_rrd_chart_widget.dart';
 
 class PveGuestOverviewHeader extends StatelessWidget {
   const PveGuestOverviewHeader({
-    Key key,
-    @required this.width,
-    @required this.guestID,
-    @required this.guestStatus,
-    @required this.guestName,
-    @required this.guestNodeID,
-    @required this.guestType,
-    @required this.template,
-    @required this.ha,
+    Key? key,
+    required this.width,
+    required this.guestID,
+    required this.guestStatus,
+    required this.guestName,
+    required this.guestNodeID,
+    required this.guestType,
+    required this.template,
+    required this.ha,
     this.background,
   })  : assert(guestName != null),
         super(key: key);
@@ -29,11 +29,11 @@ class PveGuestOverviewHeader extends StatelessWidget {
   final double width;
   final String guestID;
   final String guestType;
-  final PveResourceStatusType guestStatus;
+  final PveResourceStatusType? guestStatus;
   final String guestName;
   final String guestNodeID;
-  final Widget background;
-  final PveHAMangerServiceStatusModel ha;
+  final Widget? background;
+  final PveHAMangerServiceStatusModel? ha;
   final bool template;
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class PveGuestOverviewHeader extends StatelessWidget {
           fit: StackFit.expand,
           alignment: Alignment.center,
           children: <Widget>[
-            if (background != null) background,
+            if (background != null) background!,
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
@@ -144,9 +144,9 @@ class PveGuestOverviewHeader extends StatelessWidget {
 }
 
 class PveGuestHeaderRRDPageView extends StatefulWidget {
-  final BuiltList<PveGuestRRDdataModel> rrdData;
+  final BuiltList<PveGuestRRDdataModel>? rrdData;
 
-  PveGuestHeaderRRDPageView({Key key, this.rrdData}) : super(key: key);
+  PveGuestHeaderRRDPageView({Key? key, this.rrdData}) : super(key: key);
 
   @override
   _PveGuestHeaderRRDPageViewState createState() =>
@@ -163,7 +163,7 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.rrdData != null && widget.rrdData.isNotEmpty) {
+    if (widget.rrdData != null && widget.rrdData!.isNotEmpty) {
       return PageView.builder(
           controller: controller,
           itemCount: 2,
@@ -184,16 +184,15 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
                       titlePadding: EdgeInsets.only(bottom: 80),
                       titleWidth: 150,
                       titleAlginment: CrossAxisAlignment.end,
-                      title: 'CPU (${widget.rrdData.last.maxcpu ?? '-'})',
+                      title: 'CPU (${widget.rrdData?.last.maxcpu ?? '-'})',
                       subtitle:
-                          (widget.rrdData.last?.cpu ?? 0).toStringAsFixed(2) +
+                          (widget.rrdData?.last.cpu ?? 0).toStringAsFixed(2) +
                               "%",
-                      data: widget.rrdData.map(
-                          (e) => Point(e.time.millisecondsSinceEpoch, e.cpu)),
+                      data: widget.rrdData?.map((e) => Point(
+                          e.time?.millisecondsSinceEpoch ?? 0, e.cpu ?? 0)),
                       icon: Icon(Icons.memory),
                       bottomRight: pageIndicator,
-                      dataRenderer: (data) =>
-                          '${data?.toStringAsFixed(2) ?? 0} %',
+                      dataRenderer: (data) => '${data.toStringAsFixed(2)} %',
                     ),
                   ),
                 if (item == 1)
@@ -204,12 +203,12 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
                       titleAlginment: CrossAxisAlignment.end,
                       title: 'Memory',
                       subtitle:
-                          Renderers.formatSize(widget.rrdData.last.mem ?? 0),
-                      data: widget.rrdData.map(
-                          (e) => Point(e.time.millisecondsSinceEpoch, e.mem)),
+                          Renderers.formatSize(widget.rrdData?.last.mem ?? 0),
+                      data: widget.rrdData!.map((e) => Point(
+                          e.time?.millisecondsSinceEpoch ?? 0, e.mem ?? 0)),
                       icon: Icon(FontAwesomeIcons.memory),
                       bottomRight: pageIndicator,
-                      dataRenderer: (data) => Renderers.formatSize(data ?? 0),
+                      dataRenderer: (data) => Renderers.formatSize(data),
                     ),
                   ),
               ],

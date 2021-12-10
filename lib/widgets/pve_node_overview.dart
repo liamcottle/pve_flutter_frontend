@@ -20,9 +20,9 @@ import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
 
 class PveNodeOverview extends StatelessWidget {
   static final routeName = RegExp(r'\/nodes\/(\S+)$');
-  final String nodeID;
+  final String? nodeID;
 
-  const PveNodeOverview({Key key, this.nodeID}) : super(key: key);
+  const PveNodeOverview({Key? key, this.nodeID}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final nBloc = Provider.of<PveNodeOverviewBloc>(context);
@@ -38,7 +38,7 @@ class PveNodeOverview extends StatelessWidget {
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: Text(
-                nodeID,
+                nodeID!,
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -65,9 +65,10 @@ class PveNodeOverview extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             );
-                            double last_cpu = state.rrdData.last.cpu;
+                            double? last_cpu = state.rrdData.last.cpu;
                             String last_cpu_text = last_cpu != null
-                              ? "${(last_cpu * 100.0).toStringAsFixed(2)} %" : "";
+                                ? "${(last_cpu * 100.0).toStringAsFixed(2)} %"
+                                : "";
                             return Column(
                               children: [
                                 if (item == 0)
@@ -77,56 +78,59 @@ class PveNodeOverview extends StatelessWidget {
                                           'CPU (${state.status?.cpuinfo?.cpus ?? '-'})',
                                       subtitle: last_cpu_text,
                                       data: state.rrdData.map((e) => Point(
-                                          e.time.millisecondsSinceEpoch,
-                                          e.cpu != null ? e.cpu * 100.0 : null)),
+                                          e.time!.millisecondsSinceEpoch,
+                                          e.cpu! * 100.0)),
                                       icon: Icon(Icons.memory),
                                       bottomRight: pageIndicator,
                                       dataRenderer: (data) =>
-                                          '${data?.toStringAsFixed(2) ?? 0} %',
+                                          '${data.toStringAsFixed(2)} %',
                                     ),
                                   ),
                                 if (item == 1)
                                   Expanded(
                                     child: PveRRDChart(
                                       title: 'Memory',
-                                      subtitle: Renderers.formatSize(state.rrdData.last.memused ?? 0),
-                                      data: state.rrdData.map(
-                                        (e) => Point(e.time.millisecondsSinceEpoch, e.memused)),
+                                      subtitle: Renderers.formatSize(
+                                          state.rrdData.last.memused ?? 0),
+                                      data: state.rrdData.map((e) => Point(
+                                          e.time!.millisecondsSinceEpoch,
+                                          e.memused!)),
                                       icon: Icon(FontAwesomeIcons.memory),
                                       bottomRight: pageIndicator,
-                                      dataRenderer: (data) => Renderers.formatSize(data ?? 0),
+                                      dataRenderer: (data) =>
+                                          Renderers.formatSize(data),
                                     ),
                                   ),
                                 if (item == 2)
-                                 Expanded(
+                                  Expanded(
                                     child: PveRRDChart(
                                       title: 'I/O wait',
-                                      subtitle: state.rrdData.last?.iowait
+                                      subtitle: state.rrdData.last.iowait
                                               ?.toStringAsFixed(2) ??
                                           '0',
                                       data: state.rrdData.map((e) => Point(
-                                          e.time.millisecondsSinceEpoch,
-                                          e.iowait)),
+                                          e.time?.millisecondsSinceEpoch ?? 0,
+                                          e.iowait ?? 0)),
                                       icon: Icon(Icons.timer),
                                       bottomRight: pageIndicator,
                                       dataRenderer: (data) =>
-                                          data?.toStringAsFixed(3) ?? '0',
+                                          data.toStringAsFixed(3),
                                     ),
                                   ),
                                 if (item == 3)
                                   Expanded(
                                     child: PveRRDChart(
                                       title: 'Load',
-                                      subtitle: state.rrdData.last?.loadavg
+                                      subtitle: state.rrdData.last.loadavg
                                               ?.toStringAsFixed(2) ??
                                           '0',
                                       data: state.rrdData.map((e) => Point(
-                                          e.time.millisecondsSinceEpoch,
-                                          e.loadavg)),
+                                          e.time!.millisecondsSinceEpoch,
+                                          e.loadavg!)),
                                       icon: Icon(Icons.show_chart),
                                       bottomRight: pageIndicator,
                                       dataRenderer: (data) =>
-                                          data?.toStringAsFixed(2) ?? '0',
+                                          data.toStringAsFixed(2),
                                     ),
                                   ),
                               ],
@@ -171,8 +175,8 @@ class PveNodeOverview extends StatelessWidget {
                               color: Colors.white24,
                             ),
                             title: 'Console',
-                            onTap: () => showConsoleMenuBottomSheet(
-                                context, nBloc.apiClient, null, nodeID, 'node'),
+                            onTap: () => showConsoleMenuBottomSheet(context,
+                                nBloc.apiClient, null, nodeID!, 'node'),
                           ),
                         ],
                       ),
@@ -201,7 +205,7 @@ class PveNodeOverview extends StatelessWidget {
                         ListTile(
                           dense: true,
                           title: Text(
-                              '${status.cpuinfo.cpus} x ${status.cpuinfo.model}'),
+                              '${status!.cpuinfo.cpus} x ${status.cpuinfo.model}'),
                           subtitle: Text(
                               'CPU Information (Socket: ${status.cpuinfo.sockets})'),
                         ),
@@ -228,11 +232,11 @@ class PveNodeOverview extends StatelessWidget {
                                 color: Colors.blueGrey[300],
                               ),
                               usedValue:
-                                  Renderers.formatSize(status.rootfs.used ?? 0),
-                              totalValue: Renderers.formatSize(
-                                  status.rootfs.total ?? 0),
-                              usedPercent: (status.rootfs.used ?? 0.0) /
-                                  (status.rootfs.total ?? 100.0),
+                                  Renderers.formatSize(status!.rootfs.used),
+                              totalValue:
+                                  Renderers.formatSize(status.rootfs.total),
+                              usedPercent:
+                                  (status.rootfs.used) / (status.rootfs.total),
                             ),
                           ),
                         ),
@@ -271,13 +275,13 @@ class PveNodeOverview extends StatelessWidget {
                           ),
                         )
                         .toList()
-                          ..sort((a, b) => (a.title as Text)
-                              .data
-                              .compareTo((b.title as Text).data)),
+                      ..sort((a, b) => (a.title as Text)
+                          .data!
+                          .compareTo((b.title as Text).data!)),
                   ),
                   PveResourceDataCardWidget(
                     expandable: true,
-                    showTitleTrailing: state.updates?.isNotEmpty ?? false,
+                    showTitleTrailing: state.updates.isNotEmpty,
                     titleTrailing: Icon(Icons.info_outline),
                     title: Text(
                       'Updates',
@@ -314,7 +318,7 @@ class PveNodeOverview extends StatelessWidget {
                                   contentPadding: EdgeInsets.all(24),
                                   children: <Widget>[
                                     Text(
-                                      s.description,
+                                      s.description!,
                                       style: TextStyle(fontSize: 12),
                                     )
                                   ],
@@ -324,9 +328,9 @@ class PveNodeOverview extends StatelessWidget {
                           ),
                         )
                         .toList()
-                          ..sort((a, b) => (a.title as Text)
-                              .data
-                              .compareTo((b.title as Text).data)),
+                      ..sort((a, b) => (a.title as Text)
+                          .data!
+                          .compareTo((b.title as Text).data!)),
                   ),
                   PveResourceDataCardWidget(
                     expandable: false,
@@ -351,7 +355,7 @@ class PveNodeOverview extends StatelessWidget {
                                     ? Colors.grey
                                     : Colors.red),
                             title:
-                                Text('${d.type.toUpperCase()}: ${d.devPath}'),
+                                Text('${d.type!.toUpperCase()}: ${d.devPath}'),
                             subtitle: Text(
                                 'Usage: ${d.used} ${Renderers.formatSize(d.size ?? 0)}'),
                             trailing: IconButton(
@@ -366,15 +370,15 @@ class PveNodeOverview extends StatelessWidget {
                                   children: <Widget>[
                                     ListTile(
                                       title: Text("Device"),
-                                      subtitle: Text(d.devPath),
+                                      subtitle: Text(d.devPath!),
                                     ),
                                     ListTile(
                                       title: Text("Type"),
-                                      subtitle: Text(d.type),
+                                      subtitle: Text(d.type!),
                                     ),
                                     ListTile(
                                       title: Text("Usage"),
-                                      subtitle: Text(d.used),
+                                      subtitle: Text(d.used!),
                                     ),
                                     ListTile(
                                       title: Text("GPT"),
@@ -382,15 +386,15 @@ class PveNodeOverview extends StatelessWidget {
                                     ),
                                     ListTile(
                                       title: Text("Model"),
-                                      subtitle: Text(d.model),
+                                      subtitle: Text(d.model!),
                                     ),
                                     ListTile(
                                       title: Text("Serial"),
-                                      subtitle: Text(d.serial),
+                                      subtitle: Text(d.serial!),
                                     ),
                                     ListTile(
                                       title: Text("S.M.A.R.T"),
-                                      subtitle: Text(d.health),
+                                      subtitle: Text(d.health!),
                                     ),
                                     ListTile(
                                       title: Text("Wearout"),
@@ -403,9 +407,9 @@ class PveNodeOverview extends StatelessWidget {
                           ),
                         )
                         .toList()
-                          ..sort((a, b) => (a.title as Text)
-                              .data
-                              .compareTo((b.title as Text).data)),
+                      ..sort((a, b) => (a.title as Text)
+                          .data!
+                          .compareTo((b.title as Text).data!)),
                   ),
                 ],
               ),

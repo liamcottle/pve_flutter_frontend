@@ -7,7 +7,7 @@ class ProxmoxPackageInfo extends StatefulWidget {
 }
 
 class _ProxmoxPackageInfoState extends State<ProxmoxPackageInfo> {
-  Future<PackageInfo> packageInfo;
+  Future<PackageInfo>? packageInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class _ProxmoxPackageInfoState extends State<ProxmoxPackageInfo> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Text(
-            snapshot.data.version + snapshot.data.buildNumber,
+            snapshot.data!.version + snapshot.data!.buildNumber,
             style: TextStyle(color: Colors.white30),
           );
         }

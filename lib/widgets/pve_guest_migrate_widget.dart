@@ -12,7 +12,7 @@ import 'package:pve_flutter_frontend/widgets/pve_guest_migration_connector_widge
 import 'package:pve_flutter_frontend/widgets/pve_help_icon_button_widget.dart';
 
 class PveGuestMigrate extends StatelessWidget {
-  PveGuestMigrate({Key key}) : super(key: key);
+  PveGuestMigrate({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final migrateBloc = Provider.of<PveMigrateBloc>(context);
@@ -36,10 +36,11 @@ class PveGuestMigrate extends StatelessWidget {
             elevation: 0.0,
             actions: <Widget>[
               PveHelpIconButton(
-                  baseUrl: Provider.of<PveResourceBloc>(context)
-                      .apiClient
-                      .credentials
-                      .apiBaseUrl,
+                  baseUrl: (Provider.of<PveResourceBloc>(context)
+                          .apiClient
+                          ?.credentials
+                          .apiBaseUrl ??
+                      Uri.parse('https://pve.proxmox.com/')),
                   docPath: 'pve-admin-guide.html#qm_migration')
             ],
           ),
@@ -70,7 +71,7 @@ class PveGuestMigrate extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           ),
                           subtitle: Text(
-                            migrateState.nodeID ?? "unkown",
+                            migrateState.nodeID,
                             style: TextStyle(color: Colors.white54),
                           ),
                         ),
@@ -91,7 +92,7 @@ class PveGuestMigrate extends StatelessWidget {
                   Expanded(
                     child: ListView(
                       children: [
-                        for (var con in migrateState.preconditions)
+                        for (var con in migrateState.preconditions!)
                           ListTile(
                             leading: con.severity == PveMigrateSeverity.error
                                 ? Icon(
@@ -136,10 +137,10 @@ class PveGuestMigrate extends StatelessWidget {
 
 class _MigrateTargetSelector extends StatelessWidget {
   const _MigrateTargetSelector(
-      {Key key,
-      @required this.nodeSelectorbloc,
-      @required this.migrateBloc,
-      @required this.disabled,
+      {Key? key,
+      required this.nodeSelectorbloc,
+      required this.migrateBloc,
+      required this.disabled,
       this.titleColor = Colors.black,
       this.iconEnabledColor = Colors.black})
       : super(key: key);
@@ -174,7 +175,7 @@ class _MigrateTargetSelector extends StatelessWidget {
                         ),
                         trailing:
                             Icon(Icons.offline_bolt, color: Colors.greenAccent),
-                        title: Text(item.nodeName ?? 'unkown'),
+                        title: Text(item.nodeName),
                         subtitle:
                             Text('CPU: ${item.renderMemoryUsagePercent()}'),
                       ),
@@ -185,7 +186,7 @@ class _MigrateTargetSelector extends StatelessWidget {
                 getSelectedItem(state.availableNodes),
             onChanged: disabled
                 ? null
-                : (String selectedNode) {
+                : (String? selectedNode) {
                     nodeSelectorbloc.events
                         .add(NodeSelectedEvent(selectedNode));
 

@@ -8,7 +8,7 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart'
 
 class PveQemuPowerSettings extends StatelessWidget {
   const PveQemuPowerSettings({
-    Key key,
+    Key? key,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class PveQemuPowerSettings extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   if (qemuStatus == PveResourceStatusType.stopped &&
-                      !(state.currentStatus.template ?? false))
+                      !(state.currentStatus!.template ?? false))
                     ListTile(
                       leading: Icon(Icons.play_arrow),
                       title: Text(
@@ -41,7 +41,7 @@ class PveQemuPowerSettings extends StatelessWidget {
                         PveResourceStatusType.paused,
                         PveResourceStatusType.suspended
                       ].contains(qemuStatus) &&
-                      !(state.currentStatus.template ?? false))
+                      !(state.currentStatus!.template ?? false))
                     ListTile(
                       leading: Icon(Icons.play_arrow),
                       title: Text(

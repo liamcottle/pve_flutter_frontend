@@ -11,7 +11,7 @@ import 'package:pve_flutter_frontend/widgets/proxmox_tree_widget.dart';
 
 class PveMainNavigationDrawer extends StatelessWidget {
   const PveMainNavigationDrawer({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -46,7 +46,7 @@ class PveMainNavigationDrawer extends StatelessWidget {
                     initialData:
                         Provider.of<PveResourceBloc>(context).state.value,
                     builder: (context, snapshot) => ProxmoxTreeWidget(
-                      data: snapshot.data.resources
+                      data: snapshot.data!.resources
                           .where((resource) =>
                               resource.type == "node" ||
                               resource.type == "pool")
@@ -59,10 +59,10 @@ class PveMainNavigationDrawer extends StatelessWidget {
                                   shared: resource.shared,
                                 ),
                               ),
-                              children: snapshot.data.resources
+                              children: snapshot.data!.resources
                                   .where((child) =>
                                       child.node != null &&
-                                      resource.id.contains(child.node) &&
+                                      resource.id.contains(child.node!) &&
                                       child.type != resource.type)
                                   .map((child) {
                                 return ProxmoxTreeItem(
@@ -116,14 +116,14 @@ class PveMainNavigationDrawer extends StatelessWidget {
                                     .state
                                     .value,
                             builder: (context, snapshot) {
-                              final state = snapshot.data;
+                              final state = snapshot.data!;
                               return ClusterStatus(
                                 isHealthy: state.healthy,
                                 healthyColor: Colors.greenAccent,
                                 warningColor: Colors.orangeAccent,
                                 backgroundColor:
                                     Theme.of(context).scaffoldBackgroundColor,
-                                version: state.cluster.version.toString(),
+                                version: state.cluster!.version.toString(),
                               );
                             }),
                       ),

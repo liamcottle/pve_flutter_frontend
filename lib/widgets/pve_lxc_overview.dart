@@ -35,7 +35,7 @@ class PveLxcOverview extends StatelessWidget {
   static final routeName = RegExp(r"\/nodes\/(\S+)\/lxc\/(\d+)");
   final String guestID;
 
-  const PveLxcOverview({Key key, this.guestID}) : super(key: key);
+  const PveLxcOverview({Key? key, required this.guestID}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final lxcBloc = Provider.of<PveLxcOverviewBloc>(context);
@@ -177,7 +177,7 @@ class PveLxcOverview extends StatelessWidget {
                                       _createMigrationRoute(
                                           guestID,
                                           state.nodeID,
-                                          resourceBloc.apiClient)),
+                                          resourceBloc.apiClient!)),
                                 ),
                               ActionCard(
                                 icon: Icon(
@@ -188,7 +188,7 @@ class PveLxcOverview extends StatelessWidget {
                                 title: 'Backup',
                                 onTap: () => Navigator.of(context).push(
                                     _createBackupRoute(guestID, state.nodeID,
-                                        resourceBloc.apiClient)),
+                                        resourceBloc.apiClient!)),
                               ),
                             ],
                           ),
@@ -238,7 +238,7 @@ class PveLxcOverview extends StatelessWidget {
                               ),
                             ),
                             children: <Widget>[
-                              for (var net in config.net)
+                              for (var net in config.net!)
                                 ListTile(
                                   leading: Icon(FontAwesomeIcons.ethernet),
                                   dense: true,
@@ -257,15 +257,15 @@ class PveLxcOverview extends StatelessWidget {
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.globe),
                                 dense: true,
-                                title: Text(config?.searchdomain ??
-                                    'Use host settings'),
+                                title: Text(
+                                    config.searchdomain ?? 'Use host settings'),
                                 subtitle: Text('DNS Domain'),
                               ),
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.search),
                                 dense: true,
                                 title: Text(
-                                    config?.nameserver ?? 'Use host settings'),
+                                    config.nameserver ?? 'Use host settings'),
                                 subtitle: Text('DNS Server'),
                               ),
                             ]),
@@ -347,7 +347,7 @@ class PveLxcOverview extends StatelessWidget {
     );
   }
 
-  Future<T> showPowerMenuBottomSheet<T>(
+  Future<T?> showPowerMenuBottomSheet<T>(
       BuildContext context, PveLxcOverviewBloc lxcBloc) async {
     return showModalBottomSheet(
       shape: RoundedRectangleBorder(

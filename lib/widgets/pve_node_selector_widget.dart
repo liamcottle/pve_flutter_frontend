@@ -5,9 +5,9 @@ import 'package:pve_flutter_frontend/bloc/pve_node_selector_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_node_selector_state.dart';
 
 class PveNodeSelector extends StatelessWidget {
-  final String labelText;
+  final String? labelText;
 
-  const PveNodeSelector({Key key, this.labelText}) : super(key: key);
+  const PveNodeSelector({Key? key, this.labelText}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +17,8 @@ class PveNodeSelector extends StatelessWidget {
       initialData: _pveNodeSelectorBloc.state.value,
       builder:
           (BuildContext context, AsyncSnapshot<PveNodeSelectorState> snapshot) {
-        if (snapshot.hasData && snapshot.data.availableNodes.isNotEmpty) {
-          final state = snapshot.data;
+        if (snapshot.hasData && snapshot.data!.availableNodes.isNotEmpty) {
+          final state = snapshot.data!;
 
           return DropdownButton(
             items: state.availableNodes
@@ -38,9 +38,9 @@ class PveNodeSelector extends StatelessWidget {
             selectedItemBuilder: (context) => state.availableNodes
                 .map((item) => Text(item.nodeName))
                 .toList(),
-            onChanged: (String selectedNode) => _pveNodeSelectorBloc.events
+            onChanged: (String? selectedNode) => _pveNodeSelectorBloc.events
                 .add(NodeSelectedEvent(selectedNode)),
-            value: state.selectedNode.nodeName,
+            value: state.selectedNode!.nodeName,
           );
         }
 

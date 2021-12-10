@@ -10,12 +10,9 @@ abstract class PveLxcOverviewState
     implements Built<PveLxcOverviewState, PveLxcOverviewStateBuilder> {
   // Fields
   String get nodeID;
-  @nullable
-  PveNodesLxcStatusModel get currentStatus;
-  @nullable
-  BuiltList<PveGuestRRDdataModel> get rrdData;
-  @nullable
-  PveNodesLxcConfigModel get config;
+  PveNodesLxcStatusModel? get currentStatus;
+  BuiltList<PveGuestRRDdataModel>? get rrdData;
+  PveNodesLxcConfigModel? get config;
 
   PveLxcOverviewState._();
 

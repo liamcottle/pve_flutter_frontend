@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ActionCard extends StatelessWidget {
-  final Function onTap;
-  final String title;
-  final Widget icon;
+  final Function? onTap;
+  final String? title;
+  final Widget? icon;
   final Color color;
 
   const ActionCard({
-    Key key,
+    Key? key,
     this.onTap,
     this.title,
     this.icon,
@@ -20,7 +20,7 @@ class ActionCard extends StatelessWidget {
       color: color,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       child: InkWell(
-        onTap: onTap,
+        onTap: onTap as void Function()?,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
@@ -34,7 +34,7 @@ class ActionCard extends StatelessWidget {
                 children: [
                   Center(
                     child: Text(
-                      title,
+                      title!,
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold),
                     ),

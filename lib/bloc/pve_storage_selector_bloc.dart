@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/bloc/proxmox_base_bloc.dart';
@@ -13,8 +14,8 @@ class PveStorageSelectorBloc
   PveStorageSelectorState get initialState => init;
 
   PveStorageSelectorBloc({
-    @required this.apiClient,
-    @required this.init,
+    required this.apiClient,
+    required this.init,
   });
 
   @override
@@ -24,9 +25,8 @@ class PveStorageSelectorBloc
       yield latestState.rebuild((b) => b..isLoading = true);
       final storages = await getStorages(latestState);
 
-      var selected = storages.singleWhere(
-          (element) => element.id == latestState.selected?.id,
-          orElse: () => null);
+      var selected = storages.singleWhereOrNull(
+          (element) => element.id == latestState.selected?.id);
 
       if (selected == null && latestState.selected != null) {
         yield* yieldErrorState('Selected storage no longer available');
@@ -40,7 +40,7 @@ class PveStorageSelectorBloc
           ..isBlank = false
           ..isLoading = false
           ..storages.replace(storages)
-          ..selected.replace(selected));
+          ..selected.replace(selected!));
       } else {
         yield latestState.rebuild((b) => b
           ..isBlank = false
@@ -52,7 +52,7 @@ class PveStorageSelectorBloc
 
     if (event is StorageSelectedEvent) {
       if (event.storageID == null) {
-        yield latestState.rebuild((b) => b..selected.replace(event.storage));
+        yield latestState.rebuild((b) => b..selected.replace(event.storage!));
       } else {
         final storage =
             latestState.storages.singleWhere((s) => s.id == event.storageID);
@@ -91,8 +91,8 @@ class PveStorageSelectorEvent {}
 class LoadStoragesEvent extends PveStorageSelectorEvent {}
 
 class StorageSelectedEvent extends PveStorageSelectorEvent {
-  final PveNodesStorageModel storage;
-  final String storageID;
+  final PveNodesStorageModel? storage;
+  final String? storageID;
   StorageSelectedEvent({this.storage, this.storageID});
 }
 

@@ -13,12 +13,12 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart'
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 
 class PveFileSelector extends StatefulWidget {
-  final PveFileSelectorBloc fBloc;
-  final PveStorageSelectorBloc sBloc;
+  final PveFileSelectorBloc? fBloc;
+  final PveStorageSelectorBloc? sBloc;
   final bool isSelector;
 
   const PveFileSelector({
-    Key key,
+    Key? key,
     this.fBloc,
     this.sBloc,
     this.isSelector = false,
@@ -56,29 +56,29 @@ class _PveFileSelectorState extends State<PveFileSelector> {
   @override
   void dispose() {
     super.dispose();
-    widget.fBloc.dispose();
-    widget.sBloc.dispose();
+    widget.fBloc!.dispose();
+    widget.sBloc!.dispose();
   }
 }
 
 class PveFileSelectorWidget extends StatelessWidget {
-  final PveFileSelectorBloc fBloc;
-  final PveStorageSelectorBloc sBloc;
-  final bool isSelector;
+  final PveFileSelectorBloc? fBloc;
+  final PveStorageSelectorBloc? sBloc;
+  final bool? isSelector;
 
   const PveFileSelectorWidget({
-    Key key,
-    @required this.fBloc,
-    @required this.sBloc,
+    Key? key,
+    required this.fBloc,
+    required this.sBloc,
     this.isSelector,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return StreamListener<PveStorageSelectorState>(
-      stream: sBloc.state,
+      stream: sBloc!.state,
       onStateChange: (storageSelectorState) {
-        fBloc.events.add(ChangeStorage(storageSelectorState.selected?.id));
+        fBloc!.events.add(ChangeStorage(storageSelectorState.selected?.id));
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -137,10 +137,10 @@ class PveFileSelectorWidget extends StatelessWidget {
             ),
             Expanded(
               child: StreamBuilder<PveFileSelectorState>(
-                  stream: fBloc.state,
+                  stream: fBloc!.state,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final state = snapshot.data;
+                      final state = snapshot.data!;
                       return Column(
                         children: <Widget>[
                           Row(
@@ -158,7 +158,7 @@ class PveFileSelectorWidget extends StatelessWidget {
                                     color: Color.fromARGB(255, 152, 162, 201),
                                     icon: Icon(Icons.search),
                                     onPressed: () =>
-                                        fBloc.events.add(ToggleSearch()),
+                                        fBloc!.events.add(ToggleSearch()),
                                   ),
                                   IconButton(
                                     color: Color.fromARGB(255, 152, 162, 201),
@@ -168,7 +168,7 @@ class PveFileSelectorWidget extends StatelessWidget {
                                           : Icons.view_module,
                                     ),
                                     onPressed: () =>
-                                        fBloc.events.add(ToggleGridListView()),
+                                        fBloc!.events.add(ToggleGridListView()),
                                   ),
                                 ],
                               )
@@ -181,7 +181,7 @@ class PveFileSelectorWidget extends StatelessWidget {
                                 labelText: 'Search',
                               ),
                               autofocus: true,
-                              onChanged: (searchTerm) => fBloc.events
+                              onChanged: (searchTerm) => fBloc!.events
                                   .add(FilterContent(searchTerm: searchTerm)),
                             ),
                           Expanded(
@@ -207,10 +207,10 @@ class PveFileSelectorWidget extends StatelessWidget {
 }
 
 class PveStorageCardIcon extends StatelessWidget {
-  final bool selected;
-  final IconData icon;
+  final bool? selected;
+  final IconData? icon;
 
-  const PveStorageCardIcon({Key key, this.selected, this.icon})
+  const PveStorageCardIcon({Key? key, this.selected, this.icon})
       : super(key: key);
 
   @override
@@ -219,7 +219,7 @@ class PveStorageCardIcon extends StatelessWidget {
       height: 50,
       width: 50,
       child: Card(
-        color: selected ? Colors.white : Color.fromARGB(255, 243, 246, 255),
+        color: selected! ? Colors.white : Color.fromARGB(255, 243, 246, 255),
         elevation: 0,
         child: Icon(icon),
       ),
@@ -229,16 +229,16 @@ class PveStorageCardIcon extends StatelessWidget {
 
 class PveStorageCard extends StatelessWidget {
   const PveStorageCard({
-    Key key,
-    @required this.isSelected,
-    @required this.sBloc,
-    @required this.storage,
-    @required this.storageIcon,
+    Key? key,
+    required this.isSelected,
+    required this.sBloc,
+    required this.storage,
+    required this.storageIcon,
     this.width = 300,
   }) : super(key: key);
 
   final bool isSelected;
-  final PveStorageSelectorBloc sBloc;
+  final PveStorageSelectorBloc? sBloc;
   final PveNodesStorageModel storage;
   final Widget storageIcon;
   final double width;
@@ -253,9 +253,9 @@ class PveStorageCard extends StatelessWidget {
           color: isSelected ? Theme.of(context).primaryColor : Colors.white,
           elevation: isSelected ? 4 : 1,
           child: InkWell(
-              onTap: storage.active
+              onTap: storage.active!
                   ? () {
-                      sBloc.events.add(StorageSelectedEvent(storage: storage));
+                      sBloc!.events.add(StorageSelectedEvent(storage: storage));
                     }
                   : null,
               child: Padding(
@@ -281,7 +281,7 @@ class PveStorageCard extends StatelessWidget {
                         ),
                         maxLines: 1,
                       ),
-                      if (storage.active)
+                      if (storage.active!)
                         Expanded(
                           child: Align(
                             alignment: FractionalOffset.bottomCenter,
@@ -295,7 +295,7 @@ class PveStorageCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                      if (!storage.active)
+                      if (!storage.active!)
                         Expanded(
                           child: Align(
                             alignment: FractionalOffset.bottomCenter,
@@ -319,13 +319,13 @@ class PveStorageCard extends StatelessWidget {
 }
 
 class FileSelectorContentView extends StatelessWidget {
-  final bool gridView;
-  final List<PveNodesStorageContentModel> content;
-  final bool isSelector;
-  final bool storageSelected;
+  final bool? gridView;
+  final List<PveNodesStorageContentModel>? content;
+  final bool? isSelector;
+  final bool? storageSelected;
 
   const FileSelectorContentView(
-      {Key key,
+      {Key? key,
       this.gridView,
       this.content,
       this.isSelector,
@@ -339,45 +339,45 @@ class FileSelectorContentView extends StatelessWidget {
       );
     }
 
-    if (content.isEmpty && storageSelected) {
+    if (content!.isEmpty && storageSelected!) {
       return Center(
         child: Text("Nothing found"),
       );
     }
 
-    if (content.isEmpty && !storageSelected) {
+    if (content!.isEmpty && !storageSelected!) {
       return Center(
         child: Text("Please select storage"),
       );
     }
 
-    if (gridView) {
+    if (gridView!) {
       return ProxmoxLayoutBuilder(builder: (context, layout) {
         final wide = layout != ProxmoxLayout.slim;
         return GridView.builder(
-          itemCount: content.length,
+          itemCount: content!.length,
           itemBuilder: (context, index) => GridTile(
             child: Card(
               child: InkWell(
-                onTap: isSelector
-                    ? () => Navigator.pop(context, content[index])
+                onTap: isSelector!
+                    ? () => Navigator.pop(context, content![index])
                     : null,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Icon(
-                      getContentIcon(content[index].content),
+                      getContentIcon(content![index].content),
                       color: Color.fromARGB(255, 152, 162, 201),
                     ),
                     FractionallySizedBox(
                       widthFactor: 0.8,
                       child: Text(
-                        Renderers.renderStorageContent(content[index]),
+                        Renderers.renderStorageContent(content![index]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Text(Renderers.formatSize(content[index].size))
+                    Text(Renderers.formatSize(content![index].size))
                   ],
                 ),
               ),
@@ -390,27 +390,27 @@ class FileSelectorContentView extends StatelessWidget {
     }
 
     return ListView.builder(
-      itemCount: content.length,
+      itemCount: content!.length,
       itemBuilder: (context, index) => Card(
         child: ListTile(
           leading: Icon(
-            getContentIcon(content[index].content),
+            getContentIcon(content![index].content),
             color: Color.fromARGB(255, 152, 162, 201),
           ),
           title: Text(
-            Renderers.renderStorageContent(content[index]),
+            Renderers.renderStorageContent(content![index]),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          trailing: Text(Renderers.formatSize(content[index].size)),
+          trailing: Text(Renderers.formatSize(content![index].size)),
           onTap:
-              isSelector ? () => Navigator.pop(context, content[index]) : null,
+              isSelector! ? () => Navigator.pop(context, content![index]) : null,
         ),
       ),
     );
   }
 
-  IconData getContentIcon(PveStorageContentType content) {
+  IconData getContentIcon(PveStorageContentType? content) {
     switch (content) {
       case PveStorageContentType.iso:
         return FontAwesomeIcons.compactDisc;

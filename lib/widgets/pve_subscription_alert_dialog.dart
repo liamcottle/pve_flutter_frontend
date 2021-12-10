@@ -15,7 +15,7 @@ class PveSubscriptionAlertDialog extends StatelessWidget {
             onPressed: () async {
               final url = 'https://www.proxmox.com/proxmox-ve/pricing';
               if (await canLaunch(url)) {
-                return await launch(url);
+                await launch(url);
               } else {
                 throw 'Could not launch $url';
               }

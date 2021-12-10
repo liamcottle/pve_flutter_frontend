@@ -16,8 +16,8 @@ class PveWelcome extends StatefulWidget {
 }
 
 class _PveWelcomeState extends State<PveWelcome> with TickerProviderStateMixin {
-  PageController _controller;
-  SharedPreferences _sharedPreferences;
+  PageController? _controller;
+  late SharedPreferences _sharedPreferences;
 
   final List<Widget> _pages = [
     PveWelcomePageLogo(),
@@ -38,7 +38,7 @@ class _PveWelcomeState extends State<PveWelcome> with TickerProviderStateMixin {
     _sharedPreferences = await SharedPreferences.getInstance();
   }
 
-  Future<void> _prefs;
+  Future<void>? _prefs;
 
   @override
   void initState() {
@@ -52,10 +52,10 @@ class _PveWelcomeState extends State<PveWelcome> with TickerProviderStateMixin {
       skipDone();
     }));
 
-    _controller.addListener(() {
+    _controller!.addListener(() {
       setState(() {
-        _isLast = _controller.page.floor() == _pages.length - 1;
-        _isFirst = _controller.page.floor() == 0;
+        _isLast = _controller!.page!.floor() == _pages.length - 1;
+        _isFirst = _controller!.page!.floor() == 0;
       });
     });
   }
@@ -83,8 +83,8 @@ class _PveWelcomeState extends State<PveWelcome> with TickerProviderStateMixin {
         textColor: _buttonTextColor,
         disabledTextColor: _buttonDisabledTextColor,
         onPressed: () {
-          _controller.nextPage(
-              duration: _pageChangeDuration, curve: _pageChangeCurve);
+          _controller!
+              .nextPage(duration: _pageChangeDuration, curve: _pageChangeCurve);
         },
       );
     }
@@ -110,7 +110,7 @@ class _PveWelcomeState extends State<PveWelcome> with TickerProviderStateMixin {
           "Prev",
         ),
         onPressed: () {
-          _controller.previousPage(
+          _controller!.previousPage(
               duration: _pageChangeDuration, curve: _pageChangeCurve);
         },
       );
@@ -144,10 +144,10 @@ class _PveWelcomeState extends State<PveWelcome> with TickerProviderStateMixin {
                       children: [
                         skipPrevButton(),
                         DotIndicator(
-                          controller: _controller,
+                          controller: _controller!,
                           itemCount: _pages.length,
-                          onPageSelected: (int page) {
-                            _controller.animateToPage(page,
+                          onPageSelected: (int? page) {
+                            _controller!.animateToPage(page ?? 0,
                                 duration: _pageChangeDuration,
                                 curve: _pageChangeCurve);
                           },

@@ -5,9 +5,9 @@ import 'package:pve_flutter_frontend/utils/utils.dart'
 
 class PveConsoleWidget extends StatelessWidget {
   static const routeName = '/console';
-  final String vmid;
+  final String? vmid;
   final String nodeid;
-  const PveConsoleWidget({Key key, this.vmid, @required this.nodeid})
+  const PveConsoleWidget({Key? key, this.vmid, required this.nodeid})
       : super(key: key);
 
   @override

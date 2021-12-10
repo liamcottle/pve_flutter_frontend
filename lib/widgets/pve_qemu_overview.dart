@@ -35,7 +35,7 @@ class PveQemuOverview extends StatelessWidget {
   static final routeName = RegExp(r"\/nodes\/(\S+)\/qemu\/(\d+)");
   final String guestID;
 
-  const PveQemuOverview({Key key, this.guestID}) : super(key: key);
+  const PveQemuOverview({Key? key, required this.guestID}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -232,21 +232,21 @@ class PveQemuOverview extends StatelessWidget {
                               subtitle: Text('SCSI Controller'),
                               dense: true,
                             ),
-                            for (var ide in config.ide)
+                            for (var ide in config.ide!)
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.compactDisc),
                                 title: Text(ide),
                                 subtitle: Text('CD/DVD Drive'),
                                 dense: true,
                               ),
-                            for (var scsi in config.scsi)
+                            for (var scsi in config.scsi!)
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.hdd),
                                 title: Text(scsi),
                                 subtitle: Text('Hard Disk'),
                                 dense: true,
                               ),
-                            for (var net in config.net)
+                            for (var net in config.net!)
                               ListTile(
                                 leading: Icon(FontAwesomeIcons.ethernet),
                                 dense: true,
@@ -370,7 +370,7 @@ class PveQemuOverview extends StatelessWidget {
     );
   }
 
-  Future<T> showPowerMenuBottomSheet<T>(
+  Future<T?> showPowerMenuBottomSheet<T>(
       BuildContext context, PveQemuOverviewBloc qemuBloc) async {
     return showModalBottomSheet(
       shape: RoundedRectangleBorder(

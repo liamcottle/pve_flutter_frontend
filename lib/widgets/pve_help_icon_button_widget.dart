@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:pve_flutter_frontend/utils/utils.dart';
 
 class PveHelpIconButton extends StatelessWidget {
-  final String docPath;
+  final String? docPath;
 
   final Uri baseUrl;
 
   const PveHelpIconButton({
-    Key key,
-    @required this.baseUrl,
+    Key? key,
+    required this.baseUrl,
     this.docPath,
   }) : super(key: key);
 

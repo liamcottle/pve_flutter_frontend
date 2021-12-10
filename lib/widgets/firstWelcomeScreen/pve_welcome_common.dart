@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class PveQuestion extends StatelessWidget {
-  final String text;
+  final String? text;
 
   const PveQuestion({
-    Key key,
+    Key? key,
     this.text,
   }) : super(key: key);
 
@@ -13,7 +13,7 @@ class PveQuestion extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.fromLTRB(10.0, 10.0, 5.0, 0.0),
       child: Text(
-        text,
+        text!,
         style: TextStyle(
           fontWeight: FontWeight.bold,
         ),
@@ -24,11 +24,11 @@ class PveQuestion extends StatelessWidget {
 
 class PveAnswer extends StatelessWidget {
   final String text;
-  final List<TextSpan> spans;
+  final List<TextSpan>? spans;
 
   const PveAnswer({
-    Key key,
-    this.text,
+    Key? key,
+    required this.text,
     this.spans,
   }) : super(key: key);
 
@@ -48,9 +48,9 @@ class PveAnswer extends StatelessWidget {
 }
 
 class PveWelcomePageContent extends StatelessWidget {
-  final Widget child;
+  final Widget? child;
   const PveWelcomePageContent({
-    Key key,
+    Key? key,
     this.child,
   }) : super(key: key);
 

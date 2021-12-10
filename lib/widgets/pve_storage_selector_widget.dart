@@ -8,11 +8,11 @@ import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 
 class PveStorageSelectorDropdown extends StatelessWidget {
-  final String labelText;
-  final PveStorageSelectorBloc sBloc;
+  final String? labelText;
+  final PveStorageSelectorBloc? sBloc;
   final bool allowBlank;
   const PveStorageSelectorDropdown({
-    Key key,
+    Key? key,
     this.labelText,
     this.sBloc,
     this.allowBlank = true,
@@ -32,7 +32,7 @@ class PveStorageSelectorDropdown extends StatelessWidget {
             helperText: ' ',
           ),
           items: <DropdownMenuItem<PveNodesStorageModel>>[
-            for (var storage in state?.storages)
+            for (var storage in state.storages)
               DropdownMenuItem(
                 child: ListTile(
                   title: Text(storage.id),
@@ -61,14 +61,14 @@ class PveStorageSelectorDropdown extends StatelessWidget {
                 value: storage,
               )
           ],
-          onChanged: (PveNodesStorageModel selectedStorage) =>
+          onChanged: (PveNodesStorageModel? selectedStorage) =>
               _pveStorageSelectorBloc.events
                   .add(StorageSelectedEvent(storage: selectedStorage)),
           selectedItemBuilder: (context) =>
               state.storages.map((item) => Text(item.id)).toList(),
           value: state.selected,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          validator: (value) {
+          validator: (dynamic value) {
             if (state.errorMessage.isNotEmpty) {
               return state.errorMessage;
             }

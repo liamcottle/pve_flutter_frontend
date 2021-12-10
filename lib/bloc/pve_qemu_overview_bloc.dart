@@ -10,14 +10,14 @@ class PveQemuOverviewBloc
   final ProxmoxApiClient apiClient;
   final String guestID;
   final PveQemuOverviewState init;
-  Timer updateTimer;
+  Timer? updateTimer;
 
   PveQemuOverviewState get initialState => init;
 
   PveQemuOverviewBloc({
-    @required this.guestID,
-    @required this.apiClient,
-    @required this.init,
+    required this.guestID,
+    required this.apiClient,
+    required this.init,
   });
 
   @override
@@ -38,10 +38,10 @@ class PveQemuOverviewBloc
     if (event is UpdateQemuStatus) {
       final status =
           await apiClient.getQemuStatusCurrent(latestState.nodeID, guestID);
-      yield latestState.rebuild((b) => b..currentStatus.replace(status));
+      yield latestState.rebuild((b) => b..currentStatus.replace(status!));
       final config = await apiClient.getQemuConfig(latestState.nodeID, guestID,
           current: true);
-      yield latestState.rebuild((b) => b..config.replace(config));
+      yield latestState.rebuild((b) => b..config.replace(config!));
       final rrdData = await _preProcessRRDdata();
       yield latestState.rebuild((b) => b..rrdData.replace(rrdData));
     }
@@ -67,7 +67,7 @@ class PveQemuOverviewBloc
 
     if (event is UpdateQemuConfigBool) {
       final node = latestState.nodeID;
-      final digest = latestState.config.digest;
+      final digest = latestState.config!.digest!;
 
       try {
         (await apiClient.putRequest('/nodes/$node/qemu/$guestID/config',
@@ -82,7 +82,7 @@ class PveQemuOverviewBloc
 
     if (event is RevertPendingQemuConfig) {
       final node = latestState.nodeID;
-      final digest = latestState.config.digest;
+      final digest = latestState.config!.digest!;
       try {
         (await apiClient.putRequest('/nodes/$node/qemu/$guestID/config',
                 {'revert': event.cField, 'digest': digest}))
@@ -99,7 +99,7 @@ class PveQemuOverviewBloc
     final rrddata = (await apiClient.getNodeQemuRRDdata(
             latestState.nodeID, guestID, PveRRDTimeframeType.hour))
         .map((element) => element.cpu != null
-            ? element.rebuild((e) => e..cpu = e.cpu * 100)
+            ? element.rebuild((e) => e..cpu = e.cpu! * 100)
             : element)
         .toList();
     return rrddata;
@@ -118,7 +118,7 @@ class PerformQemuAction extends PveQemuOverviewEvent {
 
 class Migration extends PveQemuOverviewEvent {
   final bool inProgress;
-  final String newNodeID;
+  final String? newNodeID;
 
   Migration(this.inProgress, this.newNodeID);
 }

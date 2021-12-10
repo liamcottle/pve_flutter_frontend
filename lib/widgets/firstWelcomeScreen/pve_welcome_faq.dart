@@ -6,7 +6,7 @@ import 'package:pve_flutter_frontend/utils/promox_colors.dart';
 // FAQ
 class PveWelcomePageFAQ extends StatelessWidget {
   const PveWelcomePageFAQ({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

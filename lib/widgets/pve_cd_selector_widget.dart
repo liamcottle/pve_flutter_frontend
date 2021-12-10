@@ -20,7 +20,7 @@ class PveCdSelector extends StatelessWidget {
         initialData: cdBloc.state.value,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final state = snapshot.data;
+            final state = snapshot.data!;
             return Column(children: [
               RadioListTile<CdType>(
                 title: const Text('Use CD/DVD disc image file (iso)'),
@@ -32,11 +32,11 @@ class PveCdSelector extends StatelessWidget {
                 OutlineButton(
                   borderSide:
                       state.hasError ? BorderSide(color: Colors.red) : null,
-                  child: Text((state.file == null || state.file.isEmpty)
+                  child: Text((state.file == null || state.file!.isEmpty)
                       ? "Choose File"
-                      : state.file),
+                      : state.file!),
                   onPressed: () async {
-                    final PveNodesStorageContentModel file = await showDialog(
+                    final PveNodesStorageContentModel? file = await showDialog(
                         context: context,
                         builder: (context) => PveFileSelector(
                               fBloc: PveFileSelectorBloc(

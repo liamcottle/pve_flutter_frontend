@@ -5,9 +5,9 @@ import 'package:pve_flutter_frontend/states/pve_lxc_overview_state.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart';
 
 class PveLxcPowerSettings extends StatelessWidget {
-  final PveLxcOverviewBloc lxcBloc;
+  final PveLxcOverviewBloc? lxcBloc;
 
-  const PveLxcPowerSettings({Key key, this.lxcBloc}) : super(key: key);
+  const PveLxcPowerSettings({Key? key, this.lxcBloc}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return ProxmoxStreamBuilder<PveLxcOverviewBloc, PveLxcOverviewState>(
@@ -32,7 +32,7 @@ class PveLxcPowerSettings extends StatelessWidget {
                     ),
                     subtitle: Text("Turn on LXC container"),
                     onTap: () => action(
-                        context, PveClusterResourceAction.start, lxcBloc),
+                        context, PveClusterResourceAction.start, lxcBloc!),
                   ),
                 if (!disableShutdown) ...[
                   ListTile(
@@ -43,7 +43,7 @@ class PveLxcPowerSettings extends StatelessWidget {
                     ),
                     subtitle: Text("Turn off LXC container"),
                     onTap: () => action(
-                        context, PveClusterResourceAction.shutdown, lxcBloc),
+                        context, PveClusterResourceAction.shutdown, lxcBloc!),
                   ),
                   ListTile(
                     leading: Icon(Icons.loop),
@@ -53,7 +53,7 @@ class PveLxcPowerSettings extends StatelessWidget {
                     ),
                     subtitle: Text("Reboot LXC container"),
                     onTap: () => action(
-                        context, PveClusterResourceAction.reboot, lxcBloc),
+                        context, PveClusterResourceAction.reboot, lxcBloc!),
                   ),
                   ListTile(
                     leading: Icon(Icons.stop),
@@ -63,7 +63,7 @@ class PveLxcPowerSettings extends StatelessWidget {
                     ),
                     subtitle: Text("Stop LXC container"),
                     onTap: () =>
-                        action(context, PveClusterResourceAction.stop, lxcBloc),
+                        action(context, PveClusterResourceAction.stop, lxcBloc!),
                   ),
                 ]
               ],

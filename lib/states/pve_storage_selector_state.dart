@@ -14,12 +14,9 @@ abstract class PveStorageSelectorState
   bool get filterActive;
   String get nodeID;
 
-  @nullable
-  String get storage;
-  @nullable
-  PveNodesStorageModel get selected;
-  @nullable
-  PveStorageContentType get content;
+  String? get storage;
+  PveNodesStorageModel? get selected;
+  PveStorageContentType? get content;
 
   PveStorageSelectorState._();
 
@@ -28,7 +25,7 @@ abstract class PveStorageSelectorState
       _$PveStorageSelectorState;
 
   factory PveStorageSelectorState.init({
-    String nodeID = 'localhost',
+    String? nodeID = 'localhost',
   }) =>
       PveStorageSelectorState((b) => b
         //base

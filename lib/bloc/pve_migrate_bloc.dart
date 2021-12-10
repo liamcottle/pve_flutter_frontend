@@ -11,7 +11,7 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
   final String guestID;
   final PveMigrateState init;
   PveMigrateBloc(
-      {@required this.apiClient, @required this.guestID, @required this.init});
+      {required this.apiClient, required this.guestID, required this.init});
 
   @override
   PveMigrateState get initialState => init;
@@ -31,7 +31,7 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
 
       if (latestState.guestType == 'lxc') {
         final status =
-            await apiClient.getLxcStatusCurrent(latestState.nodeID, guestID);
+            await (apiClient.getLxcStatusCurrent(latestState.nodeID, guestID) as FutureOr<PveNodesLxcStatusModel>);
         final running = status.getLxcStatus() == PveResourceStatusType.running;
         yield latestState.rebuild((b) => b
           ..lxcPreconditions
@@ -40,7 +40,7 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
     }
     if (event is StartMigration) {
       if (latestState.targetNodeID == null ||
-          latestState.targetNodeID.isEmpty) {
+          latestState.targetNodeID!.isEmpty) {
         yield* showError("Target is mandatory");
         return;
       }
@@ -55,7 +55,7 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
           final online = latestState.mode == PveMigrationMode.online;
 
           final mtask = await apiClient.qemuMigrate(
-              latestState.nodeID, guestID, latestState.targetNodeID,
+              latestState.nodeID, guestID, latestState.targetNodeID!,
               online: online);
           yield PveMigrateState.init(latestState.nodeID, latestState.guestType)
               .rebuild((b) => b..taskUPID = mtask);
@@ -68,7 +68,7 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
         try {
           final restart = latestState.mode == PveMigrationMode.restart;
           final mtask = await apiClient.lxcMigrate(
-              latestState.nodeID, guestID, latestState.targetNodeID,
+              latestState.nodeID, guestID, latestState.targetNodeID!,
               restart: restart);
           yield PveMigrateState.init(latestState.nodeID, latestState.guestType)
               .rebuild((b) => b..taskUPID = mtask);
@@ -97,19 +97,19 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
   }
 
   Stream<PveMigrateState> checkQemuPreconditons() async* {
-    final qPreconditions = await apiClient.getMigratePreconditions(
+    final qPreconditions = await (apiClient.getMigratePreconditions(
       latestState.nodeID,
       guestID,
       migrationTarget: latestState.targetNodeID,
-    );
+    ) as FutureOr<PveNodesQemuMigrate>);
 
     var preconditions = <PveMigrateCondition>[];
 
-    qPreconditions.localDisks.forEach((d) {
+    qPreconditions.localDisks!.forEach((d) {
       var disk = d.asMap;
       if (disk['cdrom'] == 1) {
         if (disk['volid'].contains('vm-' + guestID + '-cloudinit')) {
-          if (qPreconditions.running) {
+          if (qPreconditions.running!) {
             preconditions.add(PveMigrateCondition((b) => b
               ..severity = PveMigrateSeverity.error
               ..message =
@@ -151,13 +151,13 @@ class UpdateMigrationStatus extends PveMigrateEvent {
 }
 
 class MigrationTargetChanged extends PveMigrateEvent {
-  final String targetNodeID;
+  final String? targetNodeID;
 
   MigrationTargetChanged(this.targetNodeID);
 }
 
 class SourceNodeChanged extends PveMigrateEvent {
-  final String nodeID;
+  final String? nodeID;
 
   SourceNodeChanged(this.nodeID);
 }

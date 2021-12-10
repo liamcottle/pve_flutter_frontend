@@ -4,19 +4,19 @@ import 'package:flutter/material.dart';
 
 class ProxmoxGaugeChartPainter extends CustomPainter {
   final num value;
-  final num maxValue;
+  final num? maxValue;
   final EdgeInsets padding;
   final double strokeWidth;
   final Color foreGroundColor;
   final Color backgroundGroundColor;
 
   ProxmoxGaugeChartPainter({
-    @required this.value,
-    @required this.maxValue,
+    required this.value,
+    required this.maxValue,
     this.padding = EdgeInsets.zero,
-    @required this.strokeWidth,
-    @required this.foreGroundColor,
-    @required this.backgroundGroundColor,
+    required this.strokeWidth,
+    required this.foreGroundColor,
+    required this.backgroundGroundColor,
   });
 
   @override
@@ -35,7 +35,7 @@ class ProxmoxGaugeChartPainter extends CustomPainter {
         height: size.width,
         width: size.width);
     canvas.drawArc(
-        circleRect, -pi, pi * (value / maxValue), false, foregroundPaint);
+        circleRect, -pi, pi * (value / maxValue!), false, foregroundPaint);
 
     canvas.drawArc(circleRect, -pi, pi, false, backgroundPaint);
   }
@@ -50,16 +50,16 @@ class ProxmoxGaugeChartPainter extends CustomPainter {
 }
 
 class ProxmoxGaugeChart extends StatefulWidget {
-  final double value;
-  final double maxValue;
+  final double? value;
+  final double? maxValue;
   final EdgeInsets padding;
-  final Widget info;
+  final Widget? info;
   final double strokeWidth;
   final Color foreGroundColor;
   final Color backgroundGroundColor;
 
   const ProxmoxGaugeChart({
-    Key key,
+    Key? key,
     this.value,
     this.maxValue,
     this.padding = const EdgeInsets.all(6.0),
@@ -74,9 +74,9 @@ class ProxmoxGaugeChart extends StatefulWidget {
 
 class _ProxmoxGaugeChartState extends State<ProxmoxGaugeChart>
     with TickerProviderStateMixin {
-  Animation<double> animation;
-  AnimationController controller;
-  Tween<double> _rotationTween;
+  late Animation<double> animation;
+  late AnimationController controller;
+  late Tween<double> _rotationTween;
 
   @override
   void initState() {
@@ -131,9 +131,9 @@ class _ProxmoxGaugeChartState extends State<ProxmoxGaugeChart>
           child: Align(
             alignment: Alignment.bottomCenter,
             child: AnimatedDefaultTextStyle(
-              style: Theme.of(context).textTheme.caption,
+              style: Theme.of(context).textTheme.caption!,
               duration: kThemeChangeDuration,
-              child: widget.info,
+              child: widget.info!,
             ),
           ),
         ),
@@ -149,14 +149,14 @@ class _ProxmoxGaugeChartState extends State<ProxmoxGaugeChart>
 }
 
 class ProxmoxGaugeChartListTile extends StatelessWidget {
-  final Widget title;
-  final Widget subtitle;
-  final Widget legend;
-  final num value;
-  final num maxValue;
+  final Widget? title;
+  final Widget? subtitle;
+  final Widget? legend;
+  final num? value;
+  final num? maxValue;
 
   const ProxmoxGaugeChartListTile({
-    Key key,
+    Key? key,
     this.title,
     this.subtitle,
     this.legend,
@@ -179,12 +179,12 @@ class ProxmoxGaugeChartListTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 AnimatedDefaultTextStyle(
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.subtitle1!,
                   duration: kThemeChangeDuration,
                   child: title ?? const SizedBox(),
                 ),
                 AnimatedDefaultTextStyle(
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.caption!,
                   duration: kThemeChangeDuration,
                   child: subtitle ?? const SizedBox(),
                 ),
@@ -195,8 +195,8 @@ class ProxmoxGaugeChartListTile extends StatelessWidget {
             width: 100,
             height: 50,
             child: ProxmoxGaugeChart(
-              value: value ?? 0.0,
-              maxValue: maxValue ?? 100.0,
+              value: value as double? ?? 0.0,
+              maxValue: maxValue as double? ?? 100.0,
               info: legend ?? const SizedBox(),
             ),
           )

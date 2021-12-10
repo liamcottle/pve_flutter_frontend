@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 class PveResourceDataCardWidget extends StatelessWidget {
   final bool showTitleTrailing;
   final bool expandable;
-  final Widget title;
-  final Widget titleTrailing;
-  final Widget subtitle;
+  final Widget? title;
+  final Widget? titleTrailing;
+  final Widget? subtitle;
   final EdgeInsets padding;
-  final List<Widget> children;
+  final List<Widget>? children;
 
   const PveResourceDataCardWidget({
-    Key key,
+    Key? key,
     this.showTitleTrailing = false,
     this.title,
     this.titleTrailing,
@@ -32,12 +32,12 @@ class PveResourceDataCardWidget extends StatelessWidget {
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    title,
-                    if (showTitleTrailing) titleTrailing,
+                    title!,
+                    if (showTitleTrailing) titleTrailing!,
                   ],
                 ),
                 subtitle: subtitle,
-                children: children,
+                children: children!,
               );
             }
             return Column(
@@ -47,8 +47,8 @@ class PveResourceDataCardWidget extends StatelessWidget {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      title,
-                      if (showTitleTrailing) titleTrailing,
+                      title!,
+                      if (showTitleTrailing) titleTrailing!,
                     ],
                   ),
                   subtitle: subtitle,
@@ -57,7 +57,7 @@ class PveResourceDataCardWidget extends StatelessWidget {
                   indent: 10,
                   endIndent: 10,
                 ),
-                ...children
+                ...children!
               ],
             );
           },

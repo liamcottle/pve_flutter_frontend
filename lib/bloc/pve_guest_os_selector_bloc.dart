@@ -39,12 +39,12 @@ class PveGuestOsSelectorBloc
   }
 }
 
-class PveGuestOsSelectorState extends PveFormFieldState<OSType> {
-  PveGuestOsSelectorState({OSType value, String errorText})
+class PveGuestOsSelectorState extends PveFormFieldState<OSType?> {
+  PveGuestOsSelectorState({OSType? value, String? errorText})
       : super(value: value, errorText: errorText);
 
   PveGuestOsSelectorState copyWith(
-      {String os, OSType value, String errorText}) {
+      {String? os, OSType? value, String? errorText}) {
     return PveGuestOsSelectorState(
         value: value ?? this.value, errorText: errorText ?? this.errorText);
   }
@@ -53,7 +53,7 @@ class PveGuestOsSelectorState extends PveFormFieldState<OSType> {
 abstract class PveGuestOsSelectorEvent {}
 
 class ChangeOsType extends PveGuestOsSelectorEvent {
-  final OSType type;
+  final OSType? type;
 
   ChangeOsType(this.type);
 }

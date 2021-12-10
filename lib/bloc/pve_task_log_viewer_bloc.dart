@@ -12,10 +12,10 @@ class PveTaskLogViewerBloc
   @override
   PveTaskLogViewerState get initialState => init;
 
-  PveTaskLogViewerBloc({@required this.apiClient, @required this.init});
+  PveTaskLogViewerBloc({required this.apiClient, required this.init});
 
-  Timer updateStatus;
-  Timer updateLog;
+  Timer? updateStatus;
+  Timer? updateLog;
 
   @override
   void doOnListen() {
@@ -23,7 +23,7 @@ class PveTaskLogViewerBloc
       if (latestState.upid != null) {
         events.add(UpdateStatus());
         if (latestState.status?.status == PveTaskLogStatusType.stopped) {
-          updateStatus.cancel();
+          updateStatus!.cancel();
         }
       }
     });
@@ -32,7 +32,7 @@ class PveTaskLogViewerBloc
       if (latestState.upid != null) {
         events.add(UpdateLog());
         if (latestState.status?.status == PveTaskLogStatusType.stopped) {
-          updateLog.cancel();
+          updateLog!.cancel();
         }
       }
     });
@@ -57,18 +57,18 @@ class PveTaskLogViewerBloc
       yield latestState.rebuild((b) => b..isLoading = true);
 
       final taskStatus = await apiClient.getNodeTaskStatus(
-          latestState.nodeID, latestState.upid);
+          latestState.nodeID, latestState.upid!);
       yield latestState.rebuild((b) => b
-        ..status.replace(taskStatus)
+        ..status.replace(taskStatus!)
         ..isLoading = false);
     }
     if (event is UpdateLog) {
       yield latestState.rebuild((b) => b..isLoading = true);
 
       final taskLog = await apiClient
-          .getNodeTaskLog(latestState.nodeID, latestState.upid, limit: '1000');
+          .getNodeTaskLog(latestState.nodeID, latestState.upid!, limit: '1000');
       yield latestState.rebuild((b) => b
-        ..log.replace(taskLog)
+        ..log.replace(taskLog!)
         ..isLoading = false);
     }
   }
@@ -77,7 +77,7 @@ class PveTaskLogViewerBloc
 class PveTaskLogViewerEvent {}
 
 class SetTaskUPID extends PveTaskLogViewerEvent {
-  final String upid;
+  final String? upid;
 
   SetTaskUPID(this.upid);
 }

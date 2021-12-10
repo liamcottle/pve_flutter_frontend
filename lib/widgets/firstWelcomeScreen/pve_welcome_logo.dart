@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Big Logo
 class PveWelcomePageLogo extends StatelessWidget {
   const PveWelcomePageLogo({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

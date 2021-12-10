@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 
 class StatusChip extends StatelessWidget {
-  final PveResourceStatusType status;
+  final PveResourceStatusType? status;
   final double fontzsize;
   final FontWeight fontWeight;
   final Color offlineColor;
@@ -10,7 +10,7 @@ class StatusChip extends StatelessWidget {
 
   final Color onlineColor;
   const StatusChip({
-    Key key,
+    Key? key,
     this.status,
     this.fontzsize = 12,
     this.fontWeight = FontWeight.normal,

@@ -12,9 +12,9 @@ import 'package:pve_flutter_frontend/states/pve_resource_state.dart';
 /// and a view subscribes to it.
 class PveResourceBloc
     extends ProxmoxBaseBloc<PveResourceEvents, PveResourceState> {
-  ProxmoxApiClient apiClient;
+  ProxmoxApiClient? apiClient;
 
-  PveResourceBloc({this.apiClient, @required this.init});
+  PveResourceBloc({this.apiClient, required this.init});
 
   PveResourceState init;
 
@@ -29,7 +29,7 @@ class PveResourceBloc
   @override
   PveResourceState get initialState => init;
 
-  Timer updateTimer;
+  Timer? updateTimer;
 
   @override
   void doOnListen() {
@@ -49,15 +49,17 @@ class PveResourceBloc
   @override
   Stream<PveResourceState> processEvents(event) async* {
     if (event is PollResources) {
-      var resources = await apiClient.getResources();
-      resources.sort((a, b) => a.id.compareTo(b.id));
-      yield latestState.rebuild((b) => b..resources.replace(resources));
+      var resources = await apiClient?.getResources();
+      if (resources != null) {
+        resources.sort((a, b) => a.id.compareTo(b.id));
+        yield latestState.rebuild((b) => b..resources.replace(resources));
+      }
     }
 
     if (event is PerformActionOnResource) {
       final resource = event.resource;
-      await apiClient.doResourceAction(
-          resource.node, resource.id, resource.type, event.action);
+      await apiClient?.doResourceAction(
+          resource.node!, resource.id, resource.type, event.action);
     }
 
     if (event is FilterResources) {
@@ -87,12 +89,12 @@ abstract class PveResourceEvents {}
 class PollResources extends PveResourceEvents {}
 
 class FilterResources extends PveResourceEvents {
-  final BuiltSet<String> typeFilter;
-  final BuiltSet<String> subscriptionfilter;
-  final BuiltSet<String> nodeFilter;
-  final BuiltSet<String> poolFilter;
-  final BuiltSet<PveResourceStatusType> statusFilter;
-  final String nameFilter;
+  final BuiltSet<String>? typeFilter;
+  final BuiltSet<String>? subscriptionfilter;
+  final BuiltSet<String>? nodeFilter;
+  final BuiltSet<String>? poolFilter;
+  final BuiltSet<PveResourceStatusType>? statusFilter;
+  final String? nameFilter;
 
   FilterResources({
     this.typeFilter,

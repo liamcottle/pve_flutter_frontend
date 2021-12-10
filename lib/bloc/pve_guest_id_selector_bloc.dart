@@ -14,7 +14,7 @@ class PveGuestIdSelectorBloc
   @override
   GuestIdSelectorState get initialState => GuestIdSelectorState();
 
-  PveGuestIdSelectorBloc({@required this.apiClient});
+  PveGuestIdSelectorBloc({required this.apiClient});
 
   @override
   Stream<GuestIdSelectorState> eventPipe(
@@ -46,9 +46,9 @@ class PveGuestIdSelectorBloc
         final id = await apiClient.getNextFreeID(id: event.id);
         yield GuestIdSelectorState(value: id);
       } on ProxmoxApiException catch (e) {
-        if (e.details != null && e.details['vmid'] != null) {
+        if (e.details != null && e.details!['vmid'] != null) {
           yield GuestIdSelectorState(
-              value: event.id, errorText: e.details['vmid']);
+              value: event.id, errorText: e.details!['vmid']);
         }
       }
     }
@@ -65,7 +65,7 @@ class OnChanged extends PveGuestIdSelectorEvent {
   OnChanged(this.id);
 }
 
-class GuestIdSelectorState extends PveFormFieldState<String> {
-  GuestIdSelectorState({String value, String errorText})
+class GuestIdSelectorState extends PveFormFieldState<String?> {
+  GuestIdSelectorState({String? value, String? errorText})
       : super(value: value, errorText: errorText);
 }

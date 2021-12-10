@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
 class ProxmoxCapacityIndicator extends StatelessWidget {
-  final Icon icon;
+  final Icon? icon;
   final String totalValue;
   final String usedValue;
-  final double usedPercent;
-  final Color indicatorBackgroundColor;
-  final Color textColor;
-  final Animation<Color> valueColor;
+  final double? usedPercent;
+  final Color? indicatorBackgroundColor;
+  final Color? textColor;
+  final Animation<Color>? valueColor;
   final bool selected;
 
   const ProxmoxCapacityIndicator(
-      {Key key,
+      {Key? key,
       this.icon,
-      @required this.totalValue,
-      @required this.usedValue,
-      @required this.usedPercent,
+      required this.totalValue,
+      required this.usedValue,
+      required this.usedPercent,
       this.selected = false,
       this.indicatorBackgroundColor,
       this.textColor,
@@ -24,7 +24,7 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (usedPercent == null || usedPercent.isNaN || usedPercent.isInfinite) {
+    if (usedPercent == null || usedPercent!.isNaN || usedPercent!.isInfinite) {
       return Container();
     }
     return Theme(
@@ -47,17 +47,15 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
                   ),
                   Text(usedValue,
                       style: TextStyle(
-                          color: textColor ?? selected
-                              ? Colors.white
-                              : Colors.black,
+                          color: textColor ??
+                              (selected ? Colors.white : Colors.black),
                           fontWeight: FontWeight.bold)),
                 ],
               ),
               Text("Total: $totalValue",
                   style: TextStyle(
-                      color: textColor ?? selected
-                          ? Colors.white70
-                          : Colors.blueGrey[300],
+                      color: textColor ??
+                          (selected ? Colors.white70 : Colors.blueGrey[300]),
                       fontWeight: FontWeight.bold))
             ],
           ),
@@ -72,7 +70,7 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
     );
   }
 
-  AlwaysStoppedAnimation<Color> getUsageAwareColor(double usedPercent) {
+  AlwaysStoppedAnimation<Color>? getUsageAwareColor(double? usedPercent) {
     if (usedPercent == null) {
       return null;
     }

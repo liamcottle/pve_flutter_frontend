@@ -8,7 +8,7 @@ import 'package:rxdart/streams.dart' show ValueStreamExtensions;
 abstract class ProxmoxBaseBloc<E, S> {
   final PublishSubject<E> _eventSubject = PublishSubject<E>();
 
-  BehaviorSubject<S> _stateSubject;
+  late final BehaviorSubject<S> _stateSubject;
 
   StreamSink<E> get events => _eventSubject.sink;
 
@@ -19,7 +19,7 @@ abstract class ProxmoxBaseBloc<E, S> {
   S get latestState => _stateSubject.stream.value;
   S get initialState;
 
-  S penultimate;
+  S? penultimate;
 
   void doOnListen() {}
   void doOnCancel() {}
@@ -49,7 +49,7 @@ abstract class ProxmoxBaseBloc<E, S> {
     });
   }
 
-  void _errorHandler(Object error, [StackTrace stacktrace]) {
+  void _errorHandler(Object error, [StackTrace? stacktrace]) {
     ProxmoxGlobalErrorBloc().addError(error);
     print(error);
     print(stacktrace);
@@ -57,7 +57,7 @@ abstract class ProxmoxBaseBloc<E, S> {
 
   @mustCallSuper
   void dispose() {
-    _eventSubject?.close();
-    _stateSubject?.close();
+    _eventSubject.close();
+    _stateSubject.close();
   }
 }

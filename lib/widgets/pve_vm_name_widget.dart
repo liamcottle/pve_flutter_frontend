@@ -6,7 +6,7 @@ import 'package:pve_flutter_frontend/bloc/pve_vm_name_bloc.dart';
 class PveVmNameWidget extends StatelessWidget {
   final String labelText;
 
-  const PveVmNameWidget({Key key, this.labelText = 'Name'}) : super(key: key);
+  const PveVmNameWidget({Key? key, this.labelText = 'Name'}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final vBloc = Provider.of<PveVmNameBloc>(context);
@@ -17,7 +17,7 @@ class PveVmNameWidget extends StatelessWidget {
           final state = snapshot.data;
 
           return TextFormField(
-            key: state.value != null ? null : ValueKey(1),
+            key: state?.value != null ? null : ValueKey(1),
             decoration: InputDecoration(
               labelText: labelText,
               helperText: ' ',

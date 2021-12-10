@@ -12,7 +12,7 @@ class PveNodeSelectorBloc
   @override
   PveNodeSelectorState get initialState => init;
 
-  PveNodeSelectorBloc({@required this.apiClient, @required this.init});
+  PveNodeSelectorBloc({required this.apiClient, required this.init});
 
   @override
   Stream<PveNodeSelectorState> processEvents(
@@ -31,7 +31,7 @@ class PveNodeSelectorBloc
     }
 
     if (event is ExcludeOfflineNodes) {
-      yield latestState.rebuild((b) => b..onlineValidator = !b.onlineValidator);
+      yield latestState.rebuild((b) => b..onlineValidator = !b.onlineValidator!);
     }
 
     if (event is UpdateAllowedNodes) {
@@ -62,7 +62,7 @@ abstract class PveNodeSelectorEvent {}
 class LoadNodesEvent extends PveNodeSelectorEvent {}
 
 class NodeSelectedEvent extends PveNodeSelectorEvent {
-  final String nodeName;
+  final String? nodeName;
 
   NodeSelectedEvent(this.nodeName);
 }
@@ -76,7 +76,7 @@ class UpdateAllowedNodes extends PveNodeSelectorEvent {
 }
 
 class UpdateDisallowedNodes extends PveNodeSelectorEvent {
-  final Set<String> nodes;
+  final Set<String?> nodes;
 
   UpdateDisallowedNodes(this.nodes);
 }

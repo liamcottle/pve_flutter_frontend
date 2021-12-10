@@ -10,7 +10,7 @@ class Renderers {
     'p': 'Premium',
   };
 
-  static String formatSize(num size) {
+  static String formatSize(num? size) {
     if (size == null) {
       return 'NaN';
     }
@@ -29,10 +29,10 @@ class Renderers {
   }
 
   static String renderStorageContent(PveNodesStorageContentModel content) {
-    return content.volid.replaceAll(RegExp(r"^.*?:(.*?\/)?"), '');
+    return content.volid!.replaceAll(RegExp(r"^.*?:(.*?\/)?"), '');
   }
 
-  static IconData getDefaultResourceIcon(String type, {bool shared = false}) {
+  static IconData getDefaultResourceIcon(String type, {bool? shared = false}) {
     switch (type) {
       case "node":
         return Icons.storage;
@@ -42,7 +42,9 @@ class Renderers {
       case "lxc":
         return FontAwesomeIcons.cube;
       case "storage":
-        return shared ? Icons.folder_shared : FontAwesomeIcons.database;
+        return (shared ?? false)
+            ? Icons.folder_shared
+            : FontAwesomeIcons.database;
       case "pool":
         return Icons.label;
       default:
@@ -79,7 +81,8 @@ class Renderers {
     return icon;
   }
 
-  static String renderSupportLevel(String level) {
-    return supportLevelMap[level];
+  static String renderSupportLevel(String? level) {
+    var lvl = level ?? 'none';
+    return supportLevelMap[level!] ?? 'no support';
   }
 }

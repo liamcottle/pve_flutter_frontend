@@ -12,9 +12,9 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
   @override
   PveTaskLogState get initialState => init;
 
-  PveTaskLogBloc({@required this.apiClient, @required this.init});
+  PveTaskLogBloc({required this.apiClient, required this.init});
 
-  Timer updateTasks;
+  Timer? updateTasks;
 
   @override
   void doOnListen() {
@@ -51,7 +51,8 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
       if (latestState.limit >= latestState.tasks.length &&
           !latestState.isLoading) {
         final taskResponse = await getNodeTasks(latestState);
-        yield latestState.rebuild((b) => b..tasks.replace(taskResponse.tasks));
+        yield latestState
+            .rebuild((b) => b..tasks.replace(taskResponse!.tasks!));
       }
     }
 
@@ -63,7 +64,8 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
             await getNodeTasks(latestState, start: latestState.tasks.length);
 
         yield latestState.rebuild((b) => b
-          ..tasks.addAll(nodeTaskResponse.tasks)
+          ..tasks
+              .addAll(nodeTaskResponse!.tasks as Iterable<PveClusterTasksModel>)
           ..total = nodeTaskResponse.total
           ..isLoading = false);
       }
@@ -74,7 +76,7 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
     }
 
     if (event is FilterTasksByError) {
-      yield latestState.rebuild((b) => b..onlyErrors = !b.onlyErrors);
+      yield latestState.rebuild((b) => b..onlyErrors = !b.onlyErrors!);
     }
 
     if (event is FilterTasksByUser) {
@@ -90,11 +92,11 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
     }
   }
 
-  Future<NodeTasksResponse> getNodeTasks(PveTaskLogState state,
-      {int start, int limit = 50}) async {
+  Future<NodeTasksResponse?> getNodeTasks(PveTaskLogState state,
+      {int? start, int limit = 50}) async {
     return await apiClient.getNodeTasks(
       state.nodeID,
-      limit: limit?.toString(),
+      limit: limit.toString(),
       guestId: state.guestID,
       source: state.source,
       userfilter: state.userFilter,
@@ -123,7 +125,7 @@ class FilterTasksByGuestID extends PVETaskLogEvent {
   final String guestID;
 
   FilterTasksByGuestID({
-    @required this.guestID,
+    required this.guestID,
   });
 }
 
@@ -142,7 +144,7 @@ class FilterTasksByType extends PVETaskLogEvent {
 }
 
 class FilterTasksBySource extends PVETaskLogEvent {
-  final String source;
+  final String? source;
 
   FilterTasksBySource(this.source);
 }

@@ -8,16 +8,16 @@ import 'package:pve_flutter_frontend/states/pve_lxc_overview_state.dart';
 class PveLxcOverviewBloc
     extends ProxmoxBaseBloc<PveLxcOverviewEvent, PveLxcOverviewState> {
   final ProxmoxApiClient apiClient;
-  final String guestID;
+  late final String guestID;
   final PveLxcOverviewState init;
-  Timer updateTimer;
+  Timer? updateTimer;
 
   PveLxcOverviewState get initialState => init;
 
   PveLxcOverviewBloc({
-    @required this.guestID,
-    @required this.apiClient,
-    @required this.init,
+    required this.guestID,
+    required this.apiClient,
+    required this.init,
   });
 
   @override
@@ -37,11 +37,11 @@ class PveLxcOverviewBloc
     if (event is UpdateLxcStatus) {
       final status =
           await apiClient.getLxcStatusCurrent(latestState.nodeID, guestID);
-      yield latestState.rebuild((b) => b..currentStatus.replace(status));
+      yield latestState.rebuild((b) => b..currentStatus.replace(status!));
 
       final config = await apiClient.getLxcConfig(latestState.nodeID, guestID,
           current: true);
-      yield latestState.rebuild((b) => b..config.replace(config));
+      yield latestState.rebuild((b) => b..config.replace(config!));
 
       final rrdData = (await apiClient.getNodeQemuRRDdata(
           latestState.nodeID, guestID, PveRRDTimeframeType.hour));
@@ -63,7 +63,7 @@ class PveLxcOverviewBloc
     }
     if (event is UpdateLxcConfigBool) {
       final node = latestState.nodeID;
-      final digest = latestState.config.digest;
+      final digest = latestState.config!.digest!;
 
       try {
         (await apiClient.putRequest('/nodes/$node/lxc/$guestID/config',
@@ -78,7 +78,7 @@ class PveLxcOverviewBloc
 
     if (event is RevertPendingLxcConfig) {
       final node = latestState.nodeID;
-      final digest = latestState.config.digest;
+      final digest = latestState.config!.digest!;
       try {
         (await apiClient.putRequest('/nodes/$node/lxc/$guestID/config',
                 {'revert': event.cField, 'digest': digest}))
@@ -104,7 +104,7 @@ class PerformLxcAction extends PveLxcOverviewEvent {
 
 class Migration extends PveLxcOverviewEvent {
   final bool inProgress;
-  final String newNodeID;
+  final String? newNodeID;
 
   Migration(this.inProgress, this.newNodeID);
 }

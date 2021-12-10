@@ -11,8 +11,7 @@ abstract class PveNodeOverviewState
     with PveBaseState
     implements Built<PveNodeOverviewState, PveNodeOverviewStateBuilder> {
   // Fields
-  @nullable
-  PveNodeStatusModel get status;
+  PveNodeStatusModel? get status;
 
   BuiltList<PveNodeRRDDataModel> get rrdData;
   BuiltList<PveNodeServicesModel> get services;

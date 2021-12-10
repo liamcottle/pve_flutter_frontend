@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +18,7 @@ import 'package:pve_flutter_frontend/widgets/pve_storage_selector_widget.dart';
 class PveGuestBackupWidget extends StatelessWidget {
   final String guestID;
 
-  const PveGuestBackupWidget({Key key, @required this.guestID})
+  const PveGuestBackupWidget({Key? key, required this.guestID})
       : super(key: key);
 
   @override
@@ -99,7 +100,7 @@ class PveGuestBackupWidget extends StatelessWidget {
                 stream: fBloc.state,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    final state = snapshot.data;
+                    final state = snapshot.data!;
                     return Column(
                       children: <Widget>[
                         Row(
@@ -174,11 +175,11 @@ class PveGuestBackupWidget extends StatelessWidget {
 }
 
 class PveGuestBackupContent extends StatelessWidget {
-  final List<PveNodesStorageContentModel> content;
-  final bool storageSelected;
+  final List<PveNodesStorageContentModel>? content;
+  final bool? storageSelected;
 
   const PveGuestBackupContent({
-    Key key,
+    Key? key,
     this.content,
     this.storageSelected,
   }) : super(key: key);
@@ -192,20 +193,20 @@ class PveGuestBackupContent extends StatelessWidget {
       );
     }
 
-    if (content.isEmpty && storageSelected) {
+    if (content!.isEmpty && storageSelected!) {
       return Center(
         child: Text("no backup file found"),
       );
     }
 
-    if (content.isEmpty && !storageSelected) {
+    if (content!.isEmpty && !storageSelected!) {
       return Center(
         child: Text("please select storage"),
       );
     }
 
     return ListView.builder(
-      itemCount: content.length,
+      itemCount: content!.length,
       itemBuilder: (context, index) => Card(
         child: ListTile(
           leading: Icon(
@@ -213,23 +214,23 @@ class PveGuestBackupContent extends StatelessWidget {
             color: Color.fromARGB(255, 152, 162, 201),
           ),
           title: Text(
-            Renderers.renderStorageContent(content[index]),
+            Renderers.renderStorageContent(content![index]),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Row(
-            children: [Text(Renderers.formatSize(content[index].size))],
+            children: [Text(Renderers.formatSize(content![index].size))],
           ),
           trailing: Icon(Icons.more_vert),
           onTap: () => _createBackupOptionsSheet(
-              context, content[index].volid, content[index].size, fBloc),
+              context, content![index].volid, content![index].size, fBloc),
         ),
       ),
     );
   }
 
-  Future<T> _createBackupOptionsSheet<T>(BuildContext context, String volid,
-      int filesize, PveFileSelectorBloc fBloc) async {
+  Future<T?> _createBackupOptionsSheet<T>(BuildContext context, String? volid,
+      int? filesize, PveFileSelectorBloc fBloc) async {
     return await showModalBottomSheet(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
@@ -253,7 +254,7 @@ class PveGuestBackupContent extends StatelessWidget {
               ),
               ListTile(
                 title: Text("Selection:"),
-                subtitle: Text(volid),
+                subtitle: Text(volid!),
                 trailing: Text(Renderers.formatSize(filesize)),
               ),
               Expanded(
@@ -268,10 +269,11 @@ class PveGuestBackupContent extends StatelessWidget {
                     ),
                     OutlineButton.icon(
                       onPressed: () async {
-                        final guard = await _showConfirmDialog(
-                            context,
-                            'Attention',
-                            'Do you really want to delete this backup?');
+                        final guard = await (_showConfirmDialog(
+                                context,
+                                'Attention',
+                                'Do you really want to delete this backup?')
+                            as FutureOr<bool>);
                         if (guard) {
                           fBloc.events.add(DeleteFile(volid));
                           Navigator.of(context).pop();
@@ -296,7 +298,7 @@ class PveGuestBackupContent extends StatelessWidget {
     );
   }
 
-  Future<bool> _showConfirmDialog(
+  Future<bool?> _showConfirmDialog(
       BuildContext context, String title, String body) async {
     return await showDialog(
       context: context,
@@ -324,7 +326,7 @@ class PveGuestBackupContent extends StatelessWidget {
   }
 
   Future<void> _showConfigurationDialog(
-      BuildContext context, PveFileSelectorBloc fBloc, String volume) async {
+      BuildContext context, PveFileSelectorBloc fBloc, String? volume) async {
     return await showDialog(
       context: context,
       builder: (context) => PveConfigurationDialog(
@@ -339,25 +341,25 @@ class PveGuestBackupContent extends StatelessWidget {
 class PveConfigurationDialog extends StatefulWidget {
   final ProxmoxApiClient apiClient;
   final String targetNode;
-  final String volume;
+  final String? volume;
 
   const PveConfigurationDialog({
-    Key key,
-    @required this.apiClient,
-    @required this.targetNode,
-    @required this.volume,
+    Key? key,
+    required this.apiClient,
+    required this.targetNode,
+    required this.volume,
   }) : super(key: key);
   @override
   _PveConfigurationDialogState createState() => _PveConfigurationDialogState();
 }
 
 class _PveConfigurationDialogState extends State<PveConfigurationDialog> {
-  Future<String> configuration;
+  Future<String?>? configuration;
   @override
   void initState() {
     super.initState();
     configuration = widget.apiClient
-        .getNodesVZDumpExtractConfig(widget.targetNode, widget.volume);
+        .getNodesVZDumpExtractConfig(widget.targetNode, widget.volume!);
   }
 
   @override
@@ -368,7 +370,7 @@ class _PveConfigurationDialogState extends State<PveConfigurationDialog> {
         insetPadding: EdgeInsets.all(4),
         title: Text("Configuration"),
         content: snapshot.hasData
-            ? SingleChildScrollView(child: Text(snapshot.data))
+            ? SingleChildScrollView(child: Text(snapshot.data as String))
             : Center(
                 child: CircularProgressIndicator(),
               ),
@@ -390,7 +392,7 @@ class PveBackupForm extends StatefulWidget {
   final PveStorageSelectorBloc sBloc;
   final String guestID;
 
-  const PveBackupForm({Key key, @required this.sBloc, @required this.guestID})
+  const PveBackupForm({Key? key, required this.sBloc, required this.guestID})
       : super(key: key);
 
   @override
@@ -398,15 +400,15 @@ class PveBackupForm extends StatefulWidget {
 }
 
 class _PveBackupFormState extends State<PveBackupForm> {
-  PveVZDumpModeType mode = PveVZDumpModeType.suspend;
-  PveVZDumpCompressionType compression = PveVZDumpCompressionType.zstd;
+  PveVZDumpModeType? mode = PveVZDumpModeType.suspend;
+  PveVZDumpCompressionType? compression = PveVZDumpCompressionType.zstd;
   static const compTypes = [
     {'type': PveVZDumpCompressionType.none, 'name': 'none'},
     {'type': PveVZDumpCompressionType.gzip, 'name': 'GZIP (good)'},
     {'type': PveVZDumpCompressionType.lzo, 'name': 'LZO (fast)'},
     {'type': PveVZDumpCompressionType.zstd, 'name': 'ZSTD (fast & good)'}
   ];
-  TextEditingController emailToController;
+  TextEditingController? emailToController;
   bool enableSubmitButton = true;
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
@@ -435,7 +437,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
           child: Form(
             key: _formKey,
             onChanged: () {
-              final isValid = _formKey.currentState.validate();
+              final isValid = _formKey.currentState!.validate();
               setState(() {
                 enableSubmitButton = isValid;
               });
@@ -457,7 +459,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
                   controller: emailToController,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
-                    if (value.isNotEmpty && !Validators.isValidEmail(value)) {
+                    if (value!.isNotEmpty && !Validators.isValidEmail(value)) {
                       return 'Please enter valid email address';
                     }
                     return null;
@@ -467,7 +469,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
                     onPressed: enableSubmitButton
                         ? () {
                             //TODO remove when async validation is implemented
-                            if (!_formKey.currentState.validate()) {
+                            if (!_formKey.currentState!.validate()) {
                               setState(() {
                                 enableSubmitButton = false;
                               });
@@ -477,11 +479,11 @@ class _PveBackupFormState extends State<PveBackupForm> {
                             startBackup(
                               widget.sBloc.apiClient,
                               widget.sBloc.latestState.nodeID,
-                              widget.sBloc.latestState.selected.id,
+                              widget.sBloc.latestState.selected!.id,
                               widget.guestID,
                               compression,
-                              mode,
-                              mailTo: emailToController.text,
+                              mode!,
+                              mailTo: emailToController!.text,
                             );
                           }
                         : null,
@@ -498,28 +500,30 @@ class _PveBackupFormState extends State<PveBackupForm> {
     String node,
     String storage,
     String guestId,
-    PveVZDumpCompressionType compression,
+    PveVZDumpCompressionType? compression,
     PveVZDumpModeType mode, {
-    String mailTo,
+    String? mailTo,
   }) async {
     try {
-      final jobId = await apiClient.nodesVZDumpCreateBackup(
+      final jobId = await (apiClient.nodesVZDumpCreateBackup(
           node, storage, guestId,
-          compressionType: compression, mode: mode, mailTo: mailTo);
+          compressionType: compression,
+          mode: mode,
+          mailTo: mailTo) as FutureOr<String>);
 
       await showTaskLogBottomSheet(context, apiClient, node, jobId,
           icon: Icon(Icons.save), jobTitle: Text('Backup $guestId'));
       Navigator.of(context).pop();
     } on ProxmoxApiException catch (e) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
+      _scaffoldKey.currentState!.showSnackBar(SnackBar(
         content: Text(
-          e.message ?? "Error",
+          e.message,
           style: ThemeData.dark().textTheme.button,
         ),
         backgroundColor: ThemeData.dark().errorColor,
       ));
     } catch (e) {
-      _scaffoldKey.currentState.showSnackBar(
+      _scaffoldKey.currentState!.showSnackBar(
         SnackBar(
           content: Text(
             "Error: Could not start backup",
@@ -544,7 +548,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
             value: mode,
           )
       ],
-      onChanged: (PveVZDumpModeType selection) => setState(() {
+      onChanged: (PveVZDumpModeType? selection) => setState(() {
         mode = selection;
       }),
       value: mode,
@@ -561,11 +565,11 @@ class _PveBackupFormState extends State<PveBackupForm> {
       items: <DropdownMenuItem<PveVZDumpCompressionType>>[
         for (var comp in compTypes)
           DropdownMenuItem(
-            child: Text(comp['name']),
-            value: comp['type'],
+            child: Text(comp['name'] as String),
+            value: comp['type'] as PveVZDumpCompressionType?,
           )
       ],
-      onChanged: (PveVZDumpCompressionType selection) => setState(() {
+      onChanged: (PveVZDumpCompressionType? selection) => setState(() {
         compression = selection;
       }),
       value: compression,

@@ -10,17 +10,13 @@ abstract class PveFileSelectorState
     implements Built<PveFileSelectorState, PveFileSelectorStateBuilder> {
   // Fields
   BuiltList<PveNodesStorageContentModel> get content;
-  bool get gridView;
-  bool get search;
-  String get nodeID;
-  @nullable
-  String get volidFilter;
-  @nullable
-  String get storageID;
-  @nullable
-  PveStorageContentType get fileType;
-  @nullable
-  int get guestID;
+  /*late*/ bool get gridView;
+  /*late*/ bool get search;
+  /*late*/ String get nodeID;
+  String? get volidFilter;
+  String? get storageID;
+  PveStorageContentType? get fileType;
+  int? get guestID;
 
   PveFileSelectorState._();
 
@@ -29,7 +25,7 @@ abstract class PveFileSelectorState
       _$PveFileSelectorState;
 
   factory PveFileSelectorState.init({
-    String nodeID = 'localhost',
+    String? nodeID = 'localhost',
   }) =>
       PveFileSelectorState((b) => b
         //base

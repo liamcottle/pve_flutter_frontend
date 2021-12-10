@@ -5,12 +5,12 @@ import 'package:pve_flutter_frontend/widgets/proxmox_line_chart.dart';
 
 class ProxmoxHeartbeatIndicator extends StatelessWidget {
   final bool isHealthy;
-  final Color healthyColor;
-  final Color warningColor;
+  final Color? healthyColor;
+  final Color? warningColor;
 
   const ProxmoxHeartbeatIndicator({
-    Key key,
-    @required this.isHealthy,
+    Key? key,
+    required this.isHealthy,
     this.healthyColor,
     this.warningColor,
   }) : super(key: key);

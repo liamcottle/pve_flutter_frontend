@@ -10,7 +10,7 @@ class PveClusterStatusBloc
   final ProxmoxApiClient apiClient;
   final PveClusterStatusState init;
   PveClusterStatusState get initialState => init;
-  Timer updateTimer;
+  Timer? updateTimer;
 
   @override
   void doOnListen() {
@@ -25,7 +25,7 @@ class PveClusterStatusBloc
     }
   }
 
-  PveClusterStatusBloc({@required this.apiClient, @required this.init});
+  PveClusterStatusBloc({required this.apiClient, required this.init});
 
   Stream<PveClusterStatusState> processEvents(
       PveClusterStatusEvent event) async* {

@@ -13,14 +13,14 @@ class PveBridgeSelectorBloc
 
   String targetNode;
 
-  InterfaceType bridgeType;
+  InterfaceType? bridgeType;
 
   @override
   PveBridgeSelectorState get initialState =>
       PveBridgeSelectorState(bridges: [], selectedBridge: null, error: null);
 
   PveBridgeSelectorBloc({
-    @required this.apiClient,
+    required this.apiClient,
     this.targetNode = 'localhost',
     this.bridgeType,
   });
@@ -43,7 +43,7 @@ class PveBridgeSelectorBloc
 
       // to make sure it's the same object
       var selection =
-          bridges.where((item) => item.iface == event.bridge.iface).single;
+          bridges.where((item) => item.iface == event.bridge!.iface).single;
       yield PveBridgeSelectorState(bridges: bridges, selectedBridge: selection);
     }
 
@@ -81,7 +81,7 @@ class PveBridgeSelectorEvent {}
 class LoadBridgesEvent extends PveBridgeSelectorEvent {}
 
 class BridgeSelectedEvent extends PveBridgeSelectorEvent {
-  final PveNodeNetworkModel bridge;
+  final PveNodeNetworkModel? bridge;
 
   BridgeSelectedEvent(this.bridge);
 }
@@ -94,10 +94,10 @@ class ChangeTargetNode extends PveBridgeSelectorEvent {
 
 //STATES
 
-class PveBridgeSelectorState extends PveFormFieldState<PveNodeNetworkModel> {
-  final List<PveNodeNetworkModel> bridges;
+class PveBridgeSelectorState extends PveFormFieldState<PveNodeNetworkModel?> {
+  final List<PveNodeNetworkModel>? bridges;
 
   PveBridgeSelectorState(
-      {this.bridges, PveNodeNetworkModel selectedBridge, String error})
+      {this.bridges, PveNodeNetworkModel? selectedBridge, String? error})
       : super(value: selectedBridge, errorText: error);
 }

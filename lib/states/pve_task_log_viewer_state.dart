@@ -10,19 +10,16 @@ abstract class PveTaskLogViewerState
   // Fields
   String get nodeID;
 
-  @nullable
-  String get upid;
-  @nullable
-  PveTaskLogResponse get log;
-  @nullable
-  PveTaskLogStatus get status;
+  String? get upid;
+  PveTaskLogResponse? get log;
+  PveTaskLogStatus? get status;
   PveTaskLogViewerState._();
 
   factory PveTaskLogViewerState(
           [void Function(PveTaskLogViewerStateBuilder) updates]) =
       _$PveTaskLogViewerState;
 
-  factory PveTaskLogViewerState.init(String nodeID, {String upid}) =>
+  factory PveTaskLogViewerState.init(String nodeID, {String? upid}) =>
       PveTaskLogViewerState((b) => b
         //base
         ..errorMessage = ''

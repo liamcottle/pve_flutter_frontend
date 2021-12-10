@@ -21,8 +21,8 @@ class PveGuestOsSelector extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          getIcon(gBloc.osChoices[choice]['type']),
-                          Text(gBloc.osChoices[choice]['desc']),
+                          getIcon(gBloc.osChoices[choice]!['type']),
+                          Text(gBloc.osChoices[choice]!['desc']!),
                         ],
                       ),
                     ))
@@ -37,7 +37,7 @@ class PveGuestOsSelector extends StatelessWidget {
         });
   }
 
-  Widget getIcon(String osGroup) {
+  Widget getIcon(String? osGroup) {
     if (osGroup == "Microsoft Windows") {
       return Icon(FontAwesomeIcons.windows);
     }
@@ -46,6 +46,6 @@ class PveGuestOsSelector extends StatelessWidget {
       return Icon(FontAwesomeIcons.linux);
     }
 
-    return Text(osGroup);
+    return Text(osGroup!);
   }
 }

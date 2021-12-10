@@ -4,23 +4,23 @@ import 'package:pve_flutter_frontend/utils/renderers.dart';
 
 class PveGuestIcon extends StatelessWidget {
   final String type;
-  final bool template;
-  final PveResourceStatusType status;
+  final bool? template;
+  final PveResourceStatusType? status;
   final Color color;
   final Color templateColor;
 
   const PveGuestIcon({
-    Key key,
-    @required this.type,
+    Key? key,
+    required this.type,
     this.template = false,
-    @required this.status,
+    required this.status,
     this.color = Colors.grey,
     this.templateColor = Colors.black,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (template) {
+    if (template!) {
       return Container(
         height: 24,
         width: 36,

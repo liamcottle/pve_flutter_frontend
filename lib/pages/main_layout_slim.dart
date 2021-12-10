@@ -188,10 +188,11 @@ class MobileDashboard extends StatelessWidget {
         automaticallyImplyLeading: false,
         actions: <Widget>[
           PveHelpIconButton(
-              baseUrl: Provider.of<PveResourceBloc>(context)
-                  .apiClient
-                  .credentials
-                  .apiBaseUrl,
+              baseUrl: (Provider.of<PveResourceBloc>(context)
+                      .apiClient
+                      ?.credentials
+                      ?.apiBaseUrl) ??
+                  Uri.parse('https://pve.proxmox.com'),
               docPath: 'index.html'),
         ],
       ),
@@ -406,7 +407,7 @@ class MobileDashboard extends StatelessWidget {
                         children: <Widget>[
                           ListTile(
                             title: Text("Virtual Machines"),
-                            trailing: Text(totalVMs.toString() ?? '?'),
+                            trailing: Text(totalVMs.toString()),
                             leading:
                                 Icon(Renderers.getDefaultResourceIcon('qemu')),
                             onTap: () {
@@ -472,7 +473,7 @@ class MobileDashboard extends StatelessWidget {
                           ),
                           ListTile(
                             title: Text("LXC Container"),
-                            trailing: Text(totalCTs.toString() ?? '?'),
+                            trailing: Text(totalCTs.toString()),
                             leading:
                                 Icon(Renderers.getDefaultResourceIcon('lxc')),
                             onTap: () {
@@ -547,15 +548,15 @@ class MobileDashboard extends StatelessWidget {
 
 class PveNodeListTile extends StatelessWidget {
   final String name;
-  final bool online;
+  final bool? online;
   final String type;
-  final String level;
-  final String ip;
+  final String? level;
+  final String? ip;
   const PveNodeListTile(
-      {Key key,
-      @required this.name,
-      @required this.online,
-      @required this.type,
+      {Key? key,
+      required this.name,
+      @required this.online = false,
+      required this.type,
       this.level,
       this.ip = ''})
       : super(key: key);
@@ -565,19 +566,16 @@ class PveNodeListTile extends StatelessWidget {
       leading: Icon(
         Renderers.getDefaultResourceIcon(type),
       ),
-      title: Text(name ?? "unkown"),
-      subtitle: Text(getNodeTileSubtitle(online, level, ip)),
-      trailing: Icon(Icons.power, color: online ? Colors.green : Colors.grey),
+      title: Text(name),
+      subtitle: Text(getNodeTileSubtitle(online!, level, ip)),
+      trailing: Icon(Icons.power, color: online! ? Colors.green : Colors.grey),
       onTap: () => Navigator.pushNamed(context, '/nodes/$name'),
     );
   }
 
-  String getNodeTileSubtitle(bool online, String level, String ip) {
+  String getNodeTileSubtitle(bool online, String? level, String? ip) {
     if (online) {
-      if (level != null && level.isNotEmpty) {
-        return '$ip - ' + Renderers.renderSupportLevel(level);
-      }
-      return '$ip - no support';
+      return '$ip - ' + Renderers.renderSupportLevel(level);
     }
     return 'offline';
   }
@@ -618,7 +616,7 @@ class MobileResourceOverview extends StatelessWidget {
                 }
                 if (resource.type == 'node') {
                   listWidget = PveNodeListTile(
-                    name: resource.node,
+                    name: resource.node!,
                     online:
                         resource.getStatus() == PveResourceStatusType.running,
                     type: resource.type,
@@ -677,8 +675,8 @@ class MobileResourceOverview extends StatelessWidget {
 
 class PveGuestListTile extends StatelessWidget {
   const PveGuestListTile({
-    Key key,
-    @required this.resource,
+    Key? key,
+    required this.resource,
   }) : super(key: key);
 
   final PveClusterResourcesModel resource;
@@ -697,7 +695,7 @@ class PveGuestListTile extends StatelessWidget {
       subtitle: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(resource.node),
+          Text(resource.node!),
           StatusChip(
             status: status,
             fontzsize: 12,
@@ -716,8 +714,8 @@ class PveGuestListTile extends StatelessWidget {
 
 class PveStorageListeTile extends StatelessWidget {
   const PveStorageListeTile({
-    Key key,
-    @required this.resource,
+    Key? key,
+    required this.resource,
   }) : super(key: key);
 
   final PveClusterResourcesModel resource;
@@ -734,7 +732,7 @@ class PveStorageListeTile extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(resource.node),
+              Text(resource.node!),
               StatusChip(
                 status: resource.getStatus(),
                 fontzsize: 12,
@@ -775,15 +773,15 @@ class PveStorageListeTile extends StatelessWidget {
 }
 
 class AppbarSearchTextField extends StatefulWidget {
-  final ValueChanged<String> onChanged;
+  final ValueChanged<String>? onChanged;
 
-  const AppbarSearchTextField({Key key, this.onChanged}) : super(key: key);
+  const AppbarSearchTextField({Key? key, this.onChanged}) : super(key: key);
   @override
   _AppbarSearchTextFieldState createState() => _AppbarSearchTextFieldState();
 }
 
 class _AppbarSearchTextFieldState extends State<AppbarSearchTextField> {
-  TextEditingController _controller;
+  TextEditingController? _controller;
 
   void initState() {
     super.initState();
@@ -791,7 +789,7 @@ class _AppbarSearchTextFieldState extends State<AppbarSearchTextField> {
   }
 
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -803,14 +801,14 @@ class _AppbarSearchTextFieldState extends State<AppbarSearchTextField> {
             Icons.search,
             size: 20,
           ),
-          suffixIcon: _controller.text.isNotEmpty
+          suffixIcon: _controller!.text.isNotEmpty
               ? IconButton(
                   padding: EdgeInsets.zero,
                   iconSize: 20,
                   icon: Icon(Icons.close),
                   onPressed: () {
-                    _controller.clear();
-                    widget.onChanged('');
+                    _controller!.clear();
+                    widget.onChanged!('');
                     FocusScope.of(context).unfocus();
                   },
                 )
@@ -824,7 +822,7 @@ class _AppbarSearchTextFieldState extends State<AppbarSearchTextField> {
           enabledBorder:
               OutlineInputBorder(borderSide: BorderSide(color: Colors.white))),
       style: TextStyle(fontSize: 20),
-      onChanged: (value) => widget.onChanged(value),
+      onChanged: (value) => widget.onChanged!(value),
       controller: _controller,
     );
   }
@@ -885,7 +883,7 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       ),
                       value: state.typeFilter.contains('node'),
                       onChanged: (v) => rBloc.events.add(FilterResources(
-                        typeFilter: addOrRemove(v, 'node', state.typeFilter),
+                        typeFilter: addOrRemove(v!, 'node', state.typeFilter),
                       )),
                     ),
                     CheckboxListTile(
@@ -896,7 +894,7 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       ),
                       value: state.typeFilter.contains('qemu'),
                       onChanged: (v) => rBloc.events.add(FilterResources(
-                        typeFilter: addOrRemove(v, 'qemu', state.typeFilter),
+                        typeFilter: addOrRemove(v!, 'qemu', state.typeFilter),
                       )),
                     ),
                     CheckboxListTile(
@@ -907,7 +905,7 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       ),
                       value: state.typeFilter.contains('lxc'),
                       onChanged: (v) => rBloc.events.add(FilterResources(
-                        typeFilter: addOrRemove(v, 'lxc', state.typeFilter),
+                        typeFilter: addOrRemove(v!, 'lxc', state.typeFilter),
                       )),
                     ),
                     CheckboxListTile(
@@ -918,7 +916,8 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       ),
                       value: state.typeFilter.contains('storage'),
                       onChanged: (v) => rBloc.events.add(FilterResources(
-                        typeFilter: addOrRemove(v, 'storage', state.typeFilter),
+                        typeFilter:
+                            addOrRemove(v!, 'storage', state.typeFilter),
                       )),
                     ),
                   ],
@@ -944,7 +943,7 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       value: state.statusFilter
                           .contains(PveResourceStatusType.running),
                       onChanged: (v) => rBloc.events.add(FilterResources(
-                        statusFilter: addOrRemove(v,
+                        statusFilter: addOrRemove(v!,
                             PveResourceStatusType.running, state.statusFilter),
                       )),
                     ),
@@ -957,7 +956,7 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       value: state.statusFilter
                           .contains(PveResourceStatusType.stopped),
                       onChanged: (v) => rBloc.events.add(FilterResources(
-                        statusFilter: addOrRemove(v,
+                        statusFilter: addOrRemove(v!,
                             PveResourceStatusType.stopped, state.statusFilter),
                       )),
                     ),
@@ -1062,7 +1061,7 @@ class MobileAccessManagement extends StatelessWidget {
                       final token = aState.tokens[index];
                       var expireDate = 'infinite';
                       if (token.expire != null) {
-                        expireDate = DateFormat.yMd().format(token.expire);
+                        expireDate = DateFormat.yMd().format(token.expire!);
                       }
 
                       return ListTile(
@@ -1074,8 +1073,9 @@ class MobileAccessManagement extends StatelessWidget {
                     itemCount: aState.groups.length,
                     itemBuilder: (context, index) {
                       final group = aState.groups[index];
-                      final users =
-                          group.users.isNotEmpty ? group.users.split(',') : [];
+                      final users = (group.users?.isNotEmpty ?? false)
+                          ? group.users!.split(',')
+                          : [];
                       return ListTile(
                         title: Text(group.groupid),
                         subtitle: Text(group.comment ?? ''),
@@ -1133,8 +1133,9 @@ class MobileAccessManagement extends StatelessWidget {
                       final perms = role.privs.split(',');
                       return ListTile(
                         title: Text(role.roleid),
-                        subtitle:
-                            Text(role.special ? 'Built in Role' : 'Custom'),
+                        subtitle: Text((role.special ?? false)
+                            ? 'Built in Role'
+                            : 'Custom'),
                         trailing: Icon(Icons.arrow_right),
                         onTap: () => showModalBottomSheet(
                           shape: RoundedRectangleBorder(

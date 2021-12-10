@@ -10,10 +10,10 @@ class PveTaskExpansionTile extends StatefulWidget {
   final Color errorColor;
   final Color headerColor;
   final Color headerColorExpanded;
-  final Widget showMorePage;
+  final Widget? showMorePage;
   const PveTaskExpansionTile({
-    Key key,
-    @required this.task,
+    Key? key,
+    required this.task,
     this.showMorePage,
     this.errorColor = Colors.orange,
     this.headerColor = Colors.black,
@@ -27,7 +27,7 @@ class PveTaskExpansionTile extends StatefulWidget {
 }
 
 class _PveTaskExpansionTileState extends State<PveTaskExpansionTile> {
-  bool isExpanded;
+  late bool isExpanded;
   @override
   void initState() {
     super.initState();
@@ -42,7 +42,7 @@ class _PveTaskExpansionTileState extends State<PveTaskExpansionTile> {
     final taskLogBloc = Provider.of<PveTaskLogBloc>(context);
     var duration;
     if (isFinished) {
-      duration = widget.task.endTime.difference(widget.task.startTime);
+      duration = widget.task.endTime!.difference(widget.task.startTime);
     }
     final headerColor =
         isExpanded ? widget.headerColorExpanded : widget.headerColor;
@@ -63,7 +63,7 @@ class _PveTaskExpansionTileState extends State<PveTaskExpansionTile> {
         style: TextStyle(color: headerColor),
       ),
       subtitle: isFinished
-          ? Text(DateFormat.Md().add_Hms().format(widget.task.endTime),
+          ? Text(DateFormat.Md().add_Hms().format(widget.task.endTime!),
               style: TextStyle(color: headerColor))
           : LinearProgressIndicator(
               backgroundColor: headerColor.withOpacity(0.5),
@@ -121,9 +121,9 @@ class _PveTaskExpansionTileState extends State<PveTaskExpansionTile> {
     );
   }
 
-  Route _createTaskLogRoute(PveTaskLogBloc bloc, Widget page) {
+  Route _createTaskLogRoute(PveTaskLogBloc bloc, Widget? page) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
+      pageBuilder: (context, animation, secondaryAnimation) => page!,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return ScaleTransition(
           scale: Tween<double>(

@@ -5,24 +5,24 @@ import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_line_chart.dart';
 
 class PveRRDChart extends StatefulWidget {
-  final String title;
-  final double titleWidth;
-  final String subtitle;
-  final EdgeInsetsGeometry titlePadding;
-  final Iterable<Point<num>> data;
-  final Widget icon;
+  final String? title;
+  final double? titleWidth;
+  final String? subtitle;
+  final EdgeInsetsGeometry? titlePadding;
+  final Iterable<Point<num>>? data;
+  final Widget? icon;
   final Color lineColor;
-  final double staticMaximum;
+  final double? staticMaximum;
   final Color shadeColorTop;
   final Color shadeColorBottom;
   final CrossAxisAlignment titleAlginment;
   final bool showMaximum;
   final bool showDuration;
-  final Widget bottomRight;
-  final DataRenderer dataRenderer;
+  final Widget? bottomRight;
+  final DataRenderer? dataRenderer;
 
   const PveRRDChart({
-    Key key,
+    Key? key,
     this.title,
     this.subtitle,
     this.data,
@@ -45,14 +45,16 @@ class PveRRDChart extends StatefulWidget {
 }
 
 class _PveRRDChartState extends State<PveRRDChart> {
-  Point touchpoint;
+  Point? touchpoint;
   @override
   Widget build(BuildContext context) {
     final globalMaxima =
-        widget.data.map((e) => e.y).reduce((a, b) => max(a ?? 0, b ?? 0));
-    final globalMaximaLabel = globalMaxima?.toStringAsFixed(2) ?? '';
-    final timeWindow = DateTime.fromMillisecondsSinceEpoch(widget.data.last.x)
-        .difference(DateTime.fromMillisecondsSinceEpoch(widget.data.first.x));
+        widget.data!.map((e) => e.y).reduce((a, b) => max(a, b));
+    final globalMaximaLabel = globalMaxima.toStringAsFixed(2);
+    final timeWindow = DateTime.fromMillisecondsSinceEpoch(
+            widget.data!.last.x as int)
+        .difference(
+            DateTime.fromMillisecondsSinceEpoch(widget.data!.first.x as int));
     return Column(
       crossAxisAlignment: widget.titleAlginment,
       children: <Widget>[
@@ -62,7 +64,7 @@ class _PveRRDChartState extends State<PveRRDChart> {
           child: ListTile(
             leading: widget.icon,
             title: Text(
-              widget.title,
+              widget.title!,
               style: TextStyle(
                   fontSize: 12,
                   color: Colors.white60,
@@ -82,7 +84,7 @@ class _PveRRDChartState extends State<PveRRDChart> {
             children: [
               Text(
                 widget.dataRenderer != null
-                    ? 'max ' + widget.dataRenderer(globalMaxima)
+                    ? 'max ' + widget.dataRenderer!(globalMaxima)
                     : 'max $globalMaximaLabel',
                 style: TextStyle(color: Colors.white60, fontSize: 11),
               ),
@@ -116,9 +118,9 @@ class _PveRRDChartState extends State<PveRRDChart> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('past ' + Renderers.renderDuration(timeWindow) ?? '',
+            Text('past ' + Renderers.renderDuration(timeWindow),
                 style: TextStyle(color: Colors.white60, fontSize: 11)),
-            if (widget.bottomRight != null) widget.bottomRight,
+            if (widget.bottomRight != null) widget.bottomRight!,
           ],
         ),
       ],

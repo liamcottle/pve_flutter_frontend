@@ -17,7 +17,7 @@ Future<bool> launchDocURL(String url) async {
   }
 }
 
-Future<T> showTaskLogBottomSheet<T>(BuildContext context,
+Future<T?> showTaskLogBottomSheet<T>(BuildContext context,
     ProxmoxApiClient apiClient, String targetNode, String upid,
     {Widget icon = const Icon(Icons.work),
     Widget jobTitle = const Text('Job')}) async {
@@ -41,10 +41,10 @@ Future<T> showTaskLogBottomSheet<T>(BuildContext context,
   );
 }
 
-Future<T> showConsoleMenuBottomSheet<T>(
+Future<T?> showConsoleMenuBottomSheet<T>(
     BuildContext context,
     ProxmoxApiClient apiClient,
-    String guestID,
+    String? guestID,
     String node,
     String type) async {
   return showModalBottomSheet(

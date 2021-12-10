@@ -6,10 +6,10 @@ import 'package:pve_flutter_frontend/bloc/pve_guest_id_selector_bloc.dart';
 import 'package:pve_flutter_frontend/states/proxmox_form_field_state.dart';
 
 class PveGuestIdSelector extends StatelessWidget {
-  final String labelText;
+  final String? labelText;
 
   PveGuestIdSelector({
-    Key key,
+    Key? key,
     this.labelText,
   }) : super(key: key);
 
@@ -21,7 +21,7 @@ class PveGuestIdSelector extends StatelessWidget {
         stream: _pveGuestIdSelectorBloc.state,
         initialData: _pveGuestIdSelectorBloc.state.value,
         builder: (context, snapshot) {
-          final state = snapshot.data;
+          final state = snapshot.data!;
 
           return TextFormField(
             // make sure a new internal state is created if the

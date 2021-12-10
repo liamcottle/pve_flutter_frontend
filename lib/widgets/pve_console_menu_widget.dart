@@ -11,16 +11,16 @@ class PveConsoleMenu extends StatelessWidget {
   static const platform =
       const MethodChannel('com.proxmox.app.pve_flutter_frontend/filesharing');
   final ProxmoxApiClient apiClient;
-  final String guestID;
+  final String? guestID;
   final String node;
   final String type;
 
   const PveConsoleMenu(
-      {Key key,
-      @required this.apiClient,
+      {Key? key,
+      required this.apiClient,
       this.guestID,
-      @required this.node,
-      @required this.type})
+      required this.node,
+      required this.type})
       : super(key: key);
 
   @override
@@ -58,7 +58,7 @@ class PveConsoleMenu extends StatelessWidget {
                           'Ensure you have "${type == 'node' ? 'Sys' : 'VM'}.Console" permissions.');
                       return;
                     }
-                    var filePath = await writeSpiceFile(data, tempDir[0].path);
+                    var filePath = await writeSpiceFile(data, tempDir![0].path);
 
                     try {
                       await platform.invokeMethod('shareFile', {

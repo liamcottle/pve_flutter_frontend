@@ -5,9 +5,9 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_builder_widget.dart'
 import 'package:pve_flutter_frontend/widgets/pve_config_switch_list_tile.dart';
 
 class PveLxcOptions extends StatelessWidget {
-  final PveLxcOverviewBloc lxcBloc;
+  final PveLxcOverviewBloc? lxcBloc;
 
-  const PveLxcOptions({Key key, this.lxcBloc}) : super(key: key);
+  const PveLxcOptions({Key? key, this.lxcBloc}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return ProxmoxStreamBuilder<PveLxcOverviewBloc, PveLxcOverviewState>(
@@ -30,9 +30,9 @@ class PveLxcOptions extends StatelessWidget {
                       defaultValue: false,
                       pending: config.getPending('onboot'),
                       onChanged: (v) =>
-                          lxcBloc.events.add(UpdateLxcConfigBool('onboot', v)),
+                          lxcBloc!.events.add(UpdateLxcConfigBool('onboot', v)),
                       onDeleted: () =>
-                          lxcBloc.events.add(RevertPendingLxcConfig('onboot')),
+                          lxcBloc!.events.add(RevertPendingLxcConfig('onboot')),
                     ),
                     ListTile(
                       title: Text("Start/Shutdown order"),
@@ -51,10 +51,10 @@ class PveLxcOptions extends StatelessWidget {
                       value: config.console,
                       defaultValue: true,
                       pending: config.getPending('console'),
-                      onChanged: (v) =>
-                          lxcBloc.events.add(UpdateLxcConfigBool('console', v)),
-                      onDeleted: () =>
-                          lxcBloc.events.add(RevertPendingLxcConfig('console')),
+                      onChanged: (v) => lxcBloc!.events
+                          .add(UpdateLxcConfigBool('console', v)),
+                      onDeleted: () => lxcBloc!.events
+                          .add(RevertPendingLxcConfig('console')),
                     ),
                     ListTile(
                       title: Text("TTY Count"),
@@ -69,9 +69,9 @@ class PveLxcOptions extends StatelessWidget {
                       value: config.protection,
                       defaultValue: false,
                       pending: config.getPending('protection'),
-                      onChanged: (v) => lxcBloc.events
+                      onChanged: (v) => lxcBloc!.events
                           .add(UpdateLxcConfigBool('protection', v)),
-                      onDeleted: () => lxcBloc.events
+                      onDeleted: () => lxcBloc!.events
                           .add(RevertPendingLxcConfig('protection')),
                     ),
                     ListTile(
@@ -81,7 +81,7 @@ class PveLxcOptions extends StatelessWidget {
                     ),
                     ListTile(
                       title: Text("Features"),
-                      subtitle: Text(config?.features?.toString() ?? 'none'),
+                      subtitle: Text(config.features?.toString() ?? 'none'),
                     ),
                   ],
                 ),

@@ -35,20 +35,15 @@ abstract class PveMigrateState
     }
   }
 
-  @nullable
-  String get targetNodeID;
+  String? get targetNodeID;
 
-  @nullable
-  String get taskUPID;
+  String? get taskUPID;
 
-  @nullable
-  PveNodesQemuMigrate get qemuPreconditions;
+  PveNodesQemuMigrate? get qemuPreconditions;
 
-  @nullable
-  PveNodesLxcMigrateModel get lxcPreconditions;
+  PveNodesLxcMigrateModel? get lxcPreconditions;
 
-  @nullable
-  BuiltList<PveMigrateCondition> get preconditions;
+  BuiltList<PveMigrateCondition>? get preconditions;
 
   PveMigrateState._();
 

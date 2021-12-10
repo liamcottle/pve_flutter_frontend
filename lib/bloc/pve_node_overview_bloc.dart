@@ -14,9 +14,9 @@ class PveNodeOverviewBloc
   PveNodeOverviewState get initialState => init;
 
   PveNodeOverviewBloc(
-      {@required this.apiClient, @required this.nodeID, @required this.init});
+      {required this.apiClient, required this.nodeID, required this.init});
 
-  Timer sTimer;
+  Timer? sTimer;
   @override
   void doOnListen() {
     sTimer = Timer.periodic(

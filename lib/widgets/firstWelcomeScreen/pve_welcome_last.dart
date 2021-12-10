@@ -4,9 +4,9 @@ import 'package:pve_flutter_frontend/utils/promox_colors.dart';
 
 // goodbye
 class PveWelcomePageLast extends StatelessWidget {
-  const PveWelcomePageLast({Key key, this.onDone}) : super(key: key);
+  const PveWelcomePageLast({Key? key, this.onDone}) : super(key: key);
 
-  final VoidCallback onDone;
+  final VoidCallback? onDone;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class PveWelcomePageLast extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: RaisedButton(
-                          onPressed: () => {onDone()},
+                          onPressed: () => {onDone!()},
                           color: ProxmoxColors.orange,
                           textColor: Colors.white,
                           child: Text("Start"),

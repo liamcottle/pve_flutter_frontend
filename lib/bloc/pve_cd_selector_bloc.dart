@@ -15,7 +15,7 @@ class PveCdSelectorBloc
   Stream<PveCdSelectorState> processEvents(PveCdSelectorEvent event) async* {
     if (event is ChangeValue) {
       if (event.value == CdType.iso &&
-          (state.value.file == null || state.value.file.isEmpty)) {
+          (state.value.file == null || state.value.file!.isEmpty)) {
         yield PveCdSelectorState(event.value, "Choose file");
       } else {
         yield PveCdSelectorState(event.value, null);
@@ -31,17 +31,17 @@ class PveCdSelectorBloc
 abstract class PveCdSelectorEvent {}
 
 class ChangeValue extends PveCdSelectorEvent {
-  final CdType value;
+  final CdType? value;
   ChangeValue(this.value);
 }
 
 class FileSelected extends PveCdSelectorEvent {
-  final String volid;
+  final String? volid;
   FileSelected(this.volid);
 }
 
-class PveCdSelectorState extends PveFormFieldState<CdType> {
-  final String file;
-  PveCdSelectorState(CdType value, String error, {this.file})
+class PveCdSelectorState extends PveFormFieldState<CdType?> {
+  final String? file;
+  PveCdSelectorState(CdType? value, String? error, {this.file})
       : super(value: value, errorText: error);
 }

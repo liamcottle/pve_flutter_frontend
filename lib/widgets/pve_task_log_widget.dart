@@ -9,7 +9,7 @@ import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 import 'package:pve_flutter_frontend/widgets/pve_task_log_expansiontile_widget.dart';
 
 class PveTaskLog extends StatefulWidget {
-  PveTaskLog({Key key}) : super(key: key);
+  PveTaskLog({Key? key}) : super(key: key);
 
   @override
   _PveTaskLogState createState() => _PveTaskLogState();
@@ -17,13 +17,13 @@ class PveTaskLog extends StatefulWidget {
 
 class _PveTaskLogState extends State<PveTaskLog> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  TextEditingController _userFilterController;
-  TextEditingController _typeFilterController;
+  late TextEditingController _userFilterController;
+  late TextEditingController _typeFilterController;
   @override
   void initState() {
     super.initState();
     final bloc = Provider.of<PveTaskLogBloc>(context, listen: false);
-    final state = bloc.latestState;
+    final PveTaskLogState state = bloc.latestState;
     _userFilterController = TextEditingController.fromValue(
         TextEditingValue(text: state.userFilter ?? ''));
     _typeFilterController = TextEditingController.fromValue(
@@ -49,7 +49,7 @@ class _PveTaskLogState extends State<PveTaskLog> {
                     IconButton(
                       icon: Icon(Icons.more_vert),
                       onPressed: () =>
-                          _scaffoldKey.currentState.openEndDrawer(),
+                          _scaffoldKey.currentState?.openEndDrawer(),
                     )
                   ],
                 ),
@@ -100,7 +100,7 @@ class _PveTaskLogState extends State<PveTaskLog> {
                           icon: Icon(Icons.arrow_downward),
                           iconSize: 24,
                           elevation: 16,
-                          onChanged: (String newValue) {
+                          onChanged: (String? newValue) {
                             bloc.events.add(FilterTasksBySource(newValue));
                             bloc.events.add(LoadTasks());
                           },
@@ -173,9 +173,9 @@ class PveTaskLogScrollView extends StatefulWidget {
   final Widget jobTitle;
 
   const PveTaskLogScrollView({
-    Key key,
-    this.icon,
-    this.jobTitle,
+    Key? key,
+    required this.icon,
+    required this.jobTitle,
   }) : super(key: key);
   @override
   _PveTaskLogScrollViewState createState() => _PveTaskLogScrollViewState();
@@ -240,14 +240,14 @@ class _PveTaskLogScrollViewState extends State<PveTaskLogScrollView> {
                         title: AnimatedDefaultTextStyle(
                           style: Theme.of(context)
                               .textTheme
-                              .subtitle1
+                              .subtitle1!
                               .copyWith(fontWeight: FontWeight.bold),
                           duration: kThemeChangeDuration,
-                          child: widget.jobTitle ?? const SizedBox(),
+                          child: widget.jobTitle,
                         ),
                         trailing: Chip(
                           label: Text(
-                            state.status.status.name,
+                            state.status!.status.name,
                             style: TextStyle(color: indicatorColor),
                           ),
                           backgroundColor: statusChipColor,
@@ -260,11 +260,12 @@ class _PveTaskLogScrollViewState extends State<PveTaskLogScrollView> {
                           padding: const EdgeInsets.all(14.0),
                           child: ListView.builder(
                             controller: _scrollController,
-                            itemCount: state.log.lines.length,
+                            itemCount: state.log!.lines!.length,
                             itemBuilder: (context, index) {
                               final isLast =
-                                  index == state.log.lines.length - 1;
-                              final errorLine = state.log.lines[index].lineText
+                                  index == state.log!.lines!.length - 1;
+                              final errorLine = state
+                                  .log!.lines![index].lineText!
                                   .contains('ERROR');
                               return Card(
                                 color: isLast || errorLine
@@ -273,7 +274,7 @@ class _PveTaskLogScrollViewState extends State<PveTaskLogScrollView> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    state.log.lines[index].lineText,
+                                    state.log!.lines![index].lineText!,
                                     style: TextStyle(
                                       color: isLast || errorLine
                                           ? Colors.white

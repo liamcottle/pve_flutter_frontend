@@ -52,6 +52,6 @@ class ProxmoxClusterVisualizer extends CustomPainter {
       ..addText(String.fromCharCode(icon.codePoint));
     var para = builder.build();
     para.layout(const ui.ParagraphConstraints(width: 60));
-    canvas.drawParagraph(para, Offset(x, y));
+    canvas.drawParagraph(para, Offset(x as double, y as double));
   }
 }

@@ -8,12 +8,9 @@ abstract class PveQemuOverviewState
     with PveBaseState
     implements Built<PveQemuOverviewState, PveQemuOverviewStateBuilder> {
   String get nodeID;
-  @nullable
-  PveQemuStatusModel get currentStatus;
-  @nullable
-  BuiltList<PveGuestRRDdataModel> get rrdData;
-  @nullable
-  PveNodesQemuConfigModel get config;
+  PveQemuStatusModel? get currentStatus;
+  BuiltList<PveGuestRRDdataModel>? get rrdData;
+  PveNodesQemuConfigModel? get config;
 
   PveQemuOverviewState._();
 

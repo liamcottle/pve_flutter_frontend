@@ -12,9 +12,9 @@ import 'package:pve_flutter_frontend/utils/utils.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_stream_listener.dart';
 
 class PveMigrateStreamConnector extends StatelessWidget {
-  final Widget child;
+  final Widget? child;
 
-  const PveMigrateStreamConnector({Key key, this.child}) : super(key: key);
+  const PveMigrateStreamConnector({Key? key, this.child}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final mBloc = Provider.of<PveMigrateBloc>(context);
@@ -25,13 +25,13 @@ class PveMigrateStreamConnector extends StatelessWidget {
     return StreamListener<PveResourceState>(
       stream: gBloc.state,
       onStateChange: (globalResourceState) {
-        final mState = mBloc.latestState;
+        final PveMigrateState mState = mBloc.latestState;
         final guest = globalResourceState
             .resourceByID('${mState.guestType}/${mBloc.guestID}');
         if (guest.node != mState.nodeID) {
           mBloc.events.add(SourceNodeChanged(guest.node));
           nbloc.events.add(LoadNodesEvent());
-          nbloc.events.add(UpdateDisallowedNodes(<String>{guest.node}));
+          nbloc.events.add(UpdateDisallowedNodes(<String?>{guest.node}));
           mBloc.events.add(CheckMigratePreconditions());
         }
       },
@@ -51,7 +51,7 @@ class PveMigrateStreamConnector extends StatelessWidget {
               tBloc.events.add(SetTaskUPID(state.taskUPID));
               Navigator.of(context).pop();
               showTaskLogBottomSheet(
-                  context, mBloc.apiClient, state.nodeID, state.taskUPID,
+                  context, mBloc.apiClient, state.nodeID, state.taskUPID!,
                   icon: Icon(Icons.save),
                   jobTitle: Text('Migration ${mBloc.guestID}'));
             }
@@ -60,7 +60,7 @@ class PveMigrateStreamConnector extends StatelessWidget {
                 state.qemuPreconditions?.allowedNodes !=
                     mBloc.penultimate?.qemuPreconditions?.allowedNodes) {
               nbloc.events.add(UpdateAllowedNodes(
-                  Set.from(state.qemuPreconditions.allowedNodes)));
+                  Set.from(state.qemuPreconditions!.allowedNodes!)));
             }
           },
           child: child,

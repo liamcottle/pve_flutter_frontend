@@ -11,7 +11,7 @@ class PveFileSelectorBloc
   @override
   PveFileSelectorState get initialState => init;
 
-  PveFileSelectorBloc({@required this.apiClient, @required this.init});
+  PveFileSelectorBloc({required this.apiClient, required this.init});
 
   @override
   Stream<PveFileSelectorState> processEvents(event) async* {
@@ -28,11 +28,11 @@ class PveFileSelectorBloc
     }
 
     if (event is ToggleGridListView) {
-      yield latestState.rebuild((b) => b..gridView = !b.gridView);
+      yield latestState.rebuild((b) => b..gridView = !b.gridView!);
     }
 
     if (event is ToggleSearch) {
-      yield latestState.rebuild((b) => b..search = !b.search);
+      yield latestState.rebuild((b) => b..search = !b.search!);
       // reset search
       if (!latestState.search) {
         events.add(FilterContent(searchTerm: ''));
@@ -47,7 +47,7 @@ class PveFileSelectorBloc
     if (event is DeleteFile) {
       try {
         await apiClient.deleteNodeStorageContent(
-            latestState.nodeID, latestState.storageID, event.volume,
+            latestState.nodeID, latestState.storageID!, event.volume!,
             delay: 5);
       } on ProxmoxApiException catch (e) {
         print(e);
@@ -59,12 +59,12 @@ class PveFileSelectorBloc
   Future<List<PveNodesStorageContentModel>> loadStorageContent(
       PveFileSelectorState state) async {
     final data = await apiClient.getNodeStorageContent(
-        state.nodeID, state.storageID,
+        state.nodeID, state.storageID!,
         content: state.fileType, vmid: state.guestID);
 
-    if (state.volidFilter != null && state.volidFilter.isNotEmpty) {
+    if (state.volidFilter != null && state.volidFilter!.isNotEmpty) {
       return data
-          .where((item) => item.volid.contains(state.volidFilter))
+          .where((item) => item.volid!.contains(state.volidFilter!))
           .toList();
     } else {
       return data.toList();
@@ -83,7 +83,7 @@ class ToggleGridListView extends PveFileSelectorEvent {}
 class ChangeNode extends PveFileSelectorEvent {}
 
 class ChangeStorage extends PveFileSelectorEvent {
-  final String storageId;
+  final String? storageId;
 
   ChangeStorage(this.storageId);
 }
@@ -91,13 +91,13 @@ class ChangeStorage extends PveFileSelectorEvent {
 class ToggleSearch extends PveFileSelectorEvent {}
 
 class FilterContent extends PveFileSelectorEvent {
-  final String searchTerm;
+  final String? searchTerm;
 
   FilterContent({this.searchTerm});
 }
 
 class DeleteFile extends PveFileSelectorEvent {
-  final String volume;
+  final String? volume;
 
   DeleteFile(this.volume);
 }

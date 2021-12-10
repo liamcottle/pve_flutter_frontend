@@ -10,24 +10,22 @@ abstract class PveNodeSelectorState
     with PveBaseState
     implements Built<PveNodeSelectorState, PveNodeSelectorStateBuilder> {
   // Fields
-  @nullable
-  PveNodesModel get selectedNode;
+  PveNodesModel? get selectedNode;
 
   List<PveNodesModel> get availableNodes {
-    return nodes?.where((element) {
-          var include = true;
-          if (allowedNodes.isNotEmpty) {
-            include &= allowedNodes.contains(element.nodeName);
-          }
-          if (disallowedNodes.isNotEmpty) {
-            include &= !disallowedNodes.contains(element.nodeName);
-          }
-          if (onlineValidator) {
-            include &= element.status == 'online';
-          }
-          return include;
-        })?.toList() ??
-        [];
+    return nodes.where((element) {
+      var include = true;
+      if (allowedNodes.isNotEmpty) {
+        include &= allowedNodes.contains(element.nodeName);
+      }
+      if (disallowedNodes.isNotEmpty) {
+        include &= !disallowedNodes.contains(element.nodeName);
+      }
+      if (onlineValidator) {
+        include &= element.status == 'online';
+      }
+      return include;
+    }).toList();
   }
 
   BuiltList<PveNodesModel> get nodes;
@@ -44,7 +42,7 @@ abstract class PveNodeSelectorState
           [void Function(PveNodeSelectorStateBuilder) updates]) =
       _$PveNodeSelectorState;
 
-  factory PveNodeSelectorState.init({@required bool onlineValidator}) =>
+  factory PveNodeSelectorState.init({required bool onlineValidator}) =>
       PveNodeSelectorState((b) => b
         //base
         ..errorMessage = ''

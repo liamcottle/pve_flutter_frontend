@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 class Dot extends StatelessWidget {
-  final double dotSpacing;
-  final double dotSize;
-  final double zoom;
-  final double shadowBlurRadius;
-  final double shadowSpreadRadius;
-  final Color color;
-  final int index;
-  final void Function(int index) onTap;
+  final double? dotSpacing;
+  final double? dotSize;
+  final double? zoom;
+  final double? shadowBlurRadius;
+  final double? shadowSpreadRadius;
+  final Color? color;
+  final int? index;
+  final void Function(int? index)? onTap;
 
   const Dot({
-    Key key,
+    Key? key,
     this.dotSpacing,
     this.dotSize,
     this.zoom,
@@ -30,10 +30,10 @@ class Dot extends StatelessWidget {
       width: dotSpacing,
       child: Center(
         child: Container(
-          width: dotSize * zoom,
-          height: dotSize * zoom,
+          width: dotSize! * zoom!,
+          height: dotSize! * zoom!,
           child: GestureDetector(
-            onTap: () => onTap(index),
+            onTap: () => onTap!(index),
           ),
           decoration: BoxDecoration(
             color: color,
@@ -41,8 +41,8 @@ class Dot extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                   color: Colors.white.withOpacity(0.72),
-                  blurRadius: shadowBlurRadius,
-                  spreadRadius: shadowSpreadRadius,
+                  blurRadius: shadowBlurRadius!,
+                  spreadRadius: shadowSpreadRadius!,
                   offset: Offset(0.0, 0.0))
             ],
           ),
@@ -54,7 +54,7 @@ class Dot extends StatelessWidget {
 
 class DotIndicator extends AnimatedWidget {
   DotIndicator({
-    this.controller,
+    required this.controller,
     this.itemCount,
     this.onPageSelected,
     this.color: Colors.white,
@@ -63,12 +63,12 @@ class DotIndicator extends AnimatedWidget {
   }) : super(listenable: controller);
 
   final PageController controller;
-  final double page;
-  final double initialPage;
+  final double? page;
+  final double? initialPage;
 
-  final int itemCount;
+  final int? itemCount;
 
-  final ValueChanged<int> onPageSelected;
+  final ValueChanged<int?>? onPageSelected;
   final Color color;
 
   static const double _dotSize = 8.0;
@@ -101,7 +101,7 @@ class DotIndicator extends AnimatedWidget {
     return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: List<Widget>.generate(
-          itemCount,
+          itemCount!,
           _buildDot,
         ));
   }

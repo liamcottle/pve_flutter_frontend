@@ -29,7 +29,7 @@ class PveResourceOverview extends StatelessWidget {
                     label: Text("Action"),
                   ),
                 ],
-                rows: snapshot.data.resources
+                rows: snapshot.data!.resources
                     .where((resource) => resource.type != "pool")
                     .map((resource) => DataRow(cells: [
                           DataCell(Icon(Renderers.getDefaultResourceIcon(

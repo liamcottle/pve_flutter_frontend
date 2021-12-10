@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 typedef DataRenderer = String Function(num data);
 
 class ProxmoxLineChart extends CustomPainter {
-  final List<Point> data;
-  final Color lineColor;
+  final List<Point>? data;
+  final Color? lineColor;
   final Color shadeColorTop;
   final Color shadeColorBottom;
-  final double staticMax;
-  final Point touchPoint;
-  final DataRenderer ordinateRenderer;
+  final double? staticMax;
+  final Point? touchPoint;
+  final DataRenderer? ordinateRenderer;
   ProxmoxLineChart({
     this.data,
     this.lineColor,
@@ -28,31 +28,32 @@ class ProxmoxLineChart extends CustomPainter {
     if (data?.isEmpty ?? true) return;
 
     var paint = Paint();
-    paint.color = lineColor;
+    paint.color = lineColor!;
     paint.strokeWidth = 1;
 
     var path = Path();
-    final globalMaxima =
-        data.map((e) => e.y).reduce((a, b) => max(a ?? 0, b ?? 0));
-    final points = convertDataToPoints(data, size, staticMax ?? globalMaxima);
+    final globalMaxima = data!.map((e) => e.y).reduce((a, b) => max(a, b));
+    final points = convertDataToPoints(data!, size, staticMax ?? globalMaxima);
     points.asMap().forEach((i, el) {
       if (i == 0) {
-        path.moveTo(el.x, el.y ?? size.height);
+        path.moveTo(el.x as double, el.y as double? ?? size.height);
         return;
       }
 
-      final cp1 = Offset(
-          (points[i].x + points[i - 1].x) / 2, points[i - 1].y ?? size.height);
-      final cp2 = Offset(
-          (points[i].x + points[i - 1].x) / 2, points[i].y ?? size.height);
-      path.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, el.x, el.y ?? size.height);
+      final cp1 = Offset((points[i].x + points[i - 1].x) / 2,
+          points[i - 1].y as double? ?? size.height);
+      final cp2 = Offset((points[i].x + points[i - 1].x) / 2,
+          points[i].y as double? ?? size.height);
+      path.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, el.x as double,
+          el.y as double? ?? size.height);
     });
 
     if (touchPoint != null) {
       final index = closestX(touchPoint, points);
-      final selectedLabel = ordinateRenderer != null
-          ? ordinateRenderer(data[index].y)
-          : data[index].y?.toStringAsFixed(2) ?? '';
+      final selectedLabel = (ordinateRenderer != null
+              ? ordinateRenderer!(data?[index].y ?? 0)
+              : data?[index].y.toStringAsFixed(2)) ??
+          '-';
       TextSpan span = TextSpan(
         style: TextStyle(
           color: Colors.white,
@@ -74,9 +75,12 @@ class ProxmoxLineChart extends CustomPainter {
         tpX = points[index].x;
       }
 
-      tp.paint(canvas, Offset(tpX, points[index].y ?? size.height));
+      tp.paint(canvas, Offset(tpX, points[index].y as double? ?? size.height));
       canvas.drawCircle(
-          Offset(points[index].x, points[index].y ?? size.height), 2, paint);
+          Offset(points[index].x as double,
+              points[index].y as double? ?? size.height),
+          2,
+          paint);
     }
 
     //TODO gaps between datapoints
@@ -116,13 +120,14 @@ class ProxmoxLineChart extends CustomPainter {
 
     final List<Point> converted = [];
     data.asMap().forEach((i, e) {
-      final y = e.y != null ? bottomY - (e.y / maxima * (bottomY)) : null;
+      if (e.y == null) return;
+      final y = bottomY - (e.y / maxima * (bottomY));
       converted.add(Point(xDiff * i, y));
     });
     return converted;
   }
 
-  int closestX(Point touchPoint, List<Point> convertedPoints) {
-    return convertedPoints.indexWhere((element) => element.x >= touchPoint.x);
+  int closestX(Point? touchPoint, List<Point> convertedPoints) {
+    return convertedPoints.indexWhere((element) => element.x >= touchPoint!.x);
   }
 }

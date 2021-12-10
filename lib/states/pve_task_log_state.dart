@@ -17,19 +17,16 @@ abstract class PveTaskLogState
 
   bool get onlyErrors;
 
-  @nullable
-  String get userFilter;
-  @nullable
-  String get typeFilter;
-  @nullable
-  String get guestID;
+  String? get userFilter;
+  String? get typeFilter;
+  String? get guestID;
 
   BuiltList<PveClusterTasksModel> get tasks;
 
   PveTaskLogState._();
 
   factory PveTaskLogState.init(
-    String nodeID,
+    String? nodeID,
   ) =>
       PveTaskLogState((b) => b
         //base

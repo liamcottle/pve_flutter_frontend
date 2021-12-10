@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class PveConfigSwitchListTile extends StatelessWidget {
-  final bool value;
-  final int pending;
-  final bool defaultValue;
-  final Widget title;
-  final ValueChanged<bool> onChanged;
-  final VoidCallback onDeleted;
+  final bool? value;
+  final int? pending;
+  final bool? defaultValue;
+  final Widget? title;
+  final ValueChanged<bool>? onChanged;
+  final VoidCallback? onDeleted;
 
   const PveConfigSwitchListTile({
-    Key key,
+    Key? key,
     this.value,
     this.pending,
     this.defaultValue,
@@ -25,17 +25,17 @@ class PveConfigSwitchListTile extends StatelessWidget {
     }
     return SwitchListTile(
       title: _getTitle(),
-      value: pBool ?? value ?? defaultValue,
+      value: pBool ?? value ?? defaultValue!,
       onChanged: pending != null ? null : onChanged,
     );
   }
 
-  Widget _getTitle() {
+  Widget? _getTitle() {
     if (pending != null) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          title,
+          title!,
           Chip(
             label: Text('pending'),
             backgroundColor: Colors.red,

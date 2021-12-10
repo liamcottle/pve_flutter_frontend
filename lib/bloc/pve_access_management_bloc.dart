@@ -7,10 +7,11 @@ abstract class PveAccessManagementEvent {}
 
 class PveAccessManagementBloc extends ProxmoxBaseBloc<PveAccessManagementEvent,
     PveAccessManagementState> {
-  final ProxmoxApiClient apiClient;
-  final PveAccessManagementState init;
+  late final ProxmoxApiClient apiClient;
+  late final PveAccessManagementState init;
 
-  PveAccessManagementBloc({this.apiClient, this.init});
+  PveAccessManagementBloc(
+      {required this.apiClient, required this.init});
   @override
   PveAccessManagementState get initialState => init;
 
@@ -20,8 +21,9 @@ class PveAccessManagementBloc extends ProxmoxBaseBloc<PveAccessManagementEvent,
     if (event is LoadUsers) {
       final users = await apiClient.getAccessUsersList(full: true);
       final apiTokens = getTokensFromUserList(users);
-      yield latestState
-          .rebuild((b) => b..users.replace(users)..tokens.replace(apiTokens));
+      yield latestState.rebuild((b) => b
+        ..users.replace(users)
+        ..tokens.replace(apiTokens));
       final groups = await apiClient.getAccessGroupsList();
       yield latestState.rebuild((b) => b..groups.replace(groups));
       final roles = await apiClient.getAccessRolesList();
@@ -32,11 +34,11 @@ class PveAccessManagementBloc extends ProxmoxBaseBloc<PveAccessManagementEvent,
   }
 
   BuiltList<PveAccessUserTokenModel> getTokensFromUserList(
-      List<PveAccessUserModel> users) {
+      List<PveAccessUserModel > users) {
     final tokens = [];
     users.forEach((user) {
       if (user.tokens?.isNotEmpty ?? false) {
-        user.tokens.forEach((t) {
+        user.tokens!.forEach((t) {
           tokens.add(t.rebuild((tb) => tb..userid = user.userid));
         });
       }

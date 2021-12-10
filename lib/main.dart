@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +39,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final authBloc = PveAuthenticationBloc();
   try {
-    final loginStorage = await ProxmoxLoginStorage.fromLocalStorage();
+    final loginStorage = await (ProxmoxLoginStorage.fromLocalStorage()
+        as FutureOr<ProxmoxLoginStorage>);
     final apiClient = await loginStorage.recoverLatestSession();
     authBloc.events.add(LoggedIn(apiClient));
   } catch (e) {
@@ -72,18 +74,18 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final PveAuthenticationBloc authbloc;
+  final PveAuthenticationBloc? authbloc;
   final SharedPreferences sharedPreferences;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  MyApp({Key key, this.authbloc, this.sharedPreferences})
+  MyApp({Key? key, this.authbloc, required this.sharedPreferences})
       : assert(sharedPreferences != null),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return StreamListener<PveAuthenticationState>(
-      stream: authbloc.state,
+      stream: authbloc!.state,
       onStateChange: (state) {
         if (state is Authenticated) {
           Provider.of<PveResourceBloc>(context, listen: false)
@@ -112,12 +114,12 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return StreamListener(
             stream: ProxmoxGlobalErrorBloc().onError.distinct(),
-            onStateChange: (error) async {
+            onStateChange: (dynamic error) async {
               if (!ProxmoxGlobalErrorBloc().dialogVisible) {
                 ProxmoxGlobalErrorBloc().dialogVisible = true;
 
                 await showDialog<String>(
-                  context: navigatorKey.currentState.overlay.context,
+                  context: navigatorKey.currentState!.overlay!.context,
                   builder: (BuildContext context) {
                     return StreamBuilder<Object>(
                         stream: ProxmoxGlobalErrorBloc().onError,
@@ -147,7 +149,7 @@ class MyApp extends StatelessWidget {
           );
         },
         onGenerateRoute: (context) {
-          if (authbloc.state.value is Uninitialized) {
+          if (authbloc!.state.value is Uninitialized) {
             return MaterialPageRoute(
               builder: (context) => PveSplashScreen(),
             );
@@ -158,30 +160,31 @@ class MyApp extends StatelessWidget {
             );
           }
 
-          if (authbloc.state.value is Unauthenticated ||
+          if (authbloc!.state.value is Unauthenticated ||
               context.name == '/login') {
             return MaterialPageRoute(
               builder: (context) {
                 return StreamListener<PveAuthenticationState>(
-                  stream: authbloc.state,
+                  stream: authbloc!.state,
                   onStateChange: (state) {
                     if (state is Authenticated) {
                       Navigator.of(context).pushReplacementNamed('/');
                     }
                   },
                   child: ProxmoxLoginSelector(
-                    onLogin: (client) => authbloc.events.add(LoggedIn(client)),
+                    onLogin: (client) => authbloc!.events.add(LoggedIn(client)),
                   ),
                 );
               },
             );
           }
-          if (authbloc.state.value is Authenticated) {
-            final state = authbloc.state.value as Authenticated;
-            if (PveQemuOverview.routeName.hasMatch(context.name)) {
-              final match = PveQemuOverview.routeName.firstMatch(context.name);
-              final nodeID = match?.group(1);
-              final guestID = match?.group(2);
+          if (authbloc!.state.value is Authenticated) {
+            final state = authbloc!.state.value as Authenticated;
+            if (PveQemuOverview.routeName.hasMatch(context.name!)) {
+              final match =
+                  PveQemuOverview.routeName.firstMatch(context.name!)!;
+              final String nodeID = match.group(1)!;
+              final String guestID = match.group(2)!;
 
               return MaterialPageRoute(
                 fullscreenDialog: false,
@@ -213,10 +216,10 @@ class MyApp extends StatelessWidget {
                 },
               );
             }
-            if (PveLxcOverview.routeName.hasMatch(context.name)) {
-              final match = PveLxcOverview.routeName.firstMatch(context.name);
-              final nodeID = match?.group(1);
-              final guestID = match?.group(2);
+            if (PveLxcOverview.routeName.hasMatch(context.name!)) {
+              final match = PveLxcOverview.routeName.firstMatch(context.name!)!;
+              final String nodeID = match.group(1)!;
+              final String guestID = match.group(2)!;
 
               return MaterialPageRoute(
                 fullscreenDialog: false,
@@ -249,9 +252,10 @@ class MyApp extends StatelessWidget {
               );
             }
 
-            if (PveNodeOverview.routeName.hasMatch(context.name)) {
-              final match = PveNodeOverview.routeName.firstMatch(context.name);
-              final nodeID = match?.group(1);
+            if (PveNodeOverview.routeName.hasMatch(context.name!)) {
+              final match =
+                  PveNodeOverview.routeName.firstMatch(context.name!)!;
+              final String nodeID = match.group(1)!;
               return MaterialPageRoute(
                 fullscreenDialog: false,
                 settings: context,

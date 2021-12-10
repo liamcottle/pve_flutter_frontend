@@ -8,7 +8,7 @@ import 'package:pve_flutter_frontend/widgets/pve_config_switch_list_tile.dart';
 class PveQemuOptions extends StatelessWidget {
   final String guestID;
   final _formKey = GlobalKey<FormState>();
-  PveQemuOptions({Key key, @required this.guestID}) : super(key: key);
+  PveQemuOptions({Key? key, required this.guestID}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class PveQemuOptions extends StatelessWidget {
         bloc: bloc,
         builder: (context, state) {
           if (state.config != null) {
-            final config = state.config;
+            final config = state.config!;
             return Scaffold(
               appBar: AppBar(
                 leading: IconButton(
@@ -52,7 +52,7 @@ class PveQemuOptions extends StatelessWidget {
                       ListTile(
                         title: Text("OS Type"),
                         subtitle: Text(
-                            "${config.ostype.type} ${config.ostype.description}"),
+                            "${config.ostype!.type} ${config.ostype!.description}"),
                       ),
                       //TODO add better ui component e.g. collapseable
                       ListTile(

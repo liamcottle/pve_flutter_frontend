@@ -13,8 +13,8 @@ const double wideLayoutThreshold = 1200;
 /// Builds a widget tree that can depend on the parent widget's width
 class ProxmoxLayoutBuilder extends StatelessWidget {
   const ProxmoxLayoutBuilder({
-    @required this.builder,
-    Key key,
+    required this.builder,
+    Key? key,
   })  : assert(builder != null),
         super(key: key);
 
