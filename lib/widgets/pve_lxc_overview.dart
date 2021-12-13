@@ -35,6 +35,18 @@ class PveLxcOverview extends StatelessWidget {
   static final routeName = RegExp(r"\/nodes\/(\S+)\/lxc\/(\d+)");
   final String guestID;
 
+  ActionCard createActionCard(String title, IconData icon, Function onTap) {
+    return ActionCard(
+      icon: Icon(
+        icon,
+        size: 55,
+        color: Colors.white24,
+      ),
+      title: title,
+      onTap: onTap,
+    );
+  }
+
   const PveLxcOverview({Key? key, required this.guestID}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -125,71 +137,45 @@ class PveLxcOverview extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               if (!(status?.template ?? false))
-                                ActionCard(
-                                  icon: Icon(
+                                createActionCard(
+                                    'Power Settings',
                                     Icons.power_settings_new,
-                                    size: 55,
-                                    color: Colors.white24,
-                                  ),
-                                  title: 'Power Settings',
-                                  onTap: () => showPowerMenuBottomSheet(
-                                      context, lxcBloc),
-                                ),
+                                    () => showPowerMenuBottomSheet(
+                                        context, lxcBloc)),
                               if (!(status?.template ?? false))
-                                ActionCard(
-                                  icon: Icon(
+                                createActionCard(
+                                    'Console',
                                     Icons.queue_play_next,
-                                    size: 55,
-                                    color: Colors.white24,
-                                  ),
-                                  title: 'Console',
-                                  onTap: () => showConsoleMenuBottomSheet(
-                                      context,
-                                      lxcBloc.apiClient,
-                                      guestID,
-                                      state.nodeID,
-                                      'lxc'),
-                                ),
-                              ActionCard(
-                                icon: Icon(
+                                    () => showConsoleMenuBottomSheet(
+                                        context,
+                                        lxcBloc.apiClient,
+                                        guestID,
+                                        state.nodeID,
+                                        'lxc')),
+                              createActionCard(
+                                  'Options',
                                   Icons.settings,
-                                  size: 55,
-                                  color: Colors.white24,
-                                ),
-                                title: 'Options',
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) => PveLxcOptions(
-                                            lxcBloc: lxcBloc,
-                                          ),
-                                      fullscreenDialog: true),
-                                ),
-                              ),
+                                  () => Navigator.of(context)
+                                      .push(MaterialPageRoute(
+                                          builder: (context) => PveLxcOptions(
+                                                lxcBloc: lxcBloc,
+                                              ),
+                                          fullscreenDialog: true))),
                               if (!resourceBloc.latestState.isStandalone)
-                                ActionCard(
-                                  icon: Icon(
+                                createActionCard(
+                                    'Migrate',
                                     FontAwesomeIcons.paperPlane,
-                                    size: 55,
-                                    color: Colors.white24,
-                                  ),
-                                  title: 'Migrate',
-                                  onTap: () => Navigator.of(context).push(
-                                      _createMigrationRoute(
-                                          guestID,
-                                          state.nodeID,
-                                          resourceBloc.apiClient!)),
-                                ),
-                              ActionCard(
-                                icon: Icon(
+                                    () => Navigator.of(context).push(
+                                        _createMigrationRoute(
+                                            guestID,
+                                            state.nodeID,
+                                            resourceBloc.apiClient!))),
+                              createActionCard(
+                                  'Backup',
                                   FontAwesomeIcons.save,
-                                  size: 55,
-                                  color: Colors.white24,
-                                ),
-                                title: 'Backup',
-                                onTap: () => Navigator.of(context).push(
-                                    _createBackupRoute(guestID, state.nodeID,
-                                        resourceBloc.apiClient!)),
-                              ),
+                                  () => Navigator.of(context).push(
+                                      _createBackupRoute(guestID, state.nodeID,
+                                          resourceBloc.apiClient!))),
                             ],
                           ),
                         ),

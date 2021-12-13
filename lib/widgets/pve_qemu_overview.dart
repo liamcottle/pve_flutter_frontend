@@ -37,6 +37,18 @@ class PveQemuOverview extends StatelessWidget {
 
   const PveQemuOverview({Key? key, required this.guestID}) : super(key: key);
 
+  ActionCard createActionCard(String title, IconData icon, Function onTap) {
+    return ActionCard(
+      icon: Icon(
+        icon,
+        size: 55,
+        color: Colors.white24,
+      ),
+      title: title,
+      onTap: onTap,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bloc = Provider.of<PveQemuOverviewBloc>(context);
@@ -125,65 +137,40 @@ class PveQemuOverview extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
                             if (!(status?.template ?? false))
-                              ActionCard(
-                                icon: Icon(
+                              createActionCard(
+                                  'Power Settings',
                                   Icons.power_settings_new,
-                                  size: 55,
-                                  color: Colors.white24,
-                                ),
-                                title: 'Power Settings',
-                                onTap: () =>
-                                    showPowerMenuBottomSheet(context, bloc),
-                              ),
+                                  () =>
+                                      showPowerMenuBottomSheet(context, bloc)),
                             if (!(status?.template ?? false) &&
                                 (status?.spice ?? false))
-                              ActionCard(
-                                icon: Icon(
+                              createActionCard(
+                                  'Console',
                                   Icons.queue_play_next,
-                                  size: 55,
-                                  color: Colors.white24,
-                                ),
-                                title: 'Console',
-                                onTap: () => showConsoleMenuBottomSheet(
-                                    context,
-                                    bloc.apiClient,
-                                    guestID,
-                                    state.nodeID,
-                                    'qemu'),
-                              ),
-                            ActionCard(
-                              icon: Icon(
+                                  () => showConsoleMenuBottomSheet(
+                                      context,
+                                      bloc.apiClient,
+                                      guestID,
+                                      state.nodeID,
+                                      'qemu')),
+                            createActionCard(
+                                'Options',
                                 Icons.settings,
-                                size: 55,
-                                color: Colors.white24,
-                              ),
-                              title: 'Options',
-                              onTap: () => Navigator.of(context)
-                                  .push(_createOptionsRoute(bloc)),
-                            ),
+                                () => Navigator.of(context)
+                                    .push(_createOptionsRoute(bloc))),
                             if (!rBloc.latestState.isStandalone)
-                              ActionCard(
-                                icon: Icon(
+                              createActionCard(
+                                  'Migrate',
                                   FontAwesomeIcons.paperPlane,
-                                  size: 55,
-                                  color: Colors.white24,
-                                ),
-                                title: 'Migrate',
-                                onTap: () => Navigator.of(context).push(
-                                    _createMigrationRoute(
-                                        guestID, state.nodeID, bloc.apiClient)),
-                              ),
-                            ActionCard(
-                              icon: Icon(
+                                  () => Navigator.of(context).push(
+                                      _createMigrationRoute(guestID,
+                                          state.nodeID, bloc.apiClient))),
+                            createActionCard(
+                                'Backup',
                                 FontAwesomeIcons.save,
-                                size: 55,
-                                color: Colors.white24,
-                              ),
-                              title: 'Backup',
-                              onTap: () => Navigator.of(context).push(
-                                  _createBackupRoute(
-                                      guestID, state.nodeID, bloc.apiClient)),
-                            ),
+                                () => Navigator.of(context).push(
+                                    _createBackupRoute(guestID, state.nodeID,
+                                        bloc.apiClient))),
                           ],
                         ),
                       ),
