@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
@@ -153,6 +154,16 @@ class PveGuestHeaderRRDPageView extends StatefulWidget {
       _PveGuestHeaderRRDPageViewState();
 }
 
+class PVEScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        // what else?
+      };
+}
+
 class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
   PageController controller = PageController();
 
@@ -164,7 +175,9 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
   @override
   Widget build(BuildContext context) {
     if (widget.rrdData != null && widget.rrdData!.isNotEmpty) {
-      return PageView.builder(
+      return ScrollConfiguration(
+        behavior: PVEScrollBehavior(),
+        child: PageView.builder(
           controller: controller,
           itemCount: 2,
           itemBuilder: (context, item) {
@@ -213,7 +226,8 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
                   ),
               ],
             );
-          });
+        },
+      ));
     }
     return Container(
       height: 200,
