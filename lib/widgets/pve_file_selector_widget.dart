@@ -415,6 +415,9 @@ class FileSelectorContentView extends StatelessWidget {
       case PveStorageContentType.iso:
         return FontAwesomeIcons.compactDisc;
         break;
+      case PveStorageContentType.vztmpl:
+        return FontAwesomeIcons.cube;
+        break;
       case PveStorageContentType.images:
         return FontAwesomeIcons.hdd;
         break;
