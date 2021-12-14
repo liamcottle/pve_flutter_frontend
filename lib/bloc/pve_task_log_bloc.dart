@@ -51,8 +51,7 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
       if (latestState.limit >= latestState.tasks.length &&
           !latestState.isLoading) {
         final taskResponse = await getNodeTasks(latestState);
-        yield latestState
-            .rebuild((b) => b..tasks.replace(taskResponse!.tasks!));
+        yield latestState.rebuild((b) => b..tasks.replace(taskResponse.tasks!));
       }
     }
 
@@ -65,7 +64,7 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
 
         yield latestState.rebuild((b) => b
           ..tasks
-              .addAll(nodeTaskResponse!.tasks as Iterable<PveClusterTasksModel>)
+              .addAll(nodeTaskResponse.tasks as Iterable<PveClusterTasksModel>)
           ..total = nodeTaskResponse.total
           ..isLoading = false);
       }
@@ -92,7 +91,7 @@ class PveTaskLogBloc extends ProxmoxBaseBloc<PVETaskLogEvent, PveTaskLogState> {
     }
   }
 
-  Future<NodeTasksResponse?> getNodeTasks(PveTaskLogState state,
+  Future<NodeTasksResponse> getNodeTasks(PveTaskLogState state,
       {int? start, int limit = 50}) async {
     return await apiClient.getNodeTasks(
       state.nodeID,

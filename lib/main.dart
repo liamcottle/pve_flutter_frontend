@@ -31,7 +31,7 @@ import 'package:pve_flutter_frontend/widgets/pve_lxc_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_node_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_qemu_overview.dart';
 import 'package:pve_flutter_frontend/widgets/pve_splash_screen.dart';
-import 'utils/promox_colors.dart';
+import 'package:pve_flutter_frontend/utils/proxmox_colors.dart';
 
 import 'package:rxdart/streams.dart' show ValueStreamExtensions;
 
@@ -100,16 +100,61 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         navigatorKey: navigatorKey,
         title: 'Proxmox',
+        themeMode: ThemeMode.dark,
         theme: ThemeData(
-          brightness: Brightness.light,
+          colorScheme: ColorScheme.light(
+            brightness: Brightness.light,
+            primary: ProxmoxColors.supportBlue,
+            onPrimary: Colors.white,
+            primaryVariant: ProxmoxColors.blue900,
+            secondary: ProxmoxColors.orange,
+            secondaryVariant: ProxmoxColors.supportLightOrange,
+            surface: ProxmoxColors.supportGreyTint50,
+            onSurface: Colors.black,
+            background: ProxmoxColors.supportGreyTint75,
+            onBackground: Colors.black,
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(primary: ProxmoxColors.grey),
+          ),
           fontFamily: "Open Sans",
-          primarySwatch: Colors.blue,
-          primaryColor: ProxmoxColors.supportBlue,
           primaryTextTheme: TextTheme(
             headline6:
                 TextStyle(fontFamily: "Open Sans", fontWeight: FontWeight.w700),
           ),
-          scaffoldBackgroundColor: Color(0xFFf6f7f9),
+          appBarTheme: AppBarTheme(
+            backgroundColor: ProxmoxColors.supportBlue, // primary
+            foregroundColor: Colors.white, // onPrimary
+          ),
+        ),
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.dark(
+            brightness: Brightness.dark,
+            primary: ProxmoxColors.supportBlue,
+            onPrimary: Colors.white,
+            primaryVariant: ProxmoxColors.blue800,
+            surface: ProxmoxColors.greyTint20,
+            onSurface: Colors.white,
+            secondary: ProxmoxColors.orange,
+            secondaryVariant: ProxmoxColors.supportLightOrange,
+            background: ProxmoxColors.grey,
+            onBackground: ProxmoxColors.supportGreyTint75,
+          ),
+          // flutter has a weird logic where it pulls colors from different
+          // scheme properties depending on light/dark mode, avoid that...
+          appBarTheme: AppBarTheme(
+            backgroundColor: ProxmoxColors.supportBlue, // primary
+            foregroundColor: Colors.white, // onPrimary
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(primary: ProxmoxColors.greyTint80),
+          ),
+          fontFamily: "Open Sans",
+          primaryTextTheme: TextTheme(
+            headline6:
+                TextStyle(fontFamily: "Open Sans", fontWeight: FontWeight.w700),
+          ),
+          scaffoldBackgroundColor: ProxmoxColors.grey,
         ),
         builder: (context, child) {
           return StreamListener(

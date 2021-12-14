@@ -17,6 +17,7 @@ class PveGuestMigrate extends StatelessWidget {
   Widget build(BuildContext context) {
     final migrateBloc = Provider.of<PveMigrateBloc>(context);
     final nodeSelectorbloc = Provider.of<PveNodeSelectorBloc>(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return ProxmoxStreamBuilder<PveMigrateBloc, PveMigrateState>(
       bloc: migrateBloc,
@@ -41,7 +42,7 @@ class PveGuestMigrate extends StatelessWidget {
                           ?.credentials
                           .apiBaseUrl ??
                       Uri.parse('https://pve.proxmox.com/')),
-                  docPath: 'pve-admin-guide.html#qm_migration')
+                  docPath: 'chapter-qm.html') // FIXME: '#anchor' is url encoded
             ],
           ),
           body: PveMigrateStreamConnector(
@@ -49,7 +50,7 @@ class PveGuestMigrate extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  color: Theme.of(context).primaryColor,
+                  color: colorScheme.primary,
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -57,29 +58,31 @@ class PveGuestMigrate extends StatelessWidget {
                           leading: Icon(FontAwesomeIcons.globe),
                           title: Text(
                             'Mode',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: colorScheme.onPrimary),
                           ),
                           subtitle: Text(
                             migrateState.mode.name,
-                            style: TextStyle(color: Colors.white54),
+                            style: TextStyle(
+                                color: colorScheme.onPrimary.withOpacity(0.66)),
                           ),
                         ),
                         ListTile(
                           leading: Icon(FontAwesomeIcons.mapPin),
                           title: Text(
                             'Source',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: colorScheme.onPrimary),
                           ),
                           subtitle: Text(
                             migrateState.nodeID,
-                            style: TextStyle(color: Colors.white54),
+                            style: TextStyle(
+                                color: colorScheme.onPrimary.withOpacity(0.66)),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 20),
                           child: _MigrateTargetSelector(
-                            titleColor: Colors.white,
-                            iconEnabledColor: Colors.white,
+                            titleColor: colorScheme.onPrimary,
+                            iconEnabledColor: colorScheme.onPrimary,
                             nodeSelectorbloc: nodeSelectorbloc,
                             migrateBloc: migrateBloc,
                             disabled: migrateState.inProgress,
@@ -97,7 +100,7 @@ class PveGuestMigrate extends StatelessWidget {
                             leading: con.severity == PveMigrateSeverity.error
                                 ? Icon(
                                     Icons.error,
-                                    color: Colors.red,
+                                    color: colorScheme.error,
                                   )
                                 : Icon(
                                     Icons.warning,
@@ -136,20 +139,20 @@ class PveGuestMigrate extends StatelessWidget {
 }
 
 class _MigrateTargetSelector extends StatelessWidget {
-  const _MigrateTargetSelector(
-      {Key? key,
-      required this.nodeSelectorbloc,
-      required this.migrateBloc,
-      required this.disabled,
-      this.titleColor = Colors.black,
-      this.iconEnabledColor = Colors.black})
-      : super(key: key);
+  const _MigrateTargetSelector({
+    Key? key,
+    required this.nodeSelectorbloc,
+    required this.migrateBloc,
+    required this.disabled,
+    required this.titleColor,
+    required this.iconEnabledColor,
+  }) : super(key: key);
 
   final PveNodeSelectorBloc nodeSelectorbloc;
   final PveMigrateBloc migrateBloc;
   final bool disabled;
   final Color titleColor;
-  final Color iconEnabledColor;
+  final Color? iconEnabledColor;
 
   @override
   Widget build(BuildContext context) {
@@ -164,8 +167,9 @@ class _MigrateTargetSelector extends StatelessWidget {
           ),
           subtitle: DropdownButtonFormField(
             decoration: InputDecoration(
-                enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: titleColor))),
+              enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: titleColor)),
+            ),
             iconEnabledColor: iconEnabledColor,
             items: state.availableNodes
                 .map((item) => DropdownMenuItem(
@@ -174,7 +178,7 @@ class _MigrateTargetSelector extends StatelessWidget {
                           Icons.storage,
                         ),
                         trailing:
-                            Icon(Icons.offline_bolt, color: Colors.greenAccent),
+                            Icon(Icons.offline_bolt, color: Colors.green[500]),
                         title: Text(item.nodeName),
                         subtitle:
                             Text('CPU: ${item.renderMemoryUsagePercent()}'),

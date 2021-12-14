@@ -25,8 +25,11 @@ abstract class ProxmoxBaseBloc<E, S> {
   void doOnCancel() {}
 
   ProxmoxBaseBloc() {
-    _stateSubject = BehaviorSubject<S>.seeded(initialState,
-        onCancel: doOnCancel, onListen: doOnListen);
+    _stateSubject = BehaviorSubject<S>.seeded(
+      initialState,
+      onCancel: doOnCancel,
+      onListen: doOnListen,
+    );
     _initEventPipe();
   }
 

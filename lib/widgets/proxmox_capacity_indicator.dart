@@ -38,30 +38,41 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
               Row(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 10.0),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 8.0),
                     child: icon ??
-                        Icon(
-                          Icons.storage,
-                          color: selected ? Colors.white : Colors.blueGrey[300],
-                        ),
+                        Icon(Icons.storage,
+                            color: (selected
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onBackground
+                                    .withOpacity(0.75))),
                   ),
                   Text(usedValue,
                       style: TextStyle(
                           color: textColor ??
-                              (selected ? Colors.white : Colors.black),
+                              (selected
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onBackground)
+                                  .withOpacity(0.66),
                           fontWeight: FontWeight.bold)),
                 ],
               ),
               Text("Total: $totalValue",
                   style: TextStyle(
                       color: textColor ??
-                          (selected ? Colors.white70 : Colors.blueGrey[300]),
+                          (selected
+                                  ? Theme.of(context).colorScheme.onPrimary
+                                  : Theme.of(context).colorScheme.onBackground)
+                              .withOpacity(0.66),
                       fontWeight: FontWeight.bold))
             ],
           ),
           LinearProgressIndicator(
-            backgroundColor:
-                indicatorBackgroundColor ?? Color.fromARGB(255, 229, 226, 248),
+            backgroundColor: indicatorBackgroundColor ??
+                Theme.of(context).colorScheme.onPrimary,
             valueColor: valueColor ?? getUsageAwareColor(usedPercent),
             value: usedPercent,
           )
@@ -76,11 +87,11 @@ class ProxmoxCapacityIndicator extends StatelessWidget {
     }
 
     if (usedPercent < 0.75) {
-      return AlwaysStoppedAnimation<Color>(Colors.greenAccent);
+      return AlwaysStoppedAnimation<Color>(Colors.green[400]!);
     } else if (usedPercent < 0.85) {
-      return AlwaysStoppedAnimation<Color>(Colors.red);
-    } else {
       return AlwaysStoppedAnimation<Color>(Colors.yellow);
+    } else {
+      return AlwaysStoppedAnimation<Color>(Colors.red);
     }
   }
 }

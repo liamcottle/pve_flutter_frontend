@@ -4,20 +4,20 @@ class ActionCard extends StatelessWidget {
   final Function? onTap;
   final String? title;
   final Widget? icon;
-  final Color color;
+  final Color? color;
 
   const ActionCard({
     Key? key,
     this.onTap,
     this.title,
     this.icon,
-    this.color = const Color(0xFF003752),
+    this.color,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: color,
+      color: color ?? Theme.of(context).colorScheme.primary,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       child: InkWell(
         onTap: onTap as void Function()?,
@@ -36,7 +36,8 @@ class ActionCard extends StatelessWidget {
                     child: Text(
                       title!,
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

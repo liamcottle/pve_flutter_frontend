@@ -33,16 +33,8 @@ class _PveFileSelectorState extends State<PveFileSelector> {
     return ProxmoxLayoutBuilder(
       builder: (context, layout) => Scaffold(
         appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.black),
-          backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Text(
-            "Storage",
-            style: TextStyle(
-                // fontSize: 30,
-                // fontWeight: FontWeight.bold,
-                color: Colors.black),
-          ),
+          title: Text("Storage"),
         ),
         body: PveFileSelectorWidget(
           isSelector: widget.isSelector,
@@ -64,13 +56,13 @@ class _PveFileSelectorState extends State<PveFileSelector> {
 class PveFileSelectorWidget extends StatelessWidget {
   final PveFileSelectorBloc? fBloc;
   final PveStorageSelectorBloc? sBloc;
-  final bool? isSelector;
+  final bool isSelector;
 
   const PveFileSelectorWidget({
     Key? key,
     required this.fBloc,
     required this.sBloc,
-    this.isSelector,
+    this.isSelector = false,
   }) : super(key: key);
 
   @override
@@ -149,19 +141,24 @@ class PveFileSelectorWidget extends StatelessWidget {
                               Text(
                                 "Content",
                                 style: TextStyle(
-                                    color: Color.fromARGB(255, 159, 171, 207),
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.bold),
                               ),
                               Row(
                                 children: <Widget>[
                                   IconButton(
-                                    color: Color.fromARGB(255, 152, 162, 201),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground,
                                     icon: Icon(Icons.search),
                                     onPressed: () =>
                                         fBloc!.events.add(ToggleSearch()),
                                   ),
                                   IconButton(
-                                    color: Color.fromARGB(255, 152, 162, 201),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground,
                                     icon: Icon(
                                       state.gridView
                                           ? Icons.view_list
@@ -207,10 +204,10 @@ class PveFileSelectorWidget extends StatelessWidget {
 }
 
 class PveStorageCardIcon extends StatelessWidget {
-  final bool? selected;
+  final bool selected;
   final IconData? icon;
 
-  const PveStorageCardIcon({Key? key, this.selected, this.icon})
+  const PveStorageCardIcon({Key? key, this.selected = false, this.icon})
       : super(key: key);
 
   @override
@@ -219,7 +216,7 @@ class PveStorageCardIcon extends StatelessWidget {
       height: 50,
       width: 50,
       child: Card(
-        color: selected! ? Colors.white : Color.fromARGB(255, 243, 246, 255),
+        color: Theme.of(context).colorScheme.secondary,
         elevation: 0,
         child: Icon(icon),
       ),
@@ -250,7 +247,9 @@ class PveStorageCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Card(
-          color: isSelected ? Theme.of(context).primaryColor : Colors.white,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.surface,
           elevation: isSelected ? 4 : 1,
           child: InkWell(
               onTap: storage.active!
@@ -270,13 +269,18 @@ class PveStorageCard extends StatelessWidget {
                       Text(
                         storage.id,
                         style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(context).colorScheme.onBackground,
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
                         "(${storage.content})",
                         style: TextStyle(
-                          color: isSelected ? Colors.white54 : Colors.black54,
+                          color: (isSelected
+                                  ? Theme.of(context).colorScheme.onPrimary
+                                  : Theme.of(context).colorScheme.onBackground)
+                              .withOpacity(0.75),
                           fontWeight: FontWeight.bold,
                         ),
                         maxLines: 1,
@@ -302,9 +306,10 @@ class PveStorageCard extends StatelessWidget {
                             child: Text(
                               "Storage offline",
                               style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white54
-                                    : Colors.black54,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onBackground
+                                    .withOpacity(0.75),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -321,16 +326,16 @@ class PveStorageCard extends StatelessWidget {
 class FileSelectorContentView extends StatelessWidget {
   final bool? gridView;
   final List<PveNodesStorageContentModel>? content;
-  final bool? isSelector;
-  final bool? storageSelected;
+  final bool isSelector;
+  final bool storageSelected;
 
-  const FileSelectorContentView(
-      {Key? key,
-      this.gridView,
-      this.content,
-      this.isSelector,
-      this.storageSelected})
-      : super(key: key);
+  const FileSelectorContentView({
+    Key? key,
+    this.gridView,
+    this.content,
+    this.isSelector = false,
+    this.storageSelected = false,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     if (content == null) {
@@ -339,15 +344,15 @@ class FileSelectorContentView extends StatelessWidget {
       );
     }
 
-    if (content!.isEmpty && storageSelected!) {
+    if (content!.isEmpty && storageSelected) {
       return Center(
         child: Text("Nothing found"),
       );
     }
 
-    if (content!.isEmpty && !storageSelected!) {
+    if (content!.isEmpty && !storageSelected) {
       return Center(
-        child: Text("Please select storage"),
+        child: Text("Please select a storage"),
       );
     }
 
@@ -359,7 +364,7 @@ class FileSelectorContentView extends StatelessWidget {
           itemBuilder: (context, index) => GridTile(
             child: Card(
               child: InkWell(
-                onTap: isSelector!
+                onTap: isSelector
                     ? () => Navigator.pop(context, content![index])
                     : null,
                 child: Column(
@@ -367,7 +372,7 @@ class FileSelectorContentView extends StatelessWidget {
                   children: <Widget>[
                     Icon(
                       getContentIcon(content![index].content),
-                      color: Color.fromARGB(255, 152, 162, 201),
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                     FractionallySizedBox(
                       widthFactor: 0.8,
@@ -395,7 +400,7 @@ class FileSelectorContentView extends StatelessWidget {
         child: ListTile(
           leading: Icon(
             getContentIcon(content![index].content),
-            color: Color.fromARGB(255, 152, 162, 201),
+            color: Theme.of(context).colorScheme.secondary,
           ),
           title: Text(
             Renderers.renderStorageContent(content![index]),
@@ -404,7 +409,7 @@ class FileSelectorContentView extends StatelessWidget {
           ),
           trailing: Text(Renderers.formatSize(content![index].size)),
           onTap:
-              isSelector! ? () => Navigator.pop(context, content![index]) : null,
+              isSelector ? () => Navigator.pop(context, content![index]) : null,
         ),
       ),
     );

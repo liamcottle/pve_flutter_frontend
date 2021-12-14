@@ -20,10 +20,9 @@ abstract class PveNodeOverviewState
   bool get standalone;
 
   bool get allServicesRunning => !services.any((s) {
-        if (s.name == 'corosync' && standalone) {
-          return false;
-        }
-        return s.state != 'running';
+        if (s.name == 'corosync' && standalone) return false;
+        return (s.state != 'running' &&
+            !(s.unitState == 'masked' || s.unitState == 'not-found'));
       });
   bool get allDisksHealthy => !disks.any((s) => !isDiskHealthy(s));
 

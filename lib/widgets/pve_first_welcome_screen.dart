@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pve_flutter_frontend/utils/dot_indicator.dart';
-import 'package:pve_flutter_frontend/utils/promox_colors.dart';
+import 'package:pve_flutter_frontend/utils/proxmox_colors.dart';
 import 'package:pve_flutter_frontend/widgets/firstWelcomeScreen/pve_welcome_logo.dart';
 import 'package:pve_flutter_frontend/widgets/firstWelcomeScreen/pve_welcome_faq.dart';
 import 'package:pve_flutter_frontend/widgets/firstWelcomeScreen/pve_welcome_ssl_hint.dart';

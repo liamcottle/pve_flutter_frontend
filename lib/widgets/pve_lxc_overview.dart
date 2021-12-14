@@ -72,11 +72,10 @@ class PveLxcOverview extends StatelessWidget {
             return SafeArea(
               child: Scaffold(
                 appBar: AppBar(
-                  backgroundColor: Colors.transparent,
                   elevation: 0,
                   title: Text(config?.hostname ?? 'CT $guestID'),
                 ),
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).colorScheme.background,
                 body: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
@@ -89,7 +88,9 @@ class PveLxcOverview extends StatelessWidget {
                                 child: Text(
                                   "TEMPLATE",
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground,
                                   ),
                                 ),
                               ),
@@ -108,7 +109,6 @@ class PveLxcOverview extends StatelessWidget {
                           if (taskState.tasks != null &&
                               taskState.tasks.isNotEmpty) {
                             return PveTaskExpansionTile(
-                              headerColor: Colors.white,
                               task: taskState.tasks.first,
                               showMorePage: Provider<PveTaskLogBloc>(
                                 create: (context) => PveTaskLogBloc(

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
 import 'package:pve_flutter_frontend/bloc/pve_node_overview_bloc.dart';
 import 'package:pve_flutter_frontend/bloc/pve_task_log_bloc.dart';
 import 'package:pve_flutter_frontend/states/pve_node_overview_state.dart';
 import 'package:pve_flutter_frontend/states/pve_task_log_state.dart';
-import 'package:pve_flutter_frontend/utils/promox_colors.dart';
+import 'package:pve_flutter_frontend/utils/proxmox_colors.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/utils/utils.dart';
 import 'package:pve_flutter_frontend/widgets/proxmox_capacity_indicator.dart';
@@ -20,9 +21,21 @@ import 'package:pve_flutter_frontend/widgets/pve_task_log_widget.dart';
 
 class PveNodeOverview extends StatelessWidget {
   static final routeName = RegExp(r'\/nodes\/(\S+)$');
-  final String? nodeID;
+  final String nodeID;
 
-  const PveNodeOverview({Key? key, this.nodeID}) : super(key: key);
+  Icon getServiceStateIcon(BuildContext context, PveNodeServicesModel s) {
+    if (s.state == 'running')
+      return Icon(Icons.play_arrow, color: Colors.green[400]);
+    else if (s.unitState == 'masked' || s.unitState == 'not-found')
+      return Icon(
+        Icons.play_disabled,
+        color: IconTheme.of(context).color!.withOpacity(0.75),
+      );
+    else
+      return Icon(Icons.stop, color: Theme.of(context).colorScheme.error);
+  }
+
+  const PveNodeOverview({Key? key, required this.nodeID}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final nBloc = Provider.of<PveNodeOverviewBloc>(context);
@@ -32,28 +45,28 @@ class PveNodeOverview extends StatelessWidget {
       bloc: nBloc,
       builder: (context, state) {
         final status = state.status;
+        final rrd = state.rrdData.where((e) => e.time != null);
         return SafeArea(
           child: Scaffold(
             appBar: AppBar(
-              backgroundColor: Colors.transparent,
+              //backgroundColor: Colors.transparent,
               elevation: 0,
               title: Text(
-                nodeID!,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25),
+                "Node ${nodeID}",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            backgroundColor: ProxmoxColors.supportBlue,
+            //backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.background,
             body: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  if (state.rrdData.isNotEmpty)
+                  if (rrd.isNotEmpty)
                     Container(
                       height: 200,
+                      color: Theme.of(context).colorScheme.primary,
                       child: ScrollConfiguration(
                         behavior: PVEScrollBehavior(),
                         child: PageView.builder(
@@ -67,7 +80,7 @@ class PveNodeOverview extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             );
-                            double? last_cpu = state.rrdData.last.cpu;
+                            double? last_cpu = rrd.last.cpu;
                             String last_cpu_text = last_cpu != null
                                 ? "${(last_cpu * 100.0).toStringAsFixed(2)} %"
                                 : "";
@@ -79,9 +92,10 @@ class PveNodeOverview extends StatelessWidget {
                                       title:
                                           'CPU (${state.status?.cpuinfo?.cpus ?? '-'})',
                                       subtitle: last_cpu_text,
-                                      data: state.rrdData.map((e) => Point(
-                                          e.time!.millisecondsSinceEpoch,
-                                          e.cpu! * 100.0)),
+                                      data: rrd.where((e) => e.cpu != null).map(
+                                          (e) => Point(
+                                              e.time!.millisecondsSinceEpoch,
+                                              e.cpu! * 100.0)),
                                       icon: Icon(Icons.memory),
                                       bottomRight: pageIndicator,
                                       dataRenderer: (data) =>
@@ -93,8 +107,8 @@ class PveNodeOverview extends StatelessWidget {
                                     child: PveRRDChart(
                                       title: 'Memory',
                                       subtitle: Renderers.formatSize(
-                                          state.rrdData.last.memused ?? 0),
-                                      data: state.rrdData.map((e) => Point(
+                                          rrd.last.memused ?? 0),
+                                      data: rrd.map((e) => Point(
                                           e.time!.millisecondsSinceEpoch,
                                           e.memused!)),
                                       icon: Icon(FontAwesomeIcons.memory),
@@ -107,11 +121,11 @@ class PveNodeOverview extends StatelessWidget {
                                   Expanded(
                                     child: PveRRDChart(
                                       title: 'I/O wait',
-                                      subtitle: state.rrdData.last.iowait
-                                              ?.toStringAsFixed(2) ??
-                                          '0',
-                                      data: state.rrdData.map((e) => Point(
-                                          e.time?.millisecondsSinceEpoch ?? 0,
+                                      subtitle:
+                                          rrd.last.iowait?.toStringAsFixed(2) ??
+                                              '0',
+                                      data: rrd.map((e) => Point(
+                                          e.time!.millisecondsSinceEpoch,
                                           e.iowait ?? 0)),
                                       icon: Icon(Icons.timer),
                                       bottomRight: pageIndicator,
@@ -123,10 +137,10 @@ class PveNodeOverview extends StatelessWidget {
                                   Expanded(
                                     child: PveRRDChart(
                                       title: 'Load',
-                                      subtitle: state.rrdData.last.loadavg
+                                      subtitle: rrd.last.loadavg
                                               ?.toStringAsFixed(2) ??
                                           '0',
-                                      data: state.rrdData.map((e) => Point(
+                                      data: rrd.map((e) => Point(
                                           e.time!.millisecondsSinceEpoch,
                                           e.loadavg!)),
                                       icon: Icon(Icons.show_chart),
@@ -147,9 +161,8 @@ class PveNodeOverview extends StatelessWidget {
                       if (taskState.tasks != null &&
                           taskState.tasks.isNotEmpty) {
                         return Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: PveTaskExpansionTile(
-                            headerColor: Colors.white,
                             task: taskState.tasks.first,
                             showMorePage: Provider<PveTaskLogBloc>(
                               create: (context) => PveTaskLogBloc(
@@ -179,8 +192,8 @@ class PveNodeOverview extends StatelessWidget {
                               color: Colors.white24,
                             ),
                             title: 'Console',
-                            onTap: () => showConsoleMenuBottomSheet(context,
-                                nBloc.apiClient, null, nodeID!, 'node'),
+                            onTap: () => showConsoleMenuBottomSheet(
+                                context, nBloc.apiClient, null, nodeID, 'node'),
                           ),
                         ],
                       ),
@@ -273,9 +286,7 @@ class PveNodeOverview extends StatelessWidget {
                             dense: true,
                             title: Text('${s.name}'),
                             subtitle: Text('${s.desc}'),
-                            trailing: s.state != 'running'
-                                ? Icon(Icons.play_arrow)
-                                : Icon(Icons.stop),
+                            trailing: getServiceStateIcon(context, s),
                           ),
                         )
                         .toList()

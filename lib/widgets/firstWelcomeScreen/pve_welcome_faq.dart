@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pve_flutter_frontend/widgets/firstWelcomeScreen/pve_welcome_common.dart';
-import 'package:pve_flutter_frontend/utils/promox_colors.dart';
+import 'package:pve_flutter_frontend/utils/proxmox_colors.dart';
 
 // FAQ
 class PveWelcomePageFAQ extends StatelessWidget {

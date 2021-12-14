@@ -76,7 +76,7 @@ class PveQemuOverview extends StatelessWidget {
                   elevation: 0,
                   title: Text(config?.name ?? 'VM $guestID'),
                 ),
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).colorScheme.background,
                 body: SingleChildScrollView(
                     child: Column(
                   children: <Widget>[
@@ -108,7 +108,8 @@ class PveQemuOverview extends StatelessWidget {
                         if (taskState.tasks != null &&
                             taskState.tasks.isNotEmpty) {
                           return PveTaskExpansionTile(
-                            headerColor: Colors.white,
+                            headerColor:
+                                Theme.of(context).colorScheme.onBackground,
                             task: taskState.tasks.first,
                             showMorePage: Provider<PveTaskLogBloc>(
                               create: (context) => PveTaskLogBloc(

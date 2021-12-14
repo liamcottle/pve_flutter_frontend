@@ -11,10 +11,10 @@ class PveRRDChart extends StatefulWidget {
   final EdgeInsetsGeometry? titlePadding;
   final Iterable<Point<num>>? data;
   final Widget? icon;
-  final Color lineColor;
+  final Color? lineColor;
   final double? staticMaximum;
-  final Color shadeColorTop;
-  final Color shadeColorBottom;
+  final Color? shadeColorTop;
+  final Color? shadeColorBottom;
   final CrossAxisAlignment titleAlginment;
   final bool showMaximum;
   final bool showDuration;
@@ -27,10 +27,10 @@ class PveRRDChart extends StatefulWidget {
     this.subtitle,
     this.data,
     this.icon,
-    this.lineColor = Colors.white,
+    this.lineColor,
     this.staticMaximum,
-    this.shadeColorTop = Colors.white,
-    this.shadeColorBottom = const Color(0x00FFFFFF),
+    this.shadeColorTop,
+    this.shadeColorBottom,
     this.titleAlginment = CrossAxisAlignment.start,
     this.titleWidth,
     this.titlePadding,
@@ -55,6 +55,7 @@ class _PveRRDChartState extends State<PveRRDChart> {
     final timeWindow = DateTime.fromMillisecondsSinceEpoch(data.last.x as int)
         .difference(DateTime.fromMillisecondsSinceEpoch(data.first.x as int));
 
+    final fgColor = Theme.of(context).colorScheme.onPrimary.withOpacity(0.85);
     return Column(
       crossAxisAlignment: widget.titleAlginment,
       children: <Widget>[
@@ -66,16 +67,12 @@ class _PveRRDChartState extends State<PveRRDChart> {
             title: Text(
               widget.title!,
               style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white60,
-                  fontWeight: FontWeight.bold),
+                  fontSize: 12, color: fgColor, fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
               '${widget.subtitle}',
               style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
+                  fontSize: 20, color: fgColor, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -86,7 +83,7 @@ class _PveRRDChartState extends State<PveRRDChart> {
                 widget.dataRenderer != null
                     ? 'max ' + widget.dataRenderer!(globalMaxima)
                     : 'max $globalMaximaLabel',
-                style: TextStyle(color: Colors.white60, fontSize: 11),
+                style: TextStyle(color: fgColor, fontSize: 11),
               ),
             ],
           ),
@@ -105,10 +102,15 @@ class _PveRRDChartState extends State<PveRRDChart> {
               child: CustomPaint(
                 painter: ProxmoxLineChart(
                     data: data.toList(),
-                    lineColor: widget.lineColor,
+                    textColor: widget.lineColor ??
+                        Theme.of(context).colorScheme.onPrimary,
+                    lineColor: widget.lineColor ??
+                        Theme.of(context).colorScheme.onPrimary,
                     staticMax: widget.staticMaximum,
-                    shadeColorBottom: widget.shadeColorBottom,
-                    shadeColorTop: widget.shadeColorTop,
+                    shadeColorBottom: widget.shadeColorBottom ??
+                        Theme.of(context).colorScheme.primary,
+                    shadeColorTop: widget.shadeColorTop ??
+                        Theme.of(context).colorScheme.onPrimary,
                     touchPoint: touchpoint,
                     ordinateRenderer: widget.dataRenderer),
               ),
@@ -119,7 +121,7 @@ class _PveRRDChartState extends State<PveRRDChart> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('past ' + Renderers.renderDuration(timeWindow),
-                style: TextStyle(color: Colors.white60, fontSize: 11)),
+                style: TextStyle(color: fgColor, fontSize: 11)),
             if (widget.bottomRight != null) widget.bottomRight!,
           ],
         ),

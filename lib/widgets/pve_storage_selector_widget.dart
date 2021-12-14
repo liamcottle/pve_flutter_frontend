@@ -40,16 +40,16 @@ class PveStorageSelectorDropdown extends StatelessWidget {
                     height: 40,
                     width: 40,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Color.fromARGB(255, 243, 246, 255)),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
                     child: Center(
-                        child: Text(
-                      storage.type.toUpperCase(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontSize: 14),
-                    )),
+                        child: Text(storage.type.toUpperCase(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 14,
+                            ))),
                   ),
                   subtitle: ProxmoxCapacityIndicator(
                     usedValue: Renderers.formatSize(storage.usedSpace),

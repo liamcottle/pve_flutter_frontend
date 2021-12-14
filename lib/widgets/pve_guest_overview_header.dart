@@ -4,7 +4,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proxmox_dart_api_client/proxmox_dart_api_client.dart';
-import 'package:pve_flutter_frontend/utils/promox_colors.dart';
+import 'package:pve_flutter_frontend/utils/proxmox_colors.dart';
 import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/widgets/pve_guest_icon_widget.dart';
 
@@ -39,11 +39,14 @@ class PveGuestOverviewHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final haError = ha?.state == 'error';
+    final fgColor = Theme.of(context).colorScheme.onPrimary.withOpacity(0.75);
     return Container(
       height: 250,
       width: width,
       decoration: BoxDecoration(
-        color: ProxmoxColors.supportBlue,
+        //color: ProxmoxColors.supportBlue,
+        //color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.primary,
       ),
       child: Stack(
           fit: StackFit.expand,
@@ -64,7 +67,7 @@ class PveGuestOverviewHeader extends StatelessWidget {
                           status: guestStatus,
                           fontzsize: 15.0,
                           fontWeight: FontWeight.w500,
-                          offlineColor: Colors.black38,
+                          offlineColor: fgColor,
                         ),
                       ),
                     ],
@@ -78,15 +81,15 @@ class PveGuestOverviewHeader extends StatelessWidget {
                         type: guestType,
                         template: template,
                         status: guestStatus,
-                        color: Colors.white54,
-                        templateColor: Colors.white54,
+                        color: fgColor,
+                        templateColor: fgColor,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
                           guestID,
                           style: TextStyle(
-                            color: Colors.white54,
+                            color: fgColor,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -100,14 +103,14 @@ class PveGuestOverviewHeader extends StatelessWidget {
                     children: <Widget>[
                       Icon(
                         Icons.storage,
-                        color: Colors.white54,
+                        color: fgColor,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
                           guestNodeID,
                           style: TextStyle(
-                            color: Colors.white54,
+                            color: fgColor,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -122,14 +125,14 @@ class PveGuestOverviewHeader extends StatelessWidget {
                       children: <Widget>[
                         Icon(
                           FontAwesomeIcons.heartbeat,
-                          color: haError ? Colors.red : Colors.green,
+                          color: haError ? Colors.red : Colors.green[400],
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
                             "HA State",
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: fgColor,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -164,65 +167,66 @@ class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.rrdData != null && widget.rrdData!.isNotEmpty) {
-      return ScrollConfiguration(
-        behavior: PVEScrollBehavior(),
-        child: PageView.builder(
-          controller: controller,
-          itemCount: 2,
-          itemBuilder: (context, item) {
-            final page = item + 1;
-            final pageIndicator = Text(
-              '$page of 2',
-              style: TextStyle(
-                color: Colors.white54,
-                fontWeight: FontWeight.w500,
-              ),
-            );
-            return Column(
-              children: [
-                if (item == 0)
-                  Expanded(
-                    child: PveRRDChart(
-                      titlePadding: EdgeInsets.only(bottom: 80),
-                      titleWidth: 150,
-                      titleAlginment: CrossAxisAlignment.end,
-                      title: 'CPU (${widget.rrdData?.last.maxcpu ?? '-'})',
-                      subtitle:
-                          (widget.rrdData?.last.cpu ?? 0).toStringAsFixed(2) +
-                              "%",
-                      data: widget.rrdData?.map((e) => Point(
-                          e.time?.millisecondsSinceEpoch ?? 0, e.cpu ?? 0)),
-                      icon: Icon(Icons.memory),
-                      bottomRight: pageIndicator,
-                      dataRenderer: (data) => '${data.toStringAsFixed(2)} %',
-                    ),
-                  ),
-                if (item == 1)
-                  Expanded(
-                    child: PveRRDChart(
-                      titlePadding: EdgeInsets.only(bottom: 80),
-                      titleWidth: 200,
-                      titleAlginment: CrossAxisAlignment.end,
-                      title: 'Memory',
-                      subtitle:
-                          Renderers.formatSize(widget.rrdData?.last.mem ?? 0),
-                      data: widget.rrdData!.map((e) => Point(
-                          e.time?.millisecondsSinceEpoch ?? 0, e.mem ?? 0)),
-                      icon: Icon(FontAwesomeIcons.memory),
-                      bottomRight: pageIndicator,
-                      dataRenderer: (data) => Renderers.formatSize(data),
-                    ),
-                  ),
-              ],
-            );
-        },
-      ));
+    if (widget.rrdData == null || widget.rrdData!.isEmpty) {
+      return Container(
+        height: 200,
+        child: Center(
+          child: Text('no rrd data'),
+        ),
+      );
     }
-    return Container(
-      height: 200,
-      child: Center(
-        child: Text('no rrd data'),
+    var rrdData = widget.rrdData! // safety: checked for null above...
+        .where((e) => e.time != null);
+    final fgColor = Theme.of(context).colorScheme.onPrimary.withOpacity(0.75);
+    return ScrollConfiguration(
+      behavior: PVEScrollBehavior(),
+      child: PageView.builder(
+        controller: controller,
+        itemCount: 2,
+        itemBuilder: (context, item) {
+          final page = item + 1;
+          final pageIndicator = Text(
+            '$page of 2',
+            style: TextStyle(
+              color: fgColor,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+          return Column(
+            children: [
+              if (item == 0)
+                Expanded(
+                  child: PveRRDChart(
+                    titlePadding: EdgeInsets.only(bottom: 80),
+                    titleWidth: 150,
+                    titleAlginment: CrossAxisAlignment.end,
+                    title: 'CPU (${rrdData.last.maxcpu ?? '-'})',
+                    subtitle: (rrdData.last.cpu ?? 0).toStringAsFixed(2) + "%",
+                    data: rrdData.where((e) => e.cpu != null).map(
+                        (e) => Point(e.time!.millisecondsSinceEpoch, e.cpu!)),
+                    icon: Icon(Icons.memory, color: fgColor),
+                    bottomRight: pageIndicator,
+                    dataRenderer: (data) => '${data.toStringAsFixed(2)} %',
+                  ),
+                ),
+              if (item == 1)
+                Expanded(
+                  child: PveRRDChart(
+                    titlePadding: EdgeInsets.only(bottom: 80),
+                    titleWidth: 200,
+                    titleAlginment: CrossAxisAlignment.end,
+                    title: 'Memory',
+                    subtitle: Renderers.formatSize(rrdData.last.mem ?? 0),
+                    data: rrdData.where((e) => e.mem != null).map(
+                        (e) => Point(e.time!.millisecondsSinceEpoch, e.mem!)),
+                    icon: Icon(FontAwesomeIcons.memory, color: fgColor),
+                    bottomRight: pageIndicator,
+                    dataRenderer: (data) => Renderers.formatSize(data),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

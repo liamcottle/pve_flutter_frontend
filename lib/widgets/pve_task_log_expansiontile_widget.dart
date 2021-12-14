@@ -7,17 +7,17 @@ import 'package:pve_flutter_frontend/utils/renderers.dart';
 import 'package:pve_flutter_frontend/utils/utils.dart';
 
 class PveTaskExpansionTile extends StatefulWidget {
-  final Color errorColor;
-  final Color headerColor;
-  final Color headerColorExpanded;
+  final Color? errorColor;
+  final Color? headerColor;
+  final Color? headerColorExpanded;
   final Widget? showMorePage;
   const PveTaskExpansionTile({
     Key? key,
     required this.task,
     this.showMorePage,
-    this.errorColor = Colors.orange,
-    this.headerColor = Colors.black,
-    this.headerColorExpanded = Colors.blue,
+    this.errorColor,
+    this.headerColor,
+    this.headerColorExpanded,
   }) : super(key: key);
 
   final PveClusterTasksModel task;
@@ -44,22 +44,27 @@ class _PveTaskExpansionTileState extends State<PveTaskExpansionTile> {
     if (isFinished) {
       duration = widget.task.endTime!.difference(widget.task.startTime);
     }
-    final headerColor =
-        isExpanded ? widget.headerColorExpanded : widget.headerColor;
+    final colorScheme = Theme.of(context).colorScheme;
+    final errorColor = widget.errorColor ?? colorScheme.error;
+    final headerColor = isExpanded
+        ? (widget.headerColorExpanded ?? colorScheme.onSurface)
+        : (widget.headerColor ?? colorScheme.onBackground);
+
     return ExpansionTile(
       onExpansionChanged: (value) {
         setState(() {
           isExpanded = value;
         });
       },
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      collapsedBackgroundColor: Theme.of(context).colorScheme.background,
       key: PageStorageKey<PveClusterTasksModel>(widget.task),
       leading: Icon(
         hasError ? Icons.warning : Icons.info,
-        color: hasError ? widget.errorColor : headerColor,
+        color: hasError ? errorColor : headerColor,
       ),
       title: Text(
-        widget.task.type,
+        'Last Task: ${widget.task.type}',
         style: TextStyle(color: headerColor),
       ),
       subtitle: isFinished
@@ -103,15 +108,17 @@ class _PveTaskExpansionTileState extends State<PveTaskExpansionTile> {
         ButtonBar(
           children: <Widget>[
             if (widget.showMorePage != null)
-              FlatButton(
+              OutlineButton.icon(
                 onPressed: () => Navigator.of(context).push(
                     _createTaskLogRoute(taskLogBloc, widget.showMorePage)),
-                child: Text('More Tasks'),
+                icon: Icon(Icons.format_list_bulleted),
+                label: Text('More Tasks'),
               ),
-            FlatButton(
+            OutlineButton.icon(
               onPressed: () => showTaskLogBottomSheet(context,
                   taskLogBloc.apiClient, widget.task.node, widget.task.upid),
-              child: Text(
+              icon: Icon(Icons.article),
+              label: Text(
                 'Full Log',
               ),
             )

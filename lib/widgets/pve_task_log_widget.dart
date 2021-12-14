@@ -262,19 +262,22 @@ class _PveTaskLogScrollViewState extends State<PveTaskLogScrollView> {
                             controller: _scrollController,
                             itemCount: state.log!.lines!.length,
                             itemBuilder: (context, index) {
-                              final isLast =
-                                  index == state.log!.lines!.length - 1;
-                              final errorLine = state
-                                  .log!.lines![index].lineText!
-                                  .contains('ERROR');
+                              final log = state.log!.lines!;
+                              final isLast = index == log.length - 1;
+                              final errorLine =
+                                  log[index].lineText?.contains('ERROR') ??
+                                      false;
+                              final warningLine =
+                                  log[index].lineText?.contains('WARNING') ??
+                                      false;
                               return Card(
                                 color: isLast || errorLine
                                     ? indicatorColor
                                     : Colors.white,
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(5.0),
                                   child: Text(
-                                    state.log!.lines![index].lineText!,
+                                    log[index].lineText ?? '<unknown>',
                                     style: TextStyle(
                                       color: isLast || errorLine
                                           ? Colors.white

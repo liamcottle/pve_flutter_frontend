@@ -8,6 +8,7 @@ typedef DataRenderer = String Function(num data);
 class ProxmoxLineChart extends CustomPainter {
   final List<Point>? data;
   final Color? lineColor;
+  final Color? textColor;
   final Color shadeColorTop;
   final Color shadeColorBottom;
   final double? staticMax;
@@ -16,6 +17,7 @@ class ProxmoxLineChart extends CustomPainter {
   ProxmoxLineChart({
     this.data,
     this.lineColor,
+    this.textColor,
     this.staticMax,
     this.shadeColorTop = Colors.white,
     this.shadeColorBottom = const Color(0x00FFFFFF),
@@ -28,8 +30,10 @@ class ProxmoxLineChart extends CustomPainter {
     if (data?.isEmpty ?? true) return;
 
     var paint = Paint();
-    paint.color = lineColor!;
-    paint.strokeWidth = 1;
+    // FIXME: add wrapper widget with access to the (theme) context so we can
+    // have better defaults!
+    paint.color = lineColor ?? Colors.white;
+    paint.strokeWidth = 2;
 
     var path = Path();
     final globalMaxima = max(
@@ -51,41 +55,6 @@ class ProxmoxLineChart extends CustomPainter {
           el.y as double? ?? size.height);
     });
 
-    if (touchPoint != null) {
-      final index = closestX(touchPoint, points);
-      final selectedLabel = (ordinateRenderer != null
-              ? ordinateRenderer!(data?[index].y ?? 0)
-              : data?[index].y.toStringAsFixed(2)) ??
-          '-';
-      TextSpan span = TextSpan(
-        style: TextStyle(
-          color: Colors.white,
-        ),
-        text: selectedLabel,
-      );
-      TextPainter tp = TextPainter(
-        text: span,
-        textAlign: TextAlign.left,
-        textDirection: TextDirection.ltr,
-      );
-      tp.layout();
-
-      // prevent right/left overflow
-      var tpX;
-      if (tp.width <= points[index].x) {
-        tpX = points[index].x - tp.width;
-      } else {
-        tpX = points[index].x;
-      }
-
-      tp.paint(canvas, Offset(tpX, points[index].y as double? ?? size.height));
-      canvas.drawCircle(
-          Offset(points[index].x as double,
-              points[index].y as double? ?? size.height),
-          2,
-          paint);
-    }
-
     //TODO gaps between datapoints
     paint.style = PaintingStyle.stroke;
     canvas.drawPath(path, paint);
@@ -96,10 +65,7 @@ class ProxmoxLineChart extends CustomPainter {
     paint.shader = ui.Gradient.linear(
         Offset(size.width, 0),
         Offset(0, 0),
-        [
-          shadeColorBottom,
-          shadeColorTop,
-        ],
+        [shadeColorBottom, shadeColorTop],
         [0.25, 1.0],
         TileMode.clamp,
         GradientRotation(pi / 2)
@@ -108,6 +74,42 @@ class ProxmoxLineChart extends CustomPainter {
             .storage);
     paint.style = PaintingStyle.fill;
     canvas.drawPath(path, paint);
+
+    if (touchPoint != null) {
+      final closest = closestX(touchPoint, points);
+      final index = closest > 0 ? closest : 0;
+      final selectedLabel = (ordinateRenderer != null
+              ? ordinateRenderer!(data?[index].y ?? 0)
+              : data?[index].y.toStringAsFixed(2)) ??
+          '-';
+      TextPainter tp = TextPainter(
+        text: TextSpan(
+          style: TextStyle(
+            color: textColor ?? Colors.white,
+            backgroundColor: shadeColorBottom.withOpacity(0.75),
+          ),
+          text: selectedLabel,
+        ),
+        textAlign: TextAlign.left,
+        textDirection: TextDirection.ltr,
+      );
+      tp.layout();
+
+      final touchX = points[index].x as double;
+      final touchY = points[index].y as double;
+      if (!touchX.isNaN && !touchY.isNaN) {
+        // prevent right/left overflow
+        final labelX = tp.width <= touchX ? touchX - tp.width : touchX;
+        var labelY = true || tp.height < touchY + paint.strokeWidth
+            ? touchY - tp.height - paint.strokeWidth
+            : touchY;
+
+        tp.paint(canvas, Offset(labelX, labelY));
+        canvas.drawCircle(Offset(touchX, touchY), 4, paint);
+        paint.color = Colors.white;
+        canvas.drawCircle(Offset(touchX, touchY), 2, paint);
+      }
+    }
   }
 
   @override

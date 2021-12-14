@@ -27,13 +27,8 @@ class PveGuestBackupWidget extends StatelessWidget {
     final fBloc = Provider.of<PveFileSelectorBloc>(context);
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
-          "Backup",
-          style: TextStyle(color: Colors.black),
-        ),
+        title: Text("Backup $guestID"),
       ),
       body: Column(
         children: [
@@ -111,14 +106,16 @@ class PveGuestBackupWidget extends StatelessWidget {
                               child: Text(
                                 "Recent backups",
                                 style: TextStyle(
-                                    color: Color.fromARGB(255, 159, 171, 207),
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
                             Row(
                               children: <Widget>[
                                 IconButton(
-                                  color: Color.fromARGB(255, 152, 162, 201),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   icon: Icon(Icons.search),
                                   onPressed: () =>
                                       fBloc.events.add(ToggleSearch()),
@@ -195,13 +192,13 @@ class PveGuestBackupContent extends StatelessWidget {
 
     if (content!.isEmpty && storageSelected!) {
       return Center(
-        child: Text("no backup file found"),
+        child: Text("No existing backup file for guest found"),
       );
     }
 
     if (content!.isEmpty && !storageSelected!) {
       return Center(
-        child: Text("please select storage"),
+        child: Text("Please select a target storage"),
       );
     }
 
@@ -211,7 +208,7 @@ class PveGuestBackupContent extends StatelessWidget {
         child: ListTile(
           leading: Icon(
             FontAwesomeIcons.save,
-            color: Color.fromARGB(255, 152, 162, 201),
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           title: Text(
             Renderers.renderStorageContent(content![index]),
@@ -248,7 +245,7 @@ class PveGuestBackupContent extends StatelessWidget {
                   child: Container(
                     width: 40,
                     height: 3,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),

@@ -30,8 +30,9 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
       }
 
       if (latestState.guestType == 'lxc') {
-        final status =
-            await (apiClient.getLxcStatusCurrent(latestState.nodeID, guestID) as FutureOr<PveNodesLxcStatusModel>);
+        final status = await (apiClient.getLxcStatusCurrent(
+            latestState.nodeID, guestID) as FutureOr<PveNodesLxcStatusModel?>);
+        if (status == null) return;
         final running = status.getLxcStatus() == PveResourceStatusType.running;
         yield latestState.rebuild((b) => b
           ..lxcPreconditions

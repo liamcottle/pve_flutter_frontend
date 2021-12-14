@@ -28,6 +28,7 @@ import 'package:pve_flutter_frontend/widgets/pve_help_icon_button_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_data_card_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_subscription_alert_dialog.dart';
+import 'package:pve_flutter_frontend/utils/proxmox_colors.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MainLayoutSlim extends StatefulWidget {
@@ -113,32 +114,25 @@ class PveMobileBottomNavigationbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pageSelector = Provider.of<BehaviorSubject<int>>(context);
+    final light = Theme.of(context).colorScheme.brightness == Brightness.light;
     return BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
+        backgroundColor: light ? Colors.white : ProxmoxColors.greyShade40,
         items: [
           BottomNavigationBarItem(
-              icon: Icon(
-                Icons.dashboard,
-              ),
-              label: "Dashboard",
-              backgroundColor: Theme.of(context).primaryColor),
+            icon: Icon(Icons.dashboard),
+            label: "Dashboard",
+          ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.developer_board,
-            ),
+            icon: Icon(Icons.developer_board),
             label: "Resources",
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.supervised_user_circle,
-            ),
+            icon: Icon(Icons.supervised_user_circle),
             label: "Access",
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.logout,
-            ),
+            icon: Icon(Icons.logout),
             label: "Sites",
           ),
         ],
@@ -199,7 +193,7 @@ class MobileDashboard extends StatelessWidget {
       body: Stack(children: [
         Container(
           height: 350,
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context).colorScheme.primary,
         ),
         ProxmoxStreamBuilder<PveClusterStatusBloc, PveClusterStatusState>(
             bloc: cBloc,
@@ -240,7 +234,8 @@ class MobileDashboard extends StatelessWidget {
                     children: [
                       if (cState.missingSubscription)
                         ActionChip(
-                          backgroundColor: Color(0xE6003752),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryVariant,
                           avatar: Icon(Icons.report, color: Colors.red),
                           label: Text(
                             'Subscription',
@@ -256,10 +251,13 @@ class MobileDashboard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: ActionChip(
-                          backgroundColor: Color(0xE6003752),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 8.0),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryVariant,
                           avatar: Icon(
                             Renderers.getDefaultResourceIcon('qemu'),
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             size: 20,
                           ),
                           label: Text(
@@ -283,11 +281,13 @@ class MobileDashboard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: ActionChip(
-                          labelPadding: EdgeInsets.symmetric(horizontal: 8),
-                          backgroundColor: Color(0xE6003752),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 8.0),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryVariant,
                           avatar: Icon(
                             Renderers.getDefaultResourceIcon('lxc'),
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             size: 20,
                           ),
                           label: Text(
@@ -597,7 +597,7 @@ class MobileResourceOverview extends StatelessWidget {
             endDrawer: _MobileResourceFilterSheet(),
             appBar: AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               elevation: 0,
               title: AppbarSearchTextField(
                 onChanged: (filter) =>
@@ -781,7 +781,7 @@ class AppbarSearchTextField extends StatefulWidget {
 }
 
 class _AppbarSearchTextFieldState extends State<AppbarSearchTextField> {
-  TextEditingController? _controller;
+  late TextEditingController _controller;
 
   void initState() {
     super.initState();
@@ -789,7 +789,7 @@ class _AppbarSearchTextFieldState extends State<AppbarSearchTextField> {
   }
 
   void dispose() {
-    _controller!.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -797,30 +797,36 @@ class _AppbarSearchTextFieldState extends State<AppbarSearchTextField> {
   Widget build(BuildContext context) {
     return TextField(
       decoration: InputDecoration(
-          prefixIcon: Icon(
-            Icons.search,
-            size: 20,
-          ),
-          suffixIcon: _controller!.text.isNotEmpty
-              ? IconButton(
-                  padding: EdgeInsets.zero,
-                  iconSize: 20,
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    _controller!.clear();
-                    widget.onChanged!('');
-                    FocusScope.of(context).unfocus();
-                  },
-                )
-              : null,
-          contentPadding: EdgeInsets.fromLTRB(20, 5, 8, 5),
-          prefixIconConstraints: BoxConstraints(minHeight: 32, minWidth: 32),
-          suffixIconConstraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
-          fillColor: Color(0xFFF1F2F4),
-          filled: true,
-          isDense: true,
-          enabledBorder:
-              OutlineInputBorder(borderSide: BorderSide(color: Colors.white))),
+        prefixIcon: Icon(
+          Icons.search,
+          size: 20,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        suffixIcon: _controller.text.isNotEmpty
+            ? IconButton(
+                padding: EdgeInsets.zero,
+                iconSize: 20,
+                icon: Icon(
+                  Icons.close,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onPressed: () {
+                  _controller.clear();
+                  widget.onChanged!('');
+                  FocusScope.of(context).unfocus();
+                },
+              )
+            : null,
+        contentPadding: EdgeInsets.fromLTRB(20, 5, 8, 5),
+        prefixIconConstraints: BoxConstraints(minHeight: 32, minWidth: 32),
+        suffixIconConstraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
+        //fillColor: Color(0xFFF1F2F4),
+        fillColor: Theme.of(context).colorScheme.surface,
+        filled: true,
+        isDense: true,
+        enabledBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+      ),
       style: TextStyle(fontSize: 20),
       onChanged: (value) => widget.onChanged!(value),
       controller: _controller,
@@ -845,7 +851,6 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                 child: ListTile(
                   title: Text(
                     'Filter Results',
-                    style: TextStyle(color: Colors.grey.shade700),
                   ),
                   trailing: rBloc.isFiltered
                       ? FlatButton(
@@ -871,15 +876,18 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                     ListTile(
                       title: Text(
                         'Type',
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                     CheckboxListTile(
                       dense: true,
                       title: Text(
                         'Nodes',
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.75)),
                       ),
                       value: state.typeFilter.contains('node'),
                       onChanged: (v) => rBloc.events.add(FilterResources(
@@ -890,7 +898,11 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       dense: true,
                       title: Text(
                         'Qemu',
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.75)),
                       ),
                       value: state.typeFilter.contains('qemu'),
                       onChanged: (v) => rBloc.events.add(FilterResources(
@@ -901,7 +913,11 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       dense: true,
                       title: Text(
                         'LXC',
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.75)),
                       ),
                       value: state.typeFilter.contains('lxc'),
                       onChanged: (v) => rBloc.events.add(FilterResources(
@@ -912,7 +928,11 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       dense: true,
                       title: Text(
                         'Storage',
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.75)),
                       ),
                       value: state.typeFilter.contains('storage'),
                       onChanged: (v) => rBloc.events.add(FilterResources(
@@ -930,15 +950,18 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                     ListTile(
                       title: Text(
                         'Status',
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                     CheckboxListTile(
                       dense: true,
                       title: Text(
                         'Online',
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.75)),
                       ),
                       value: state.statusFilter
                           .contains(PveResourceStatusType.running),
@@ -951,7 +974,11 @@ class _MobileResourceFilterSheet extends StatelessWidget {
                       dense: true,
                       title: Text(
                         'Offline',
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.75)),
                       ),
                       value: state.statusFilter
                           .contains(PveResourceStatusType.stopped),
