@@ -32,7 +32,10 @@ class ProxmoxLineChart extends CustomPainter {
     paint.strokeWidth = 1;
 
     var path = Path();
-    final globalMaxima = data!.map((e) => e.y).reduce((a, b) => max(a, b));
+    final globalMaxima = max(
+      data!.map((e) => e.y).reduce((a, b) => max(a, b)),
+      0.001, // avoid that almost zero usage looks like a high load
+    );
     final points = convertDataToPoints(data!, size, staticMax ?? globalMaxima);
     points.asMap().forEach((i, el) {
       if (i == 0) {
