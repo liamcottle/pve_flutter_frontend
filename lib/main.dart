@@ -100,7 +100,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         navigatorKey: navigatorKey,
         title: 'Proxmox',
-        themeMode: ThemeMode.dark,
+        //themeMode: ThemeMode.dark, // comment in/out to test
         theme: ThemeData(
           colorScheme: ColorScheme.light(
             brightness: Brightness.light,
