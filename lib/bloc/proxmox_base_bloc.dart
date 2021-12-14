@@ -40,9 +40,11 @@ abstract class ProxmoxBaseBloc<E, S> {
   }
 
   void _initEventPipe() {
-    eventPipe(_eventSubject,
-            (event) => processEvents(event).handleError(_errorHandler))
-        .forEach((S state) {
+    eventPipe(_eventSubject, (event) {
+      // can happen if request returns after user navigated somewhere else
+      if (_eventSubject.isClosed) return Stream.empty();
+      return processEvents(event).handleError(_errorHandler);
+    }).forEach((S state) {
       penultimate = latestState;
       if (_stateSubject.isClosed) return;
       _stateSubject.add(state);
