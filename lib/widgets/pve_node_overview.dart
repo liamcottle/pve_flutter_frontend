@@ -54,7 +54,9 @@ class PveNodeOverview extends StatelessWidget {
                   if (state.rrdData.isNotEmpty)
                     Container(
                       height: 200,
-                      child: PageView.builder(
+                      child: ScrollConfiguration(
+                        behavior: PVEScrollBehavior(),
+                        child: PageView.builder(
                           itemCount: 4,
                           itemBuilder: (context, item) {
                             final page = item + 1;
@@ -135,7 +137,9 @@ class PveNodeOverview extends StatelessWidget {
                                   ),
                               ],
                             );
-                          }),
+                          },
+                        ),
+                      ),
                     ),
                   ProxmoxStreamBuilder<PveTaskLogBloc, PveTaskLogState>(
                     bloc: tBloc,

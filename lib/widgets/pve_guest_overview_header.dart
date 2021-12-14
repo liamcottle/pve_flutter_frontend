@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import 'package:pve_flutter_frontend/widgets/pve_guest_icon_widget.dart';
 
 import 'package:pve_flutter_frontend/widgets/pve_resource_status_chip_widget.dart';
 import 'package:pve_flutter_frontend/widgets/pve_rrd_chart_widget.dart';
+import 'package:pve_flutter_frontend/utils/utils.dart';
 
 class PveGuestOverviewHeader extends StatelessWidget {
   const PveGuestOverviewHeader({
@@ -152,16 +152,6 @@ class PveGuestHeaderRRDPageView extends StatefulWidget {
   @override
   _PveGuestHeaderRRDPageViewState createState() =>
       _PveGuestHeaderRRDPageViewState();
-}
-
-class PVEScrollBehavior extends MaterialScrollBehavior {
-  // Override behavior methods and getters like dragDevices
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        // what else?
-      };
 }
 
 class _PveGuestHeaderRRDPageViewState extends State<PveGuestHeaderRRDPageView> {
