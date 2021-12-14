@@ -97,14 +97,20 @@ class PveMigrateBloc extends ProxmoxBaseBloc<PveMigrateEvent, PveMigrateState> {
   }
 
   Stream<PveMigrateState> checkQemuPreconditons() async* {
-    final qPreconditions = await (apiClient.getMigratePreconditions(
+    final _qPreconditions = await (apiClient.getMigratePreconditions(
       latestState.nodeID,
       guestID,
       migrationTarget: latestState.targetNodeID,
-    ) as FutureOr<PveNodesQemuMigrate>);
+    ) as FutureOr<PveNodesQemuMigrate?>);
 
     var preconditions = <PveMigrateCondition>[];
-
+    if (_qPreconditions == null) {
+      preconditions.add(PveMigrateCondition((b) => b
+        ..severity = PveMigrateSeverity.warning
+        ..message = "Couldn't get migration preconditions from API!"));
+      yield latestState.rebuild((b) => b..preconditions.replace(preconditions));
+    }
+    final qPreconditions = _qPreconditions!;
     qPreconditions.localDisks!.forEach((d) {
       var disk = d.asMap;
       if (disk['cdrom'] == 1) {
