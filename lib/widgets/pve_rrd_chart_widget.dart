@@ -48,13 +48,13 @@ class _PveRRDChartState extends State<PveRRDChart> {
   Point? touchpoint;
   @override
   Widget build(BuildContext context) {
-    final globalMaxima =
-        widget.data!.map((e) => e.y).reduce((a, b) => max(a, b));
-    final globalMaximaLabel = globalMaxima.toStringAsFixed(2);
-    final timeWindow = DateTime.fromMillisecondsSinceEpoch(
-            widget.data!.last.x as int)
-        .difference(
-            DateTime.fromMillisecondsSinceEpoch(widget.data!.first.x as int));
+    final data = widget.data!.isNotEmpty ? widget.data! : [Point(0, 0)];
+    final globalMaxima = data.map((e) => e.y).reduce((a, b) => max(a, b));
+    final globalMaximaLabel =
+        globalMaxima.toStringAsFixed(globalMaxima < 0.01 ? 3 : 2);
+    final timeWindow = DateTime.fromMillisecondsSinceEpoch(data.last.x as int)
+        .difference(DateTime.fromMillisecondsSinceEpoch(data.first.x as int));
+
     return Column(
       crossAxisAlignment: widget.titleAlginment,
       children: <Widget>[
@@ -104,7 +104,7 @@ class _PveRRDChartState extends State<PveRRDChart> {
               },
               child: CustomPaint(
                 painter: ProxmoxLineChart(
-                    data: widget.data?.toList(),
+                    data: data.toList(),
                     lineColor: widget.lineColor,
                     staticMax: widget.staticMaximum,
                     shadeColorBottom: widget.shadeColorBottom,
