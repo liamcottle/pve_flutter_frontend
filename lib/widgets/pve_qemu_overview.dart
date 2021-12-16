@@ -143,17 +143,18 @@ class PveQemuOverview extends StatelessWidget {
                                   Icons.power_settings_new,
                                   () =>
                                       showPowerMenuBottomSheet(context, bloc)),
-                            if (!(status?.template ?? false) &&
-                                (status?.spice ?? false))
+                            if (!(status?.template ?? false))
                               createActionCard(
                                   'Console',
                                   Icons.queue_play_next,
                                   () => showConsoleMenuBottomSheet(
-                                      context,
-                                      bloc.apiClient,
-                                      guestID,
-                                      state.nodeID,
-                                      'qemu')),
+                                        context,
+                                        bloc.apiClient,
+                                        guestID,
+                                        state.nodeID,
+                                        'qemu',
+                                        allowSpice: status?.spice ?? false,
+                                      )),
                             createActionCard(
                                 'Options',
                                 Icons.settings,

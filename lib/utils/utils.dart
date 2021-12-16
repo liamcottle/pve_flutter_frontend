@@ -43,22 +43,22 @@ Future<T?> showTaskLogBottomSheet<T>(BuildContext context,
   );
 }
 
-Future<T?> showConsoleMenuBottomSheet<T>(
-    BuildContext context,
-    ProxmoxApiClient apiClient,
-    String? guestID,
-    String node,
-    String type) async {
+Future<T?> showConsoleMenuBottomSheet<T>(BuildContext context,
+    ProxmoxApiClient apiClient, String? guestID, String node, String type,
+    {bool? allowSpice}) async {
   return showModalBottomSheet(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
-      context: context,
-      builder: (context) => PveConsoleMenu(
-            apiClient: apiClient,
-            guestID: guestID,
-            node: node,
-            type: type,
-          ));
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+    ),
+    context: context,
+    builder: (context) => PveConsoleMenu(
+      apiClient: apiClient,
+      guestID: guestID,
+      node: node,
+      type: type,
+      allowSpice: allowSpice,
+    ),
+  );
 }
 
 class PVEScrollBehavior extends MaterialScrollBehavior {

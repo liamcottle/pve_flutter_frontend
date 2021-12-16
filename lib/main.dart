@@ -40,8 +40,8 @@ void main() async {
   final authBloc = PveAuthenticationBloc();
   try {
     final loginStorage = await (ProxmoxLoginStorage.fromLocalStorage()
-        as FutureOr<ProxmoxLoginStorage>);
-    final apiClient = await loginStorage.recoverLatestSession();
+        as FutureOr<ProxmoxLoginStorage?>);
+    final apiClient = await loginStorage!.recoverLatestSession();
     authBloc.events.add(LoggedIn(apiClient));
   } catch (e) {
     print(e);
