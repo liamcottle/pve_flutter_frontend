@@ -218,7 +218,7 @@ class PVEWebConsoleState extends State<PVEWebConsole> {
     final ticket = widget.apiClient.credentials.ticket!;
     final baseUrl = widget.apiClient.credentials.apiBaseUrl;
 
-    var consoleUrl = "${baseUrl}/?novnc=1&node=${widget.node}&resize=scale";
+    var consoleUrl = "${baseUrl}/?novnc=1&node=${widget.node}&isFullscreen=true&resize=scale";
     if (widget.guestID != null) {
       final consoleType = widget.type == 'lxc' ? 'lxc' : 'kvm';
       consoleUrl += "&console=${consoleType}&vmid=${widget.guestID}";
