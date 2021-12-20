@@ -105,7 +105,7 @@ class PveConsoleMenu extends StatelessWidget {
                   "noVNC Console", // xterm.js doesn't work that well on mobile
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text("Open console view (beta)"),
+                subtitle: Text("Open console view (requires trusted SSL certificate)"),
                 onTap: () async {
                   if (Platform.isAndroid) {
                     if (['qemu', 'lxc'].contains(type)) {
