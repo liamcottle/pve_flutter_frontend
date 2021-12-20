@@ -180,13 +180,11 @@ class PveConsoleMenu extends StatelessWidget {
 
   Route _createHTMLConsoleRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => Card(
-        child: PVEWebConsole(
-          apiClient: apiClient,
-          node: node,
-          guestID: guestID,
-          type: type,
-        ),
+      pageBuilder: (context, animation, secondaryAnimation) => PVEWebConsole(
+        apiClient: apiClient,
+        node: node,
+        guestID: guestID,
+        type: type,
       ),
     );
   }
