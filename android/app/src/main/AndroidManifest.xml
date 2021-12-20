@@ -7,10 +7,6 @@
         android:label="Proxmox Virtual Environment"
         android:icon="@mipmap/ic_launcher">
 
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
-
         <activity
             android:name="com.proxmox.app.pve_flutter_frontend.MainActivity"
             android:exported="true"
