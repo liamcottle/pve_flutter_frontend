@@ -105,7 +105,8 @@ class PveConsoleMenu extends StatelessWidget {
                   "noVNC Console", // xterm.js doesn't work that well on mobile
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text("Open console view (requires trusted SSL certificate)"),
+                subtitle: Text(
+                    "Open console view (requires trusted SSL certificate)"),
                 onTap: () async {
                   if (Platform.isAndroid) {
                     if (['qemu', 'lxc'].contains(type)) {
@@ -226,21 +227,22 @@ class PVEWebConsoleState extends State<PVEWebConsole> {
     }
     //debugPrint("url: ${consoleUrl}, ticket: $ticket");
 
-    return WebView(
-      debuggingEnabled: true,
-      javascriptMode: JavascriptMode.unrestricted,
-      backgroundColor: Theme.of(context).colorScheme.background,
-      initialCookies: <WebViewCookie>[
-        WebViewCookie(
-          name: 'PVEAuthCookie',
-          value: ticket,
-          domain: baseUrl.origin,
-        )
-      ],
-      onWebViewCreated: (WebViewController webViewController) {
-        _controller.complete(webViewController);
-        webViewController.loadUrl(consoleUrl);
-      },
+    return SafeArea(
+      child: WebView(
+        javascriptMode: JavascriptMode.unrestricted,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        initialCookies: <WebViewCookie>[
+          WebViewCookie(
+            name: 'PVEAuthCookie',
+            value: ticket,
+            domain: baseUrl.origin,
+          )
+        ],
+        onWebViewCreated: (WebViewController webViewController) {
+          _controller.complete(webViewController);
+          webViewController.loadUrl(consoleUrl);
+        },
+      ),
     );
   }
 }
