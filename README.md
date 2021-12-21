@@ -141,6 +141,26 @@ Test-Cluster, add this to the main function:
 
 var apiClient = await proxclient.authenticate("root@pam", "yourpassword");
 
+## Android vector drawables
+
+Android does support vector drawables, but not SVGs directly. They need to be
+converted to the Android specific subset of SVG and are stored as xml files.
+
+One way to do that is to use the Asset Studio which is part of Android Studio.
+In your (dummy) project, right click in the tree view on
+app -> New -> Vector Asset.
+
+There are other options, but they have some caveats themselves.
+
+ * a web service which is subscription based https://svg2vector.com/
+ * a JS based CLI tool, but it is npm based... https://github.com/Ashung/svg2vectordrawable
+
+## Android splash screen logo
+
+Will be masked, see figure 2 in https://developer.android.com/guide/topics/ui/splash-screen
+The drawable therefore needs to account for that by being quite a bit bigger.
+The `assets/images/android_launch_background_template.svg` file is useful to
+size the logo / icon accordingly.
 
 ## Screenshots Android
 adb shell settings put global sysui_demo_allowed 1
