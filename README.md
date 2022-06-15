@@ -20,18 +20,21 @@ to local path dependencies maintained by Proxmox.
 So, in the parent folder clone both, the API client library (pure dart package)
 and the login manager, serving as a base for Proxmox api2 projects.
 
- cd ..
- git clone git://git.proxmox.com/git/flutter/proxmox_dart_api_client.git
- cd proxmox_dart_api_client
- flutter pub get
- flutter packages pub run build_runner build --delete-conflicting-outputs
+```
+cd ..
+git clone git://git.proxmox.com/git/flutter/proxmox_dart_api_client.git
+cd proxmox_dart_api_client
+flutter pub get
+flutter packages pub run build_runner build --delete-conflicting-outputs
+```
 
-
- cd ..
- git clone git://git.proxmox.com/git/flutter/proxmox_login_manager.git
- cd proxmox_login_manager
- flutter pub get
- flutter packages pub run build_runner build --delete-conflicting-outputs
+```
+cd ..
+git clone git://git.proxmox.com/git/flutter/proxmox_login_manager.git
+cd proxmox_login_manager
+flutter pub get
+flutter packages pub run build_runner build --delete-conflicting-outputs
+```
 
 Now you have made the local dependencies and their dependencies available, and
 built the generated (data) model code for each.
