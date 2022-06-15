@@ -1,6 +1,8 @@
-# pve_flutter_frontend
+# Proxmox Flutter App
 
-Frontend for Proxmox Virtual Environment
+Flutter app for managing [Proxmox Virtual Environment](https://proxmox.com/)
+
+This is a fork of the official Proxmox [pve_flutter_frontend](https://git.proxmox.com/?p=flutter/pve_flutter_frontend.git;a=summary) project with updates to run on Flutter v3 and prebuilt release versions for Android and iOS.
 
 # Setup How-To
 
