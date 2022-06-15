@@ -41,6 +41,12 @@ built the generated (data) model code for each.
 
 # Run the App
 
+Run the command below and select the device the app should be launched on.
+
+```
+flutter run
+```
+
 ## Linux native
 
 With the dependencies setup you should cd back into this directory
