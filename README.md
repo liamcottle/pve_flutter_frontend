@@ -59,7 +59,9 @@ can come in handy during development trial/error coding.
 
 To actually run it you can do:
 
- flutter run -d linux
+```
+flutter run -d linux
+```
 
 ## Build errors
 
@@ -85,19 +87,24 @@ different port.
 Create a small shell script, lets name it `chrome-no-cors.sh`, with the
 following content:
 
-    #!/bin/sh
-    mkdir -p /tmp/chrome || true
-    /usr/bin/chromium --disable-features=CrossOriginOpenerPolicy,CrossOriginEmbedderPolicy --disable-web-security --user-data-dir="/tmp/chrome" $*
+```
+#!/bin/sh
+mkdir -p /tmp/chrome || true
+/usr/bin/chromium --disable-features=CrossOriginOpenerPolicy,CrossOriginEmbedderPolicy --disable-web-security --user-data-dir="/tmp/chrome" $*
+```
 
 Then `chmod +x chrome-no-cors.sh` it and adapt the CHROME_EXECUTABLE env
 variable:
 
-     export CHROME_EXECUTABLE="$(realpath chrome-no-cors.sh)"
+```
+export CHROME_EXECUTABLE="$(realpath chrome-no-cors.sh)"
+```
 
 Now you can start the web based build normally:
 
-$ flutter run -d chrome --web-port=35000
-
+```
+flutter run -d chrome --web-port=35000
+```
 
 NOTE: without setting a fixed port flutter uses a random one, as chrome binds
  certificate expections and local browser storage to a (protocol, host, port)
@@ -106,10 +113,14 @@ NOTE: without setting a fixed port flutter uses a random one, as chrome binds
 ### Use reverse proxy to allow connections to PVE and the App over the same port
 
 Launch App in Chrome:
-$ flutter run -d chrome --web-port 42000
+
+```
+flutter run -d chrome --web-port 42000
+```
 
 nginx snippets:
 
+```
 location / {
 
 	if ( $query_string ~ "console" ) {
@@ -136,6 +147,7 @@ location /api2 {
 	proxy_set_header Cookie $http_cookie;
 	proxy_pass https://<clusterip>:8006;
 }
+```
 
 # Misc.
 
@@ -148,7 +160,9 @@ $ flutter packages pub run build_runner build
 If you want to login without typing your password for your
 Test-Cluster, add this to the main function:
 
+```
 var apiClient = await proxclient.authenticate("root@pam", "yourpassword");
+```
 
 ## Android vector drawables
 
@@ -161,8 +175,8 @@ app -> New -> Vector Asset.
 
 There are other options, but they have some caveats themselves.
 
- * a web service which is subscription based https://svg2vector.com/
- * a JS based CLI tool, but it is npm based... https://github.com/Ashung/svg2vectordrawable
+* a web service which is subscription based https://svg2vector.com/
+* a JS based CLI tool, but it is npm based... https://github.com/Ashung/svg2vectordrawable
 
 ## Android splash screen logo
 
@@ -172,7 +186,10 @@ The `assets/images/android_launch_background_template.svg` file is useful to
 size the logo / icon accordingly.
 
 ## Screenshots Android
+
+```
 adb shell settings put global sysui_demo_allowed 1
+```
 
 # Build
 
