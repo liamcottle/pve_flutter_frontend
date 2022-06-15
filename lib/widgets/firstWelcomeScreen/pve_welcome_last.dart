@@ -57,23 +57,27 @@ class PveWelcomePageLast extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            OutlineButton(
+                            OutlinedButton(
                               onPressed: () =>
                                   {launch('https://forum.proxmox.com')},
-                              child: Text('Forum'),
-                              borderSide:
-                                  BorderSide(color: ProxmoxColors.supportGrey),
-                              textColor: Colors.white,
+                              child: Text('Forum', style: TextStyle(
+                                color: Colors.white,
+                              )),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: ProxmoxColors.supportGrey),
+                              ),
                             ),
-                            OutlineButton(
+                            OutlinedButton(
                               onPressed: () => {
                                 launch(
                                     'https://lists.proxmox.com/cgi-bin/mailman/listinfo/pve-user')
                               },
-                              child: Text('User Mailing List'),
-                              borderSide:
-                                  BorderSide(color: ProxmoxColors.supportGrey),
-                              textColor: Colors.white,
+                              child: Text('User Mailing List', style: TextStyle(
+                                color: Colors.white,
+                              )),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: ProxmoxColors.supportGrey),
+                              ),
                             ),
                           ],
                         ),

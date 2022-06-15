@@ -53,7 +53,7 @@ class PveBridgeSelectorBloc
           await apiClient.getNodeNetwork(targetNode, type: bridgeType);
       try {
         var selection = bridges
-            .where((item) => item.iface == latestState.value.iface)
+            .where((item) => item.iface == latestState.value?.iface)
             .single;
         yield PveBridgeSelectorState(
           bridges: bridges,

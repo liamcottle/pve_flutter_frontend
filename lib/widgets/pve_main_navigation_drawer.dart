@@ -130,14 +130,14 @@ class PveMainNavigationDrawer extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          OutlineButton(
+                          OutlinedButton(
                             child: Text("new VM"),
                             onPressed: () {
                               Navigator.pushNamed(context, '/qemu/create');
                             },
                           ),
                           // TODO General new button or distinct ones??
-                          OutlineButton(
+                          OutlinedButton(
                             child: Text("new CT"),
                             onPressed: null,
                           )

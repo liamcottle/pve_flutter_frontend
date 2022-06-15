@@ -32,9 +32,9 @@ class MainActivity: FlutterActivity() {
                 // Note: this method is invoked on the main thread.
                 Log.d("METHODCHANNEL", call.method)
                 if (call.method == "shareFile") {
-                    val serializedShortcuts: Map<String, String> = call.arguments()
-                    val path: String = serializedShortcuts.get("path")!!;
-                    val type: String = serializedShortcuts.get("type")!!;
+                    val serializedShortcuts: Map<String, String>? = call.arguments()
+                    val path: String = serializedShortcuts?.get("path")!!;
+                    val type: String = serializedShortcuts?.get("type")!!;
                     try {
                         shareFile(path, type);
                         result.success(null);

@@ -258,13 +258,15 @@ class PveGuestBackupContent extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ListView(children: [
-                    OutlineButton.icon(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                    OutlinedButton.icon(
                       onPressed: null,
                       icon: Icon(Icons.restore),
                       label: Text("Restore"),
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 8)),
+                      ),
                     ),
-                    OutlineButton.icon(
+                    OutlinedButton.icon(
                       onPressed: () async {
                         final guard = await (_showConfirmDialog(
                                 context,
@@ -279,7 +281,7 @@ class PveGuestBackupContent extends StatelessWidget {
                       icon: Icon(Icons.delete),
                       label: Text("Remove"),
                     ),
-                    OutlineButton.icon(
+                    OutlinedButton.icon(
                       onPressed: () =>
                           _showConfigurationDialog(context, fBloc, volid),
                       icon: Icon(Icons.featured_play_list),
@@ -462,7 +464,7 @@ class _PveBackupFormState extends State<PveBackupForm> {
                     return null;
                   },
                 ),
-                OutlineButton.icon(
+                OutlinedButton.icon(
                     onPressed: enableSubmitButton
                         ? () {
                             //TODO remove when async validation is implemented

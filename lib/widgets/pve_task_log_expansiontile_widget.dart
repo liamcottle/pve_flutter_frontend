@@ -108,13 +108,13 @@ class _PveTaskExpansionTileState extends State<PveTaskExpansionTile> {
         ButtonBar(
           children: <Widget>[
             if (widget.showMorePage != null)
-              OutlineButton.icon(
+              OutlinedButton.icon(
                 onPressed: () => Navigator.of(context).push(
                     _createTaskLogRoute(taskLogBloc, widget.showMorePage)),
                 icon: Icon(Icons.format_list_bulleted),
                 label: Text('More Tasks'),
               ),
-            OutlineButton.icon(
+            OutlinedButton.icon(
               onPressed: () => showTaskLogBottomSheet(context,
                   taskLogBloc.apiClient, widget.task.node, widget.task.upid),
               icon: Icon(Icons.article),

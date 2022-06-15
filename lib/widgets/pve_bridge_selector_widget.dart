@@ -26,7 +26,7 @@ class PveBridgeSelector extends StatelessWidget {
               helperText: ' ',
             ),
             items: <DropdownMenuItem<PveNodeNetworkModel>>[
-              for (var bridge in state?.bridges!)
+              for (var bridge in state.bridges ?? [])
                 DropdownMenuItem(
                   child: Row(
                     children: <Widget>[

@@ -29,9 +29,10 @@ class PveCdSelector extends StatelessWidget {
                 onChanged: (value) => cdBloc.events.add(ChangeValue(value)),
               ),
               if (state.value == CdType.iso)
-                OutlineButton(
-                  borderSide:
-                      state.hasError ? BorderSide(color: Colors.red) : null,
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: state.hasError ? BorderSide(color: Colors.red) : null,
+                  ),
                   child: Text((state.file == null || state.file!.isEmpty)
                       ? "Choose File"
                       : state.file!),

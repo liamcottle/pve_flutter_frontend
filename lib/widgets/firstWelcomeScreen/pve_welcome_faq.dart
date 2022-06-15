@@ -42,14 +42,17 @@ class PveWelcomePageFAQ extends StatelessWidget {
               text:
                   'Currently only the following 3rd party Spice client works:'),
           Center(
-            child: OutlineButton(
+            child: OutlinedButton(
               onPressed: () => {
                 launch(
                     'https://play.google.com/store/apps/details?id=com.undatech.opaque')
               },
-              child: Text('Opague'),
-              borderSide: BorderSide(color: ProxmoxColors.supportGrey),
-              textColor: Colors.white,
+              child: Text('Opague', style: TextStyle(
+                color: Colors.white,
+              )),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: ProxmoxColors.supportGrey),
+              ),
             ),
           ),
         ],
