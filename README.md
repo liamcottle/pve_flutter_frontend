@@ -164,3 +164,46 @@ size the logo / icon accordingly.
 
 ## Screenshots Android
 adb shell settings put global sysui_demo_allowed 1
+
+# Build
+
+This section explains how to build a release version of the app for Android and iOS.
+
+## Android
+
+https://flutter.dev/docs/deployment/android
+
+Before you can build a release APK you will need to create a signing keystore.
+
+```
+keytool -genkey -v -keystore proxmox.jks -keyalg RSA -keysize 2048 -validity 10000 -alias proxmox
+```
+
+Create a `key.properties` file in the `android` directory, and fill in the values for your release keystore file.
+
+```
+storePassword=
+keyPassword=
+keyAlias=
+storeFile=
+```
+
+Once your keystore has been configured, you can build an APK for Android with the following commands.
+
+```
+flutter clean
+flutter build apk --release
+```
+
+## iOS
+
+https://docs.flutter.dev/deployment/ios
+
+Before you can build a release IPA you will need to open `ios/Runner.xcodeproj` in Xcode and configure your Development Team and Signing Profile.
+
+Once configured, you can build an IPA for iOS with the following commands.
+
+```
+flutter clean
+flutter build ipa --release
+```
